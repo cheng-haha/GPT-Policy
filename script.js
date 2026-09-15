@@ -708,9 +708,9 @@ const demoTasks = [
     family: "Goal image",
     title: "Arrange blocks into a T",
     prompt: "Match the target image's T shape, including block colors, relative positions, and spacing.",
-    targetImage: "assets/images/5cubes-in-T-shape.jpg?v=20260915-latest-target",
+    targetImage: "assets/images/blocks-goal-reference.jpg",
     configs: [
-      { label: "Goal image", model: "GPT-6 Astra", context: "Target image", success: "3 / 3", decisions: "66.7", time: "15.8 min", src: "assets/videos/blocks-t.mp4", poster: "assets/images/blocks-t-run-poster.jpg", trial: "Success", view: "Head view" }
+      { label: "Goal image", model: "GPT-6 Astra", context: "Target image", success: "3 / 3", decisions: "66.7", time: "15.8 min", src: "assets/experiments/blocks-astra-goal-r1.mp4", poster: "assets/experiments/blocks-astra-goal-r1.jpg", trial: "Trial 1: Success", view: "Head view" }
     ]
   },
   {
@@ -719,7 +719,7 @@ const demoTasks = [
     prompt: "Reproduce the target layout using the same fruit identities, positions, and spacing.",
     targetImage: "assets/images/go-image-4fruits.jpg",
     configs: [
-      { label: "Goal image", model: "GPT-6 Astra", context: "Target image", success: "3 / 3", decisions: "49.0", time: "12.4 min", src: "assets/videos/fruit-layout.mp4", poster: "assets/images/fruit-layout-run-poster.jpg", trial: "Success", view: "Head view" }
+      { label: "Goal image", model: "GPT-6 Astra", context: "Target image", success: "3 / 3", decisions: "49.0", time: "12.4 min", src: "assets/experiments/fruit-astra-goal-r1.mp4", poster: "assets/experiments/fruit-astra-goal-r1.jpg", trial: "Trial 1: Success", view: "Head view" }
     ]
   },
   {
@@ -1241,7 +1241,7 @@ function renderGoalImageTask(task, taskIndex) {
       <div class="rollout-rail" aria-label="${task.title}: target image and robot rollout">
         <figure class="rollout-card">
           <div class="rollout-media goal-image-media">
-            <img src="${task.targetImage}" alt="Target arrangement for ${task.title.toLowerCase()}" />
+            <a href="${task.targetImage}" target="_blank" rel="noopener"><img src="${task.targetImage}" alt="Target arrangement for ${task.title.toLowerCase()}" /></a>
           </div>
           <figcaption>
             <div class="rollout-caption-head"><h4>Target image</h4><span class="rollout-input">Conditioning input</span></div>
@@ -1250,7 +1250,7 @@ function renderGoalImageTask(task, taskIndex) {
         </figure>
         <figure class="rollout-card">
           <div class="rollout-media">
-            <video controls muted playsinline preload="metadata" data-playback="${config.speed || "20× robot run"}" poster="${config.poster}" src="${config.src}?v=20260914-goal-image"></video>
+            <video controls muted playsinline preload="metadata" data-playback="${config.speed || "20× robot run"}" poster="${config.poster}" src="${config.src}?v=20260915-goal-aligned"></video>
             <div class="video-overlay"><span>${config.speed || "20× robot run"}</span><span>${config.view}</span></div>
           </div>
           <figcaption>

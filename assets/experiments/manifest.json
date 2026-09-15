@@ -73,6 +73,50 @@
       "outputDuration": 25.916667,
       "speed": 20,
       "outputBytes": 1154697
+    },
+    {
+      "id": "blocks-astra-goal-r1",
+      "sourceSha256": "f479fdf66dcc426e78faba655a6d3732b1e0ae9815dc70241e849f350549a464",
+      "sourceDuration": 1029.2,
+      "outputDuration": 51.416667,
+      "speed": 20,
+      "outputBytes": 2451768,
+      "trial": 1,
+      "sourceFile": "摆成T-实验1-top.mp4"
+    },
+    {
+      "id": "fruit-astra-goal-r1",
+      "sourceSha256": "fed15c88dcb6f6f39af51b16729b5a357e37ce7cdc11867b3c6c88f1dbebfa7b",
+      "sourceDuration": 539.7,
+      "outputDuration": 26.916667,
+      "speed": 20,
+      "outputBytes": 1197163,
+      "trial": 1,
+      "sourceFile": "摆水果-实验1-top.mp4"
     }
-  ]
+  ],
+  "goalImageAlignment": {
+    "paperFigure": 6,
+    "sourceRevision": 1516,
+    "tasks": [
+      {
+        "task": "Arrange blocks into a T",
+        "targetImage": "assets/images/blocks-goal-reference.jpg",
+        "targetSha256": "9f6f873e0220278421355b7d94f74e6f9f9cce72f600b5682cc0159803e80a86",
+        "video": "blocks-astra-goal-r1",
+        "trial": 1,
+        "decisions": 71,
+        "fullTaskSeconds": 1039
+      },
+      {
+        "task": "Arrange four fruits",
+        "targetImage": "assets/images/go-image-4fruits.jpg",
+        "targetSha256": "0f2f0c6b14a2b3fa6e9f26881b891175d69d3400b39b50f46c98bab5f4b5d026",
+        "video": "fruit-astra-goal-r1",
+        "trial": 1,
+        "decisions": 33,
+        "fullTaskSeconds": 550
+      }
+    ]
+  }
 }

@@ -1,6 +1,6 @@
 # Additional task demos
 
-Three representative successful runs were added from the [experiment record](https://morphicrobot.feishu.cn/docx/XELDdCILeoYJJFxXHdPc1svgnbe), revision 1516. Existing task videos remain unchanged. Human-video tasks show the human demonstration alongside representative robot runs with and without human-video context; robot-demonstration tasks compare no video, video, and video + action; the remaining tasks retain one robot demo each.
+Three representative successful runs were added from the [experiment record](https://morphicrobot.feishu.cn/docx/XELDdCILeoYJJFxXHdPc1svgnbe), revision 1516. Selected videos are updated when needed to match their documented reference inputs. Human-video tasks show the human demonstration alongside representative robot runs with and without human-video context; robot-demonstration tasks compare no video, video, and video + action; the remaining tasks retain one robot demo each.
 
 | Task | Condition | Selected run | Decisions | Full task time |
 | --- | --- | --- | --- | --- |
@@ -28,3 +28,14 @@ See manifest.json for source hashes, source and encoded durations, and file size
 | Plug reinsertion | Robot video + action | 1 | Success |
 
 Each condition shows one illustrative trial with its trial number and outcome, while the success fraction and means cover all three trials. The bottle no-video example includes a full 100-decision attempt; the video-only example illustrates one of its two successful trials. Existing action-aligned runs and their matched summaries are unchanged. These selected examples do not replace the aggregate statistics.
+
+## Goal-image alignment
+
+Both goal-image tasks now use trial 1 from the experiment record (revision 1516), paired with the target references shown in paper Figure 6. The blocks reference is the original portrait image; its top row is green, green, blue, with yellow and orange down the stem. This replaces the older video whose color arrangement differed. The fruit reference is unchanged and matches the source image byte for byte; its video now shows the complete first recorded trial, including the unobstructed final arrangement.
+
+| Task | Selected trial | Decisions | Full task time | Playback |
+| --- | --- | --- | --- | --- |
+| Arrange blocks into a T | 1 | 71 | 17 min 19 s | 20× |
+| Arrange four fruits | 1 | 33 | 9 min 10 s | 20× |
+
+The website keeps the aggregate success rate and mean costs across all three trials. Each displayed clip is labeled as trial 1. Target images retain their original aspect ratios and open at full size when clicked.
