@@ -193,7 +193,7 @@ const zhTranslations = new Map([
   ["Text only · no demonstration", "仅文本 · 无示范"],
   ["Interrupted → failed", "中断 → 失败"],
   ["What the current evidence shows", "当前证据表明"],
-  ["Context helps at different layers", "上下文在不同层面发挥作用"],
+  ["Takeaways", "主要结论"],
   ["Finding 01", "发现 01"],
   ["Finding 02", "发现 02"],
   ["Finding 03", "发现 03"],
