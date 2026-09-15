@@ -18,10 +18,14 @@ GitHub Pages publishes this website from the root (`/`) of the `page` branch in 
 
 Published website: https://cheng-haha.github.io/GPT-Policy-Eval/
 
-The website and assets match `cheng-haha/in-context-robot-learning` at commit `7f59dbc7b94506506f7a61997b6773c3203f3a79` (Update project page from latest manuscript). This is the final corrected version before the subsequent page redesign, including the VLM Agents title, revised abstract, synchronized video summaries, and experiment-table corrections.
+The website layout and assets are based on `cheng-haha/in-context-robot-learning` at commit `7f59dbc7b94506506f7a61997b6773c3203f3a79` (Update project page from latest manuscript). This is the final corrected version before the subsequent page redesign, including the VLM Agents title, revised abstract, synchronized video summaries, and experiment-table corrections.
 
 ## Source material
 
 - Manuscript: `paper.pdf`
 - Figure assets: extracted from the supplied manuscript PDF
 - Demo configuration and recordings: project experiment log retrieved from Feishu on 14 September 2026
+
+## Manuscript synchronization
+
+Website text and the 16-row context-results table were synchronized with the live Overleaf abstract, introduction, method, experiments, discussion, and conclusion on 15 September 2026. English and Chinese text are updated together. The existing demo recordings remain illustrative runs; aggregate results and the model-comparison discussion follow the manuscript.

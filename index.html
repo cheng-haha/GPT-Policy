@@ -9,7 +9,7 @@
     />
     <meta name="theme-color" content="#f7f8fa" />
     <title>In-Context Robot Learning with VLM Agents</title>
-    <link rel="stylesheet" href="styles.css?v=20260915-paper-metadata" />
+    <link rel="stylesheet" href="styles.css?v=20260915-overleaf-sync" />
   </head>
   <body id="top">
     <button class="language-toggle" id="language-toggle" type="button" aria-label="Switch to Chinese" title="Switch to Chinese">
@@ -36,7 +36,7 @@
         <h1><span>In-Context Robot Learning</span><span>with VLM Agents</span></h1>
         <p class="authors">Anonymous authors</p>
         <p class="hero-lead">
-          <span>Can a fixed commercial LLM or VLM extract new task information at test time</span>
+          <span>Can a fixed general-purpose VLM learn from demonstrations, examples, and interaction feedback</span>
           <span>and turn it into executable, verifiable behavior from a new initial state?</span>
         </p>
         <div class="hero-actions">
@@ -83,34 +83,16 @@
             <div class="abstract-grid">
               <h3>Abstract</h3>
               <p>
-                Humans continually adapt to new situations, whereas a robot trained on a finite
-                set of demonstrations must face tasks and environments that training cannot
-                exhaustively cover. We ask whether a fixed commercial language or vision-language
-                model (LLM/VLM) can extract new task information from a small test-time context and
-                turn it into executable, verifiable behavior from a new initial state. We define
-                robotic in-context learning as adaptation during the target task that uses
-                demonstrations, examples, or interaction feedback while forbidding gradient updates
-                and persistent task-specific parameter changes.
+                Enabling robots to adapt to unfamiliar environments as readily as humans remains a moonshot goal of embodied AI. No finite collection of demonstrations can cover every task and situation a robot will encounter, making the ability to learn from context at deployment essential for generalization. Such in-context learning (ICL), however, remains largely beyond the reach of existing robotic policies. The broad agentic capabilities of commercial vision-language models (VLMs), such as GPT-6 Astra, raise a compelling question: can these models learn from demonstrations, examples, and interaction feedback, then translate that information into executable and verifiable robot behavior from a new initial state without gradient updates or persistent changes to task-specific parameters?
               </p>
               <p>
-                We introduce <b>GPT-Policy</b>, a general-agent framework that accepts human videos,
-                robot demonstrations, goal images, self-interaction history, and experience of
-                environmental rules or human intent through a shared closed-loop interface for
-                manipulation and exploration. A context compiler preserves task-relevant visual
-                transitions, the VLM proposes robot-tool actions, and a constrained controller
-                checks, executes, and reports each action. Initial task records and case analyses
-                illustrate goal specification, changes in operation order, and online coordination,
-                while exposing a gap between task reasoning and verified physical execution. The
-                evaluation combines task-level success and efficiency reporting with matched model
-                comparisons and planned context ablations to test the reliability and limits of
-                these behaviors.
+                We introduce <b>GPT-Policy</b>, a general-agent framework for in-context robot learning. GPT-Policy integrates a context compiler that preserves task-relevant visual transitions, a VLM that proposes robot-tool actions, and a constrained controller that verifies and executes each action and reports its outcome. We evaluate its reliability and limitations through task success and efficiency metrics, matched comparisons across models, and controlled context ablations. In real-robot trials, human video demonstrations improve task completion even without robot action labels, while aligned action references yield further gains on contact-sensitive tasks. These findings position GPT-Policy as a step toward robot adaptation through in-context learning, providing an empirical foundation for translating the general-purpose capabilities of VLMs into physical behavior and clarifying the challenges that must be overcome for reliable deployment.
               </p>
             </div>
             <div class="research-question">
               <span>Central question</span>
               <p>
-                How much robotic in-context learning is already accessible through general VLMs
-                that were not exposed as dedicated robot policies?
+                How much robotic in-context learning is already accessible through general VLMs that were not trained as dedicated robot policies?
               </p>
             </div>
           </section>
@@ -119,8 +101,7 @@
             <p class="section-kicker">Context</p>
             <h2>Five sources of task information</h2>
             <p class="section-intro">
-              The study separates the source of information from the task used to test it. Each
-              family supplies something that the current instruction and observation may omit.
+              Robotic ICL adapts behavior using demonstrations, examples, or interaction experience at test time, without gradient updates or persistent task-specific parameter changes. Each context family supplies information that the current instruction and observation may omit.
             </p>
             <div class="context-grid">
               <article class="context-card blue">
@@ -160,24 +141,21 @@
             <p class="section-kicker">Method</p>
             <h2>From context to constrained action</h2>
             <p class="section-intro">
-              GPT-Policy places a fixed general VLM directly in a closed loop with robot tools.
-              The model parameters stay unchanged; only the task context and interaction history evolve.
+              GPT-Policy connects a general-purpose VLM to robot tools through a shared context-to-action interface. Embodiment-specific adapters translate tool requests into executable commands. Model parameters remain fixed; updated observations and execution or rejection feedback inform each subsequent decision.
             </p>
             <figure class="method-figure">
               <a href="assets/method-overview.png" aria-label="Open method figure at full size">
                 <img src="assets/method-overview.png" alt="Overview of the GPT-Policy context-to-action framework" />
               </a>
               <figcaption>
-                <b>Figure 2.</b> Task instruction, current state, references, and interaction
-                history are assembled with shared constraints and tool schemas. The fixed VLM
-                selects a request; constrained robot tools validate and execute it before the next decision.
+                <b>Figure 2.</b> The task instruction, current state, task references, and interaction history are combined with shared instructions and tool schemas to form the VLM input. A fixed VLM selects tool requests, which constrained robot tools execute. Returned observations and execution feedback update the context for the next decision.
               </figcaption>
             </figure>
             <div class="pipeline" aria-label="GPT-Policy pipeline">
               <article><span>1</span><h3>Construct context</h3><p>Combine task references, current views, state, and retained interaction history.</p></article>
               <article><span>2</span><h3>Assemble input</h3><p>Interleave text and images with stable instructions, constraints, and tool schemas.</p></article>
               <article><span>3</span><h3>Select action</h3><p>A fixed general VLM chooses one structured robot-tool request.</p></article>
-              <article><span>4</span><h3>Validate and execute</h3><p>Controllers check the motion, execute it, and return fresh observations and feedback.</p></article>
+              <article><span>4</span><h3>Validate and execute</h3><p>The Cartesian adapter samples poses, checks inverse-kinematics residuals, times joint references, and returns execution or rejection feedback.</p></article>
             </div>
           </section>
 
@@ -195,20 +173,26 @@
                   <tr><th>Task</th><th>Context condition</th><th>Success</th><th>Decisions</th><th>Time (min)</th></tr>
                 </thead>
                 <tbody>
-                  <tr><td>Pick Red Towel</td><td>Without human video</td><td>0 / 3</td><td>96.3</td><td>24.6</td></tr>
+                  <tr><td>Pick Red Towel</td><td>None</td><td>0 / 3</td><td>96.3</td><td>24.6</td></tr>
                   <tr><td>Pick Red Towel</td><td>Human video</td><td>2 / 3</td><td>76.7</td><td>18.9</td></tr>
-                  <tr><td>Remove Glue Cap</td><td>Without human video</td><td>3 / 3</td><td>49.3</td><td>12.2</td></tr>
-                  <tr><td>Remove Glue Cap</td><td>Human video</td><td>3 / 3</td><td>65.7</td><td>16.9</td></tr>
-                  <tr><td>Arrange T Shape</td><td>Target image</td><td>3 / 3</td><td>59.3</td><td>13.3</td></tr>
+                  <tr><td>Pick Up Notebook</td><td>None</td><td>0 / 3</td><td>94.0</td><td>24.6</td></tr>
+                  <tr><td>Pick Up Notebook</td><td>Human video</td><td>2 / 3</td><td>66.7</td><td>16.1</td></tr>
+                  <tr><td>Unscrew Bottle Cap</td><td>None</td><td>0 / 3</td><td>71.0</td><td>16.1</td></tr>
+                  <tr><td>Unscrew Bottle Cap</td><td>Robot video</td><td>2 / 3</td><td>74.3</td><td>15.2</td></tr>
+                  <tr><td>Unscrew Bottle Cap</td><td>Robot video + action</td><td>3 / 3</td><td>54.7</td><td>17.9</td></tr>
+                  <tr><td>Remove and Reinsert Plug</td><td>None</td><td>0 / 3</td><td>24.0</td><td>5.3</td></tr>
+                  <tr><td>Remove and Reinsert Plug</td><td>Robot video</td><td>0 / 3</td><td>33.7</td><td>7.9</td></tr>
+                  <tr><td>Remove and Reinsert Plug</td><td>Robot video + action</td><td>2 / 3</td><td>48.3</td><td>10.8</td></tr>
+                  <tr><td>Arrange T Shape</td><td>Target image</td><td>3 / 3</td><td>66.7</td><td>15.8</td></tr>
                   <tr><td>Arrange Fruit</td><td>Target image</td><td>3 / 3</td><td>49.0</td><td>12.4</td></tr>
-                  <tr><td>Lemon To Pink Plate</td><td>Self history</td><td>3 / 3</td><td>35.0</td><td>8.1</td></tr>
+                  <tr><td>Lemon To Pink Plate</td><td>Self history</td><td>3 / 3</td><td>35.3</td><td>8.1</td></tr>
                   <tr><td>Movable Exploration</td><td>Self history</td><td>3 / 3</td><td>40.33</td><td>25.53</td></tr>
                   <tr><td>Tic-Tac-Toe</td><td>Human-robot interaction</td><td>3 / 3</td><td>69.7</td><td>13.6</td></tr>
                   <tr><td>Pointed Fruit Pickup</td><td>Human-robot interaction</td><td>3 / 3</td><td>67.3</td><td>15.0</td></tr>
                 </tbody>
               </table>
             </div>
-            <p class="table-note">Note: More experiments and broader evaluations will be added in future revisions.</p>
+            <p class="table-note">GPT-6 Astra on real robots; three trials per condition. Success requires the final scene to satisfy the task-specific geometric and semantic criteria. Decisions and time are averaged over all trials, including failures. Tic-Tac-Toe wins and draws both count as success.</p>
           </section>
 
           <section id="demos" class="section ruled demo-section">
@@ -340,18 +324,18 @@
             <div class="finding-list">
               <article data-index="01">
                 <span>Finding 01</span>
-                <h3>Context supplies missing task information.</h3>
-                <p>Goal images specify an outcome, demonstrations reveal an operation, and history preserves facts no longer visible.</p>
+                <h3>A little context goes a long way.</h3>
+                <p>Human videos raise towel and notebook pickup success from 0/3 to 2/3 without robot action labels. Aligned action references further improve bottle opening and plug reinsertion, but do not consistently reduce execution costs.</p>
               </article>
               <article data-index="02">
                 <span>Finding 02</span>
-                <h3>Interpretation and execution are separate problems.</h3>
-                <p>Correct task reasoning can coexist with failed contact, calibration, tracking, or outcome verification.</p>
+                <h3>Good plans, tricky execution.</h3>
+                <p>Context can improve task understanding, planning, and adaptation. Precise pose generation, contact execution, outcome verification, and physical safety remain separate challenges.</p>
               </article>
               <article data-index="03">
                 <span>Finding 03</span>
-                <h3>Adaptation is behavioral, not parametric.</h3>
-                <p>The general agent uses new evidence from a fresh initial state while its parameters remain fixed throughout the task.</p>
+                <h3>Good moves take time.</h3>
+                <p>VLM agents can generate useful actions, but decisions can be slow and expensive. Specialized VLA or world-action models may support fast low-level control while VLM agents focus on reasoning, adaptation, and replanning.</p>
               </article>
             </div>
           </section>
@@ -363,15 +347,21 @@
             </div>
             <div class="discussion-copy">
               <p>
-                The recorded behaviors illustrate goal grounding, changes in operation order, and
-                online coordination. They also expose a persistent gap between plausible task
-                reasoning and verified physical execution.
+                In individual red-towel runs, human video raises GPT-6 Astra task progress from 55% to 100%, with approximately 35.6% shorter run time and 58.9% lower estimated token usage. Fable 5.1 and Kimi K3 reach 30% and 20% progress. These examples do not establish a reliable model ranking: task progress is distinct from success rate, which is 2/3 for GPT-6 Astra with human video.
               </p>
               <p>
-                The current evidence comes from small run series, incomplete baselines, and
-                controlled ablations. It does not establish safe autonomous deployment. Calibration,
-                execution guards, independent monitoring, and timely human intervention remain necessary.
+                The evidence covers small task series under selected platforms, models, and context conditions. Incomplete ablations and unobserved pretraining limit causal and novel-skill claims. Context quality, observation–action alignment, execution latency, and human intervention remain constraints. Observed inter-arm collisions show that existing safeguards alone are insufficient for safe autonomous deployment.
               </p>
+
+              <h3>Future directions</h3>
+              <ul class="future-directions">
+                <li><b>Physical safety</b><span>Check both arms together, monitor separation and contact, and interrupt unsafe commands independently of the VLM.</span></li>
+                <li><b>Contact-aware execution</b><span>Expose grasp stability, slip, and object motion; add force-aware limits and local recovery.</span></li>
+                <li><b>Fast control and deliberate reasoning</b><span>Pair a deliberative agent with a fast controller for pose refinement and bimanual coordination.</span></li>
+                <li><b>Mobile manipulation</b><span>Combine active perception, persistent spatial memory, and coordinated base–arm control.</span></li>
+                <li><b>Compositional context</b><span>Compose subskills from multiple demonstrations while retaining completed subgoals and discarding obsolete context.</span></li>
+                <li><b>Adaptation to physical dynamics</b><span>Use recent interactions to update predictions of friction, compliance, and object response before failures accumulate.</span></li>
+              </ul>
             </div>
           </section>
 
@@ -400,6 +390,6 @@
       </div>
     </footer>
 
-    <script src="script.js?v=20260915-paper-metadata"></script>
+    <script src="script.js?v=20260915-overleaf-sync"></script>
   </body>
 </html>

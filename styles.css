@@ -120,7 +120,7 @@ h1 span { display: block; white-space: nowrap; }
 .abstract-grid p { max-width: 760px; margin: 0; color: #454b55; font-size: 16px; line-height: 1.72; }
 .research-question { display: grid; grid-template-columns: minmax(118px, .2fr) minmax(0, 1fr); gap: clamp(24px, 4cqi, 46px); align-items: start; margin-top: 42px; padding: 32px 34px; border-left: 3px solid var(--blue); background: linear-gradient(105deg, #edf3fc 0%, #f8fbff 72%, #fff 100%); }
 .research-question span { padding-top: 4px; color: var(--blue); font: 700 10px ui-monospace, monospace; letter-spacing: .13em; text-transform: uppercase; white-space: nowrap; }
-.research-question p { max-width: none; margin: 0; font-size: clamp(21px, 2.65cqi, 27px); font-weight: 600; line-height: 1.28; letter-spacing: -.03em; }
+.research-question p { max-width: none; margin: 0; font-size: clamp(18px, 2.3cqi, 23px); font-weight: 600; line-height: 1.28; letter-spacing: -.03em; }
 
 /* Keep long-form copy visually calm and aligned like a typeset paper page. */
 .abstract-grid p,
@@ -408,3 +408,7 @@ footer { border-top: 1px solid var(--line); background: var(--soft); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
+
+.future-directions { padding-left: 20px; color: #515762; font-size: 14px; line-height: 1.65; }
+.future-directions li { margin: 16px 0; }
+.future-directions b, .future-directions span { display: block; }
