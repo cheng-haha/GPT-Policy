@@ -554,6 +554,10 @@ const zhTranslations = new Map([
     "无示范"
   ],
   [
+    "Trial 3: Success",
+    "试验 3：成功"
+  ],
+  [
     "Trial 3: Budget exhausted",
     "试验 3：预算耗尽"
   ],
@@ -710,7 +714,7 @@ const demoTasks = [
     prompt: "Match the target image's T shape, including block colors, relative positions, and spacing.",
     targetImage: "assets/images/blocks-goal-reference.jpg",
     configs: [
-      { label: "Goal image", model: "GPT-6 Astra", context: "Target image", success: "3 / 3", decisions: "66.7", time: "15.8 min", src: "assets/experiments/blocks-astra-goal-r1.mp4", poster: "assets/experiments/blocks-astra-goal-r1.jpg", trial: "Trial 1: Success", view: "Head view" }
+      { label: "Goal image", model: "GPT-6 Astra", context: "Target image", success: "3 / 3", decisions: "66.7", time: "15.8 min", src: "assets/experiments/blocks-astra-goal-r3.mp4", poster: "assets/experiments/blocks-astra-goal-r3.jpg", trial: "Trial 3: Success", view: "Head view" }
     ]
   },
   {
@@ -1250,7 +1254,7 @@ function renderGoalImageTask(task, taskIndex) {
         </figure>
         <figure class="rollout-card">
           <div class="rollout-media">
-            <video controls muted playsinline preload="metadata" data-playback="${config.speed || "20× robot run"}" poster="${config.poster}" src="${config.src}?v=20260915-goal-aligned"></video>
+            <video controls muted playsinline preload="metadata" data-playback="${config.speed || "20× robot run"}" poster="${config.poster}" src="${config.src}?v=20260915-goal-neat"></video>
             <div class="video-overlay"><span>${config.speed || "20× robot run"}</span><span>${config.view}</span></div>
           </div>
           <figcaption>

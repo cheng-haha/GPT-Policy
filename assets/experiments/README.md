@@ -31,11 +31,11 @@ Each condition shows one illustrative trial with its trial number and outcome, w
 
 ## Goal-image alignment
 
-Both goal-image tasks now use trial 1 from the experiment record (revision 1516), paired with the target references shown in paper Figure 6. The blocks reference is the original portrait image; its top row is green, green, blue, with yellow and orange down the stem. This replaces the older video whose color arrangement differed. The fruit reference is unchanged and matches the source image byte for byte; its video now shows the complete first recorded trial, including the unobstructed final arrangement.
+The goal-image examples use blocks trial 3 and fruit trial 1 from the experiment record (revision 1516), paired with the target references shown in paper Figure 6. All three trials for each task were compared visually: blocks trial 3 has a straighter top row and more closely aligned stem in its final frame; fruit trial 1 keeps all four objects visible without gripper occlusion. These are qualitative selections for clear presentation. The blocks reference is the original portrait image; its top row is green, green, blue, with yellow and orange down the stem. This replaces the older video whose color arrangement differed. The fruit reference is unchanged and matches the source image byte for byte; its video now shows the complete first recorded trial, including the unobstructed final arrangement.
 
 | Task | Selected trial | Decisions | Full task time | Playback |
 | --- | --- | --- | --- | --- |
-| Arrange blocks into a T | 1 | 71 | 17 min 19 s | 20× |
+| Arrange blocks into a T | 3 | 66 | 13 min 47 s | 20× |
 | Arrange four fruits | 1 | 33 | 9 min 10 s | 20× |
 
-The website keeps the aggregate success rate and mean costs across all three trials. Each displayed clip is labeled as trial 1. Target images retain their original aspect ratios and open at full size when clicked.
+The website keeps the aggregate success rate and mean costs across all three trials. Each displayed clip is labeled with its selected trial number. Target images retain their original aspect ratios and open at full size when clicked.

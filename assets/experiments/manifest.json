@@ -93,6 +93,16 @@
       "outputBytes": 1197163,
       "trial": 1,
       "sourceFile": "摆水果-实验1-top.mp4"
+    },
+    {
+      "id": "blocks-astra-goal-r3",
+      "sourceSha256": "23aac25087029ff23058e2bbb2f3ba05f5cde5c5506bdf1162340fe456c3123e",
+      "sourceDuration": 817.6,
+      "outputDuration": 40.875,
+      "speed": 20,
+      "outputBytes": 2779795,
+      "trial": 3,
+      "sourceFile": "摆成T-实验3-top.mp4"
     }
   ],
   "goalImageAlignment": {
@@ -103,10 +113,10 @@
         "task": "Arrange blocks into a T",
         "targetImage": "assets/images/blocks-goal-reference.jpg",
         "targetSha256": "9f6f873e0220278421355b7d94f74e6f9f9cce72f600b5682cc0159803e80a86",
-        "video": "blocks-astra-goal-r1",
-        "trial": 1,
-        "decisions": 71,
-        "fullTaskSeconds": 1039
+        "video": "blocks-astra-goal-r3",
+        "trial": 3,
+        "decisions": 66,
+        "fullTaskSeconds": 827
       },
       {
         "task": "Arrange four fruits",
