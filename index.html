@@ -9,9 +9,18 @@
     />
     <meta name="theme-color" content="#f7f8fa" />
     <title>In-Context Robot Learning with General Agents</title>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.css?v=20260915-bilingual-toggle" />
   </head>
-  <body>
+  <body id="top">
+    <button class="language-toggle" id="language-toggle" type="button" aria-label="Switch to Chinese" title="Switch to Chinese">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="9"></circle>
+        <path d="M3 12h18M12 3c2.25 2.46 3.4 5.46 3.4 9s-1.15 6.54-3.4 9c-2.25-2.46-3.4-5.46-3.4-9S9.75 5.46 12 3Z"></path>
+      </svg>
+      <span class="language-option language-en">EN</span>
+      <span class="language-divider" aria-hidden="true"></span>
+      <span class="language-option language-zh">中</span>
+    </button>
     <div class="entry" id="entry" aria-hidden="true">
       <div class="entry-mark">
         <div class="entry-cube" aria-hidden="true">
@@ -22,60 +31,35 @@
       <p>MOVE OR SCROLL TO ENTER</p>
     </div>
 
-    <header class="site-header" id="top">
-      <a class="brand" href="#top" aria-label="GPT-Policy home">
-        <span class="brand-icon">GP</span>
-        <span>GPT-Policy</span>
-      </a>
-      <nav aria-label="Primary navigation">
-        <a href="#overview">Overview</a>
-        <a href="#context">Context</a>
-        <a href="#method">Method</a>
-        <a href="#results">Results</a>
-        <a href="#discussion">Discussion</a>
-      </nav>
-      <a class="header-paper" href="paper.pdf">Paper</a>
-    </header>
-
     <main>
       <section class="hero shell">
-        <div class="eyebrow"><span></span> ICLR 2027 submission</div>
-        <h1>In-Context Robot Learning<br />with General Agents</h1>
+        <h1><span>In-Context Robot Learning</span><span>with General Agents</span></h1>
         <p class="authors">Anonymous authors</p>
         <p class="hero-lead">
-          Can a fixed, general-purpose vision-language model learn a new robotic task from a
-          small test-time context - then turn that context into executable, verifiable behavior?
+          <span>Can a fixed, general-purpose vision-language model learn a new robotic task</span>
+          <span>from a small test-time context - then turn that context into executable, verifiable behavior?</span>
         </p>
         <div class="hero-actions">
-          <a class="button dark" href="paper.pdf">Paper <span aria-hidden="true">&#8599;</span></a>
-          <a class="button" href="https://www.overleaf.com/project/6aa022fe56f647092f7070de">Overleaf</a>
-          <a class="button" id="repo-link" href="https://github.com/cheng-haha/GPT-Policy-Eval">Project source</a>
+          <a class="button dark paper-button" href="paper.pdf">
+            <svg class="arxiv-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3.842 0a1.004 1.004 0 0 0-.922.608c-.154.369-.044.627.294 1.111l6.919 8.36-1.023 1.106a1.039 1.039 0 0 0 .003 1.422l1.23 1.314-5.44 6.444c-.28.299-.453.823-.297 1.199a1.025 1.025 0 0 0 .959.635.913.913 0 0 0 .689-.341l5.783-6.126 7.49 8.005a.853.853 0 0 0 .683.26.958.958 0 0 0 .878-.614c.158-.377-.017-.75-.306-1.141l-7.052-8.342 1.063-1.13a.963.963 0 0 0 .009-1.316L4.634.464S4.26.01 3.842 0Zm14.341 1.842a.877.877 0 0 0-.655.242l-5.696 6.158 1.694 1.832 5.309-6.514c.325-.433.479-.66.325-1.029a1.12 1.12 0 0 0-.977-.689Z" />
+            </svg>
+            <span>Paper</span>
+          </a>
+          <a class="button code-button" href="https://github.com/cheng-haha/GPT-Policy-Eval" target="_blank" rel="noreferrer" aria-label="Code on GitHub">
+            <svg class="github-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 .7a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2.24c-3.22.7-3.9-1.37-3.9-1.37-.53-1.34-1.29-1.7-1.29-1.7-1.05-.72.08-.71.08-.71 1.16.08 1.78 1.2 1.78 1.2 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.57-.29-5.27-1.28-5.27-5.69 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.47.11-3.05 0 0 .97-.31 3.16 1.18a10.9 10.9 0 0 1 5.76 0c2.2-1.49 3.16-1.18 3.16-1.18.63 1.58.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.42-2.71 5.39-5.29 5.68.42.36.79 1.07.79 2.16v3.26c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .7Z" />
+            </svg>
+            <span>Code</span>
+          </a>
         </div>
 
         <div class="hero-figure">
-          <div class="frame-grid">
-            <figure>
-              <img src="assets/demo.png" alt="Human demonstration of the task" />
-              <figcaption><span>01</span> Demonstration</figcaption>
-            </figure>
-            <figure>
-              <img src="assets/occluded.png" alt="Target plate occluded by a towel" />
-              <figcaption><span>02</span> Occluded target</figcaption>
-            </figure>
-            <figure>
-              <img src="assets/language-detour.png" alt="Language-only robot rollout" />
-              <figcaption><span>03</span> Language-only detour</figcaption>
-            </figure>
-            <figure>
-              <img src="assets/visual-rollout.png" alt="Visual-context robot rollout" />
-              <figcaption><span>04</span> Visual-context rollout</figcaption>
-            </figure>
-          </div>
-          <p class="figure-caption">
-            <b>Figure 1.</b> Visual demonstrations can provide procedural structure that language
-            leaves unstated. Here, visual context reveals that the hidden target should be
-            uncovered before placement.
-          </p>
+          <figure class="hero-cover-figure">
+            <div class="hero-cover-media">
+              <img src="assets/images/whiteboard-demo.jpg?v=20260915" alt="Whiteboard human-interaction demonstration asking Who are you?" />
+            </div>
+          </figure>
         </div>
       </section>
 
@@ -86,6 +70,7 @@
           <a href="#context">Forms of context</a>
           <a href="#method">GPT-Policy</a>
           <a href="#results">Experiments</a>
+          <a href="#demos">Demo gallery</a>
           <a href="#findings">Findings</a>
           <a href="#discussion">Discussion</a>
           <a href="#citation">Citation</a>
@@ -131,34 +116,34 @@
             </p>
             <div class="context-grid">
               <article class="context-card blue">
-                <span class="card-number">01</span>
-                <p class="card-label">Procedure</p>
+                <header><p class="card-label">Procedure</p><span class="card-number">01</span></header>
                 <h3>Human video</h3>
                 <p>Ordered visual keyframes specify how a person carries out a task, without expert robot actions.</p>
+                <ul><li>Procedural order</li><li>No robot actions</li></ul>
               </article>
               <article class="context-card violet">
-                <span class="card-number">02</span>
-                <p class="card-label">Fine contact</p>
+                <header><p class="card-label">Fine contact</p><span class="card-number">02</span></header>
                 <h3>Robot demonstration</h3>
                 <p>Aligned visual evidence and optional action references support contact-rich manipulation.</p>
+                <ul><li>Embodied motion</li><li>Optional actions</li></ul>
               </article>
               <article class="context-card green">
-                <span class="card-number">03</span>
-                <p class="card-label">Goal state</p>
+                <header><p class="card-label">Goal state</p><span class="card-number">03</span></header>
                 <h3>Target image</h3>
                 <p>A reference image gives the final arrangement and spatial relations without prescribing a sequence.</p>
+                <ul><li>Desired end state</li><li>Sequence-free</li></ul>
               </article>
               <article class="context-card orange">
-                <span class="card-number">04</span>
-                <p class="card-label">Memory</p>
+                <header><p class="card-label">Memory</p><span class="card-number">04</span></header>
                 <h3>Self-interaction history</h3>
                 <p>Earlier observations, actions, failures, and outcomes remain available for exploration and recovery.</p>
+                <ul><li>Closed-loop memory</li><li>Failure recovery</li></ul>
               </article>
               <article class="context-card pink">
-                <span class="card-number">05</span>
-                <p class="card-label">Coordination</p>
+                <header><p class="card-label">Coordination</p><span class="card-number">05</span></header>
                 <h3>Human interaction</h3>
                 <p>Pointing, turn history, and live feedback can change target selection and action timing online.</p>
+                <ul><li>Online cues</li><li>Turn-aware</li></ul>
               </article>
             </div>
           </section>
@@ -199,26 +184,146 @@
             <div class="table-wrap">
               <table>
                 <thead>
-                  <tr><th>Context condition</th><th>Task</th><th>Success</th><th>Decisions</th><th>Time</th></tr>
+                  <tr><th>Context condition</th><th>Task</th><th>Success</th><th>Decisions</th><th>Time (min)</th></tr>
                 </thead>
                 <tbody>
-                  <tr><td>Without human video</td><td>Pick Red Towel</td><td>0 / 3</td><td>96.3</td><td>24.6 min</td></tr>
-                  <tr class="highlight"><td>Human video</td><td>Pick Red Towel</td><td>2 / 3</td><td>76.7</td><td>18.9 min</td></tr>
-                  <tr><td>Without human video</td><td>Remove Glue Cap</td><td>3 / 3</td><td>49.3</td><td>12.2 min</td></tr>
-                  <tr class="highlight"><td>Human video</td><td>Remove Glue Cap</td><td>3 / 3</td><td>65.7</td><td>16.9 min</td></tr>
-                  <tr><td>Target image</td><td>Arrange T Shape</td><td>3 / 3</td><td>59.3</td><td>13.3 min</td></tr>
-                  <tr><td>Target image</td><td>Arrange Fruit</td><td>3 / 3</td><td>49.0</td><td>12.4 min</td></tr>
-                  <tr><td>Self history</td><td>Lemon To Pink Plate</td><td>3 / 3</td><td>35.0</td><td>8.1 min</td></tr>
-                  <tr><td>Self history</td><td>Movable Exploration</td><td>3 / 3</td><td>40.33</td><td>25.53 min</td></tr>
-                  <tr><td>Human-robot interaction</td><td>Tic-Tac-Toe</td><td>3 / 3</td><td>69.7</td><td>13.6 min</td></tr>
-                  <tr><td>Human-robot interaction</td><td>Pointed Fruit Pickup</td><td>3 / 3</td><td>67.3</td><td>15.0 min</td></tr>
+                  <tr><td>Without human video</td><td>Pick Red Towel</td><td>0 / 3</td><td>96.3</td><td>24.6</td></tr>
+                  <tr class="highlight"><td>Human video</td><td>Pick Red Towel</td><td>2 / 3</td><td>76.7</td><td>18.9</td></tr>
+                  <tr><td>Without human video</td><td>Remove Glue Cap</td><td>3 / 3</td><td>49.3</td><td>12.2</td></tr>
+                  <tr class="highlight"><td>Human video</td><td>Remove Glue Cap</td><td>3 / 3</td><td>65.7</td><td>16.9</td></tr>
+                  <tr><td>Target image</td><td>Arrange T Shape</td><td>3 / 3</td><td>59.3</td><td>13.3</td></tr>
+                  <tr><td>Target image</td><td>Arrange Fruit</td><td>3 / 3</td><td>49.0</td><td>12.4</td></tr>
+                  <tr><td>Self history</td><td>Lemon To Pink Plate</td><td>3 / 3</td><td>35.0</td><td>8.1</td></tr>
+                  <tr><td>Self history</td><td>Movable Exploration</td><td>3 / 3</td><td>40.33</td><td>25.53</td></tr>
+                  <tr><td>Human-robot interaction</td><td>Tic-Tac-Toe</td><td>3 / 3</td><td>69.7</td><td>13.6</td></tr>
+                  <tr><td>Human-robot interaction</td><td>Pointed Fruit Pickup</td><td>3 / 3</td><td>67.3</td><td>15.0</td></tr>
                 </tbody>
               </table>
             </div>
-            <p class="table-note">
-              Reported values reproduce Table 1 of the current manuscript. Robot visual demonstration
-              rows remain unreported in the submitted draft and are therefore not invented here.
+            <p class="table-note">Note: More experiments and broader evaluations will be added in future revisions.</p>
+          </section>
+
+          <section id="demos" class="section ruled demo-section">
+            <p class="section-kicker">Interactive demos</p>
+            <h2>See each form of context in action</h2>
+            <p class="section-intro">
+              Human-video and goal-image tasks place the conditioning input beside the corresponding
+              robot rollout. Other tasks retain configuration controls. Long robot runs are accelerated
+              as labeled; source demonstrations remain at real time.
             </p>
+            <div class="demo-grid" id="demo-grid"></div>
+
+            <section class="model-comparison" aria-labelledby="model-comparison-title">
+              <div class="comparison-heading">
+                <div>
+                  <p class="section-kicker">Controlled comparison</p>
+                  <h3 id="model-comparison-title">Human-video comparison</h3>
+                </div>
+              </div>
+              <div class="comparison-context">
+                <span>Task</span><b>Pick up the red towel with the right hand</b>
+                <span>Condition</span><b>Human video · 8 frames</b>
+              </div>
+              <div class="comparison-grid">
+                <article class="comparison-card">
+                  <header><span>GPT-6 Astra</span><strong class="result-success">Success</strong></header>
+                  <div class="comparison-stage">
+                    <video controls muted playsinline preload="metadata" data-playback="20× robot run" src="assets/videos/towel-with-demo.mp4?v=20260914-compare"></video>
+                    <div class="video-overlay"><span>20&times;</span></div>
+                  </div>
+                  <dl>
+                    <div><dt>Elapsed</dt><dd>950.7 s</dd></div>
+                    <div><dt>Outcome</dt><dd>Task completed</dd></div>
+                  </dl>
+                </article>
+                <article class="comparison-card claude-comparison-card">
+                  <header><span>Claude Fable 5.1</span><strong class="result-failure">Failed</strong></header>
+                  <div class="comparison-stage">
+                    <video controls muted playsinline preload="metadata" data-playback="20× robot run" src="assets/videos/claude-towel-paper-head.mp4?v=20260915-single-claude-run"></video>
+                    <div class="video-overlay"><span>20&times;</span></div>
+                  </div>
+                  <dl>
+                    <div><dt>Elapsed</dt><dd>795.5 s</dd></div>
+                    <div><dt>Outcome</dt><dd>Task failed</dd></div>
+                  </dl>
+                </article>
+              </div>
+            </section>
+
+            <section class="model-comparison self-history-comparison" aria-labelledby="self-history-comparison-title">
+              <div class="comparison-heading">
+                <div>
+                  <p class="section-kicker">Self-history comparison</p>
+                  <h3 id="self-history-comparison-title">Movable exploration</h3>
+                </div>
+              </div>
+              <div class="comparison-context">
+                <span>Task</span><b>Find the Sprite bottle and place it in the yellow basket</b>
+                <span>Condition</span><b>Interaction history</b>
+              </div>
+              <div class="comparison-grid">
+                <article class="comparison-card">
+                  <header><span>GPT-6 Astra</span><strong class="result-success">Success</strong></header>
+                  <div class="comparison-stage">
+                    <video controls muted playsinline preload="metadata" data-playback="30× robot run" src="assets/videos/mobile-gpt6.mp4?v=20260915-self-history-compare"></video>
+                    <div class="video-overlay"><span>30&times;</span><span>Head view</span></div>
+                  </div>
+                  <dl>
+                    <div><dt>Elapsed</dt><dd>22.5 min</dd></div>
+                    <div><dt>Outcome</dt><dd>Task completed</dd></div>
+                  </dl>
+                </article>
+                <article class="comparison-card">
+                  <header><span>Claude Fable 5.1</span><strong class="result-failure">Failed</strong></header>
+                  <div class="comparison-stage">
+                    <video controls muted playsinline preload="metadata" data-playback="30× robot run" src="assets/videos/mobile-fable.mp4?v=20260915-self-history-compare"></video>
+                    <div class="video-overlay"><span>30&times;</span><span>Head view</span></div>
+                  </div>
+                  <dl>
+                    <div><dt>Elapsed</dt><dd>17.5 min</dd></div>
+                    <div><dt>Outcome</dt><dd>Task failed</dd></div>
+                  </dl>
+                </article>
+              </div>
+            </section>
+
+            <section class="model-comparison kimi-comparison" aria-labelledby="kimi-comparison-title">
+              <div class="comparison-heading">
+                <div>
+                  <p class="section-kicker">Baseline comparison</p>
+                  <h3 id="kimi-comparison-title">Text-only comparison</h3>
+                </div>
+              </div>
+              <div class="comparison-context">
+                <span>Task</span><b>Remove fruit from the plate</b>
+                <span>Condition</span><b>Text only · no demonstration</b>
+              </div>
+              <div class="comparison-grid">
+                <article class="comparison-card">
+                  <header><span>GPT-6 Astra</span><strong class="result-success">Success</strong></header>
+                  <div class="comparison-stage">
+                    <video controls muted playsinline preload="metadata" data-playback="20× robot run" src="assets/videos/gpt6-remove-fruit-head.mp4?v=20260915-remove-fruit-compare"></video>
+                    <div class="video-overlay"><span>20&times;</span></div>
+                  </div>
+                  <dl>
+                    <div><dt>Elapsed</dt><dd>208.2 s</dd></div>
+                    <div><dt>Outcome</dt><dd>Task completed</dd></div>
+                  </dl>
+                </article>
+                <article class="comparison-card kimi-comparison-card">
+                  <header><span>Kimi K3</span><strong class="result-failure">Failed</strong></header>
+                  <div class="comparison-stage">
+                    <video controls muted playsinline preload="metadata" data-playback="20× robot run" src="assets/videos/kimi-remove-consistent-head.mp4?v=20260915-remove-fruit-compare"></video>
+                    <div class="video-overlay"><span>20&times;</span></div>
+                  </div>
+                  <dl>
+                    <div><dt>Elapsed</dt><dd>170.5 s</dd></div>
+                    <div><dt>Outcome</dt><dd>Interrupted → failed</dd></div>
+                  </dl>
+                </article>
+              </div>
+            </section>
+
           </section>
 
           <section id="findings" class="section ruled">
@@ -281,12 +386,12 @@
 
     <footer>
       <div class="shell footer-inner">
-        <a class="brand" href="#top"><span class="brand-icon">GP</span><span>GPT-Policy</span></a>
+        <a class="brand" href="#top"><span>GPT-Policy</span></a>
         <p>In-context learning for general robotic agents.</p>
-        <div><a href="paper.pdf">Paper</a><a href="https://www.overleaf.com/project/6aa022fe56f647092f7070de">Overleaf</a><a href="#top">Back to top</a></div>
+        <div><a href="paper.pdf">Paper</a><a href="#top">Back to top</a></div>
       </div>
     </footer>
 
-    <script src="script.js"></script>
+    <script src="script.js?v=20260915-bilingual-toggle"></script>
   </body>
 </html>
