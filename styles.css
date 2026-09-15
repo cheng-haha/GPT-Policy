@@ -452,3 +452,13 @@ footer { border-top: 1px solid var(--line); background: var(--soft); }
   .experiment-family-heading { gap: 12px; }
   .experiment-family[data-layout="paired"] .rollout-group-head { min-height: 0; }
 }
+
+/* One complete three-way comparison per human-video task. */
+.human-comparison .rollout-rail { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; overflow: visible; padding: 0; }
+.human-comparison .rollout-card { width: 100%; }
+.human-comparison .rollout-nav { display: none; }
+.human-comparison .rollout-caption-head { flex-wrap: wrap; gap: 5px 10px; }
+.human-comparison .rollout-media video { width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: contain; }
+@media (max-width: 760px) {
+  .human-comparison .rollout-rail { grid-template-columns: 1fr; gap: 24px; }
+}

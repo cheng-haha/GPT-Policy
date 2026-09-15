@@ -530,6 +530,8 @@ const zhTranslations = new Map([
   ]
 ].forEach(([english, chinese]) => zhTranslations.set(english, chinese));
 
+[["Human-video tasks show the human demonstration beside robot runs with and without it. Other tasks retain one representative robot run. Human demonstrations play at real time; robot runs are accelerated as labeled. Success rates and mean costs summarize all trials.", "人类视频实验并排展示人类示范、有示范执行和无示范执行；其余任务保留一个代表性机器人演示。人类示范以正常速度播放，机器人录像按标注倍速播放。成功率与平均开销汇总所有试验。"]].forEach(([english, chinese]) => zhTranslations.set(english, chinese));
+
 const originalTextNodes = new WeakMap();
 const originalAttributes = new WeakMap();
 
@@ -844,15 +846,15 @@ const demoTasks = [
 ];
 
 
-// Preserve existing clips; show one representative robot run per task.
-demoTasks.forEach(task => { task.configs = task.configs.slice(0, 1); });
+// Human-video tasks compare demonstration conditioning; other tasks keep one run.
+demoTasks.forEach(task => { if (task.family !== "Human video") task.configs = task.configs.slice(0, 1); });
 demoTasks.splice(1, 0, {
   "family": "Human video",
   "title": "Pick up a notebook",
   "prompt": "Lift the notebook from the table using the human demonstration as context.",
   "configs": [
     {
-      "label": "Human video",
+      "label": "With human video",
       "model": "GPT-6 Astra",
       "context": "Human demonstration",
       "success": "2 / 3",
@@ -862,8 +864,26 @@ demoTasks.splice(1, 0, {
       "poster": "assets/experiments/notebook-astra-human-r1.jpg",
       "trial": "Success",
       "view": "Head view"
+    },
+    {
+      "label": "Without human video",
+      "model": "GPT-6 Astra",
+      "context": "No human demonstration",
+      "success": "0 / 3",
+      "decisions": "94.0",
+      "time": "24.6 min",
+      "src": "assets/experiments/notebook-astra-none-r1.mp4",
+      "poster": "assets/experiments/notebook-astra-none-r1.jpg",
+      "trial": "Gave up",
+      "view": "Head view"
     }
-  ]
+  ],
+  "reference": {
+    "src": "assets/experiments/notebook-reference.mp4",
+    "poster": "assets/experiments/notebook-reference.jpg",
+    "label": "Original human video",
+    "playback": "Real time"
+  }
 });
 demoTasks.splice(2, 0, {
   "family": "Robot video + action",
@@ -1016,14 +1036,14 @@ function activateRolloutRail(group) {
 
 function renderHumanVideoTask(task, taskIndex) {
   const group = document.createElement("article");
-  group.className = "demo-rollout-group";
+  group.className = "demo-rollout-group human-comparison";
   group.dataset.family = task.family;
   group.dataset.clips = String(task.configs.length + 1);
 
   const resultClips = task.configs.map((config) => `
     <figure class="rollout-card">
       <div class="rollout-media">
-        <video controls muted playsinline preload="metadata" data-playback="${config.speed || "20× robot run"}" poster="${config.poster}" src="${config.src}?v=20260914-head"></video>
+        <video controls muted playsinline preload="metadata" data-playback="${config.speed || "20× robot run"}" poster="${config.poster}" src="${config.src}?v=20260915-human-comparison"></video>
         <div class="video-overlay"><span>${config.speed || "20× robot run"}</span><span>${config.view}</span></div>
       </div>
       <figcaption>
@@ -1303,7 +1323,9 @@ function setupHistorySummary(group) {
 
 demoTasks.forEach((task, index) => {
   const family = demoGrid.querySelector(`[data-family="${task.family}"]`);
-  const card = renderContextFamilyGroup([task], index);
+  const card = task.family === "Human video"
+    ? renderHumanVideoTask(task, index)
+    : renderContextFamilyGroup([task], index);
   const title = card.querySelector('.rollout-group-title h3');
   const taskHeading = document.createElement('h4');
   taskHeading.textContent = title.textContent;

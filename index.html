@@ -9,7 +9,7 @@
     />
     <meta name="theme-color" content="#f7f8fa" />
     <title>In-Context Robot Learning with VLM Agents</title>
-    <link rel="stylesheet" href="styles.css?v=20260915-figure-ratio" />
+    <link rel="stylesheet" href="styles.css?v=20260915-human-comparison" />
   </head>
   <body id="top">
     <button class="language-toggle" id="language-toggle" type="button" aria-label="Switch to Chinese" title="Switch to Chinese">
@@ -170,7 +170,7 @@
           <section id="results" class="section ruled demo-section">
             <p class="section-kicker">Experiments</p>
             <h2>Five experiment families</h2>
-            <p class="section-intro">One representative robot demo per task. Videos are accelerated as labeled. Success rates and mean decisions summarize all trials; the displayed outcome refers to the selected demo.</p>
+            <p class="section-intro">Human-video tasks show the human demonstration beside robot runs with and without it. Other tasks retain one representative robot run. Human demonstrations play at real time; robot runs are accelerated as labeled. Success rates and mean costs summarize all trials.</p>
             <div class="metric-row">
               <div><strong>5</strong><span>experiment families</span></div>
               <div><strong>10</strong><span>robot tasks</span></div>
@@ -186,7 +186,7 @@
             <p class="table-note">GPT-6 Astra on real robots; three trials per condition. Success requires the final scene to satisfy the task-specific geometric and semantic criteria. Decisions and time are averaged over all trials, including failures. Tic-Tac-Toe wins and draws both count as success.</p>
             <div id="demos" class="experiment-anchor" aria-hidden="true"></div>
             <div id="demo-grid" class="experiment-families">
-              <section id="experiment-human-video" class="experiment-family" aria-labelledby="human-video-title" data-layout="paired">
+              <section id="experiment-human-video" class="experiment-family" aria-labelledby="human-video-title" data-layout="comparison">
                 <header class="experiment-family-heading">
                   <span class="experiment-number">01</span>
                   <div><h3 id="human-video-title">Human video demonstrations</h3><p>Towel and notebook pickup test whether human demonstrations improve execution without robot action labels.</p></div>
@@ -349,6 +349,6 @@
       </div>
     </footer>
 
-    <script src="script.js?v=20260915-authors"></script>
+    <script src="script.js?v=20260915-human-comparison"></script>
   </body>
 </html>

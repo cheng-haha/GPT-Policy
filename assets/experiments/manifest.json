@@ -25,6 +25,22 @@
       "outputDuration": 30.291667,
       "speed": 20,
       "outputBytes": 1299751
+    },
+    {
+      "id": "notebook-reference",
+      "sourceSha256": "9ca19895f6e3b56090bc3432e12fc3d12cfb8faca596bd80439e5f8beb482537",
+      "sourceDuration": 8.833,
+      "outputDuration": 8.833008,
+      "speed": 1,
+      "outputBytes": 1327872
+    },
+    {
+      "id": "notebook-astra-none-r1",
+      "sourceSha256": "fb9cc64fe82c24eb7940261a153340cee62001b81233613e6c99f5c3cef08272",
+      "sourceDuration": 1306.5,
+      "outputDuration": 65.291667,
+      "speed": 20,
+      "outputBytes": 2552063
     }
   ]
 }
