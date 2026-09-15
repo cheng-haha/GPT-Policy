@@ -315,6 +315,169 @@ const zhTranslations = new Map([
   ["Target arrangement for arrange four fruits", "四种水果的目标排列"]
 ]);
 
+[
+  [
+    "Localize the bottle",
+    "定位瓶子"
+  ],
+  [
+    "The agent observes the cap from the top and left wrist views, then uses parallax to estimate its position before approaching.",
+    "智能体从顶部与左腕视角观察瓶盖，通过视差估计位置后再接近。"
+  ],
+  [
+    "Grasp and present the cap",
+    "抓瓶并呈现瓶盖"
+  ],
+  [
+    "The left hand grasps the bottle from the side, makes a small lift to check the grasp, and turns the bottle neck toward the right hand.",
+    "左手从侧面抓住瓶身，小幅提起检查抓持，然后将瓶颈转向右手。"
+  ],
+  [
+    "Align the cap grasp",
+    "对准瓶盖"
+  ],
+  [
+    "The right wrist obtains a second viewpoint, localizes the cap, and approaches along the demonstrated contact direction before closing.",
+    "右腕获取另一视角并定位瓶盖，沿示范的接触方向接近后闭合夹爪。"
+  ],
+  [
+    "Loosen, recover, and regrasp",
+    "旋松、恢复与换抓"
+  ],
+  [
+    "An early grasp slips. The agent deepens the grasp and continues in small rotations, periodically releasing and resetting the wrist while the left hand supports the bottle.",
+    "首次抓持出现滑脱。智能体加深抓持并逐步小角度旋拧，定期松开、复位右腕，左手持续支撑瓶身。"
+  ],
+  [
+    "Separate and place the cap",
+    "分离并放下瓶盖"
+  ],
+  [
+    "After the open bottle mouth and independent cap become visible, the right hand withdraws and lowers the cap onto the clear table surface.",
+    "观察到开放瓶口与独立瓶盖后，右手退开，将瓶盖放到无遮挡的桌面上。"
+  ],
+  [
+    "Return the bottle upright",
+    "将瓶子直立放回"
+  ],
+  [
+    "With the right hand clear, the left hand restores the upright orientation, lowers the bottle to the table, and opens its fingers.",
+    "右手避让后，左手恢复瓶身直立姿态，降低到桌面并张开夹爪。"
+  ],
+  [
+    "Withdraw and check",
+    "撤离并检查"
+  ],
+  [
+    "The final notes report visible finger clearance, an upright bottle, and the separated cap on the table; the left hand retreats to check unsupported standing.",
+    "最终记录显示夹指与瓶身有间隙、瓶子直立、瓶盖已独立放在桌面；左手撤离，检查瓶子能否独立站稳。"
+  ],
+  [
+    "Establish left-hand support",
+    "建立左手支撑"
+  ],
+  [
+    "The agent localizes the strip from wrist-view parallax and places the closed left fingers on a solid support area beside the socket.",
+    "智能体通过腕部视角的视差定位插排，将闭合的左指放在插孔旁的实心支撑区域。"
+  ],
+  [
+    "Approach and refine the grasp",
+    "接近并修正抓持"
+  ],
+  [
+    "The right hand approaches in the demonstrated orientation. After a shallow grasp, it reopens, shifts, and lowers to grasp the plug body from the sides.",
+    "右手按示范姿态接近。首次抓持较浅，随后张开、横移并下降，从两侧抓住插头本体。"
+  ],
+  [
+    "Adjust support and retry",
+    "调整支撑并重试"
+  ],
+  [
+    "Early lifting also moves the strip. The agent lowers the right hand to unload, strengthens left-hand support, and retries with a small upward motion.",
+    "初次上提带动了插排。智能体降低右手卸载，加强左手支撑，再以小幅上提重试。"
+  ],
+  [
+    "Withdraw the plug",
+    "拔出插头"
+  ],
+  [
+    "Once the metal prongs and a gap become visible, the right hand lifts further until the prongs are fully clear of the socket.",
+    "观察到金属插脚与间隙后，右手继续上提，使全部插脚离开插孔。"
+  ],
+  [
+    "Align and reinsert",
+    "对准并重新插入"
+  ],
+  [
+    "The right hand follows the return path, makes millimeter-scale alignment corrections, and alternates unloading with short insertion motions when contact blocks progress.",
+    "右手沿返回路径接近，进行毫米级对准修正；接触受阻时先卸载，再短程推进插入。"
+  ],
+  [
+    "Release and inspect",
+    "释放并检查"
+  ],
+  [
+    "The fingers open and retreat after the prongs are no longer visibly exposed. The notes identify a remaining gap at the plug body.",
+    "插脚不再明显外露后，夹爪张开并撤离；记录中仍观察到插头本体处的剩余间隙。"
+  ],
+  [
+    "Complete seating with short presses",
+    "短程补压完成就位"
+  ],
+  [
+    "Following the demonstration, the empty right gripper closes and makes limited presses on the insulated outer end, then unloads to inspect the fit.",
+    "参照示范，空右夹爪闭合，对绝缘外端进行有限的短程补压，随后卸载检查就位情况。"
+  ],
+  [
+    "Remove support and verify",
+    "撤去支撑并验证"
+  ],
+  [
+    "Both arms retreat. The final notes report that the plug remains in the original socket with no exposed prongs after left-hand support is removed.",
+    "双臂撤离。最终记录显示撤去左手支撑后，插头仍稳定留在原插孔内，未见插脚外露。"
+  ],
+  [
+    "Pick up a notebook",
+    "拿起笔记本"
+  ],
+  [
+    "Lift the notebook from the table using the human demonstration as context.",
+    "参考人类示范，从桌面拿起笔记本。"
+  ],
+  [
+    "Unscrew a bottle cap",
+    "旋开瓶盖"
+  ],
+  [
+    "Use the robot demonstration and aligned action references to remove the cap and return the bottle to the table.",
+    "参考机器人示范及对齐动作记录，取下瓶盖并将瓶子放回桌面。"
+  ],
+  [
+    "Bottle-opening sequence",
+    "瓶盖旋拧过程"
+  ],
+  [
+    "Remove and reinsert a plug",
+    "拔出并重新插回插头"
+  ],
+  [
+    "Support the power strip, remove the plug, and fully reinsert it into the original socket.",
+    "支撑插排，拔出插头，再将其完全插回原插孔。"
+  ],
+  [
+    "Plug-removal and reinsertion sequence",
+    "插头拔出与回插过程"
+  ],
+  [
+    "One representative robot demo per task. Videos are accelerated as labeled. Success rates and mean decisions summarize all trials; the displayed outcome refers to the selected demo.",
+    "每个任务展示一个代表性机器人演示，按标注倍速播放。成功率与平均决策次数汇总所有试验；显示的执行结果对应当前演示。"
+  ],
+  [
+    "Robot video + action",
+    "机器人视频 + 动作"
+  ]
+].forEach(([english, chinese]) => zhTranslations.set(english, chinese));
+
 const originalTextNodes = new WeakMap();
 const originalAttributes = new WeakMap();
 
@@ -643,6 +806,151 @@ const demoTasks = [
   }
 ];
 
+
+// Preserve existing clips; show one representative robot run per task.
+demoTasks.forEach(task => { task.configs = task.configs.slice(0, 1); });
+demoTasks.splice(1, 0, {
+  "family": "Human video",
+  "title": "Pick up a notebook",
+  "prompt": "Lift the notebook from the table using the human demonstration as context.",
+  "configs": [
+    {
+      "label": "Human video",
+      "model": "GPT-6 Astra",
+      "context": "Human demonstration",
+      "success": "2 / 3",
+      "decisions": "66.7",
+      "time": "16.1 min",
+      "src": "assets/experiments/notebook-astra-human-r1.mp4",
+      "poster": "assets/experiments/notebook-astra-human-r1.jpg",
+      "trial": "Success",
+      "view": "Head view"
+    }
+  ]
+});
+demoTasks.splice(3, 0, {
+  "family": "Robot video + action",
+  "title": "Unscrew a bottle cap",
+  "prompt": "Use the robot demonstration and aligned action references to remove the cap and return the bottle to the table.",
+  "historyTitle": "Bottle-opening sequence",
+  "historyTimeline": [
+    0,
+    3.1,
+    6.13,
+    10.58,
+    37.275,
+    40.14,
+    43.87
+  ],
+  "historySteps": [
+    {
+      "title": "Localize the bottle",
+      "text": "The agent observes the cap from the top and left wrist views, then uses parallax to estimate its position before approaching."
+    },
+    {
+      "title": "Grasp and present the cap",
+      "text": "The left hand grasps the bottle from the side, makes a small lift to check the grasp, and turns the bottle neck toward the right hand."
+    },
+    {
+      "title": "Align the cap grasp",
+      "text": "The right wrist obtains a second viewpoint, localizes the cap, and approaches along the demonstrated contact direction before closing."
+    },
+    {
+      "title": "Loosen, recover, and regrasp",
+      "text": "An early grasp slips. The agent deepens the grasp and continues in small rotations, periodically releasing and resetting the wrist while the left hand supports the bottle."
+    },
+    {
+      "title": "Separate and place the cap",
+      "text": "After the open bottle mouth and independent cap become visible, the right hand withdraws and lowers the cap onto the clear table surface."
+    },
+    {
+      "title": "Return the bottle upright",
+      "text": "With the right hand clear, the left hand restores the upright orientation, lowers the bottle to the table, and opens its fingers."
+    },
+    {
+      "title": "Withdraw and check",
+      "text": "The final notes report visible finger clearance, an upright bottle, and the separated cap on the table; the left hand retreats to check unsupported standing."
+    }
+  ],
+  "configs": [
+    {
+      "label": "Robot video + action",
+      "model": "GPT-6 Astra",
+      "context": "Robot video + action",
+      "success": "3 / 3",
+      "decisions": "54.7",
+      "time": "17.9 min",
+      "src": "assets/experiments/bottle-astra-action-r1.mp4",
+      "poster": "assets/experiments/bottle-astra-action-r1.jpg",
+      "trial": "Success",
+      "view": "Head view"
+    }
+  ]
+}, {
+  "family": "Robot video + action",
+  "title": "Remove and reinsert a plug",
+  "prompt": "Support the power strip, remove the plug, and fully reinsert it into the original socket.",
+  "historyTitle": "Plug-removal and reinsertion sequence",
+  "historyTimeline": [
+    0,
+    7.43,
+    13.075,
+    16.865,
+    17.625,
+    23.915,
+    25.03,
+    28.135
+  ],
+  "historySteps": [
+    {
+      "title": "Establish left-hand support",
+      "text": "The agent localizes the strip from wrist-view parallax and places the closed left fingers on a solid support area beside the socket."
+    },
+    {
+      "title": "Approach and refine the grasp",
+      "text": "The right hand approaches in the demonstrated orientation. After a shallow grasp, it reopens, shifts, and lowers to grasp the plug body from the sides."
+    },
+    {
+      "title": "Adjust support and retry",
+      "text": "Early lifting also moves the strip. The agent lowers the right hand to unload, strengthens left-hand support, and retries with a small upward motion."
+    },
+    {
+      "title": "Withdraw the plug",
+      "text": "Once the metal prongs and a gap become visible, the right hand lifts further until the prongs are fully clear of the socket."
+    },
+    {
+      "title": "Align and reinsert",
+      "text": "The right hand follows the return path, makes millimeter-scale alignment corrections, and alternates unloading with short insertion motions when contact blocks progress."
+    },
+    {
+      "title": "Release and inspect",
+      "text": "The fingers open and retreat after the prongs are no longer visibly exposed. The notes identify a remaining gap at the plug body."
+    },
+    {
+      "title": "Complete seating with short presses",
+      "text": "Following the demonstration, the empty right gripper closes and makes limited presses on the insulated outer end, then unloads to inspect the fit."
+    },
+    {
+      "title": "Remove support and verify",
+      "text": "Both arms retreat. The final notes report that the plug remains in the original socket with no exposed prongs after left-hand support is removed."
+    }
+  ],
+  "configs": [
+    {
+      "label": "Robot video + action",
+      "model": "GPT-6 Astra",
+      "context": "Robot video + action",
+      "success": "2 / 3",
+      "decisions": "48.3",
+      "time": "10.8 min",
+      "src": "assets/experiments/plug-astra-action-r1.mp4",
+      "poster": "assets/experiments/plug-astra-action-r1.jpg",
+      "trial": "Success",
+      "view": "Head view"
+    }
+  ]
+});
+
 const demoGrid = document.querySelector("#demo-grid");
 
 function statusClass(success) {
@@ -866,7 +1174,8 @@ function renderContextFamilyGroup(tasks, startIndex) {
       const wasPlaying = !player.paused;
       player.pause();
       player.dataset.playback = config.speed || "20× robot run";
-      player.src = `${config.src}?v=20260915-clean-gallery`;
+      player.src = `${config.src}?v=20260915-one-demo`;
+      if (config.poster) player.poster = config.poster;
       player.load();
       if (wasPlaying) player.play().catch(() => {});
       const result = card.querySelector('[data-field="success"]');
@@ -955,22 +1264,10 @@ function setupHistorySummary(group) {
   showTimelineStep("auto");
 }
 
-demoTasks.slice(0, 4).forEach((task, index) => {
-  demoGrid.appendChild(task.family === "Human video"
-    ? renderHumanVideoTask(task, index)
-    : renderGoalImageTask(task, index));
-});
-
-let remainingTaskIndex = 4;
-const remainingGroups = [
-  [demoTasks[4]],
-  [demoTasks[5]],
-  [demoTasks[6]],
-  [demoTasks[7]]
-];
-remainingGroups.forEach((tasks) => {
-  demoGrid.appendChild(renderContextFamilyGroup(tasks, remainingTaskIndex));
-  remainingTaskIndex += tasks.length;
+demoTasks.forEach((task, index) => {
+  demoGrid.appendChild(task.family === "Goal image"
+    ? renderGoalImageTask(task, index)
+    : renderContextFamilyGroup([task], index));
 });
 
 function formatClipDuration(seconds) {

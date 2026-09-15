@@ -1,0 +1,30 @@
+{
+  "source": "https://morphicrobot.feishu.cn/docx/XELDdCILeoYJJFxXHdPc1svgnbe",
+  "revision": 1516,
+  "videos": [
+    {
+      "id": "notebook-astra-human-r1",
+      "sourceSha256": "4af0bf7e3accbd0c4945fb8c36d52a5678caa90f702dcc2cb41b8a770194d0d2",
+      "sourceDuration": 647.4,
+      "outputDuration": 32.291667,
+      "speed": 20,
+      "outputBytes": 1340237
+    },
+    {
+      "id": "bottle-astra-action-r1",
+      "sourceSha256": "209c4ccddb162866277066c8924476aad53b5866f922924f7159dd0a809880d0",
+      "sourceDuration": 901.9,
+      "outputDuration": 45.0,
+      "speed": 20,
+      "outputBytes": 1987872
+    },
+    {
+      "id": "plug-astra-action-r1",
+      "sourceSha256": "513cedea7304b0f43bf5c89b49e71dd733e9a298f0e513bcdd7f0d3fe15734e0",
+      "sourceDuration": 606.3,
+      "outputDuration": 30.291667,
+      "speed": 20,
+      "outputBytes": 1299751
+    }
+  ]
+}

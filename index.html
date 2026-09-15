@@ -235,122 +235,9 @@
             <p class="section-kicker">Interactive demos</p>
             <h2>See each form of context in action</h2>
             <p class="section-intro">
-              Human-video and goal-image tasks place the conditioning input beside the corresponding
-              robot rollout. Other tasks retain configuration controls. Long robot runs are accelerated
-              as labeled; source demonstrations remain at real time.
+              One representative robot demo per task. Videos are accelerated as labeled. Success rates and mean decisions summarize all trials; the displayed outcome refers to the selected demo.
             </p>
             <div class="demo-grid" id="demo-grid"></div>
-
-            <section class="model-comparison" aria-labelledby="model-comparison-title">
-              <div class="comparison-heading">
-                <div>
-                  <p class="section-kicker">Controlled comparison</p>
-                  <h3 id="model-comparison-title">Human-video comparison</h3>
-                </div>
-              </div>
-              <div class="comparison-context">
-                <span>Task</span><b>Pick up the red towel with the right hand</b>
-                <span>Condition</span><b>Human video · 8 frames</b>
-              </div>
-              <div class="comparison-grid">
-                <article class="comparison-card">
-                  <header><span>GPT-6 Astra</span><strong class="result-success">Success</strong></header>
-                  <div class="comparison-stage">
-                    <video controls muted playsinline preload="metadata" data-playback="20× robot run" src="assets/videos/towel-with-demo.mp4?v=20260914-compare"></video>
-                    <div class="video-overlay"><span>20&times;</span></div>
-                  </div>
-                  <dl>
-                    <div><dt>Elapsed</dt><dd>950.7 s</dd></div>
-                    <div><dt>Outcome</dt><dd>Task completed</dd></div>
-                  </dl>
-                </article>
-                <article class="comparison-card claude-comparison-card">
-                  <header><span>Claude Fable 5.1</span><strong class="result-failure">Failed</strong></header>
-                  <div class="comparison-stage">
-                    <video controls muted playsinline preload="metadata" data-playback="20× robot run" src="assets/videos/claude-towel-paper-head.mp4?v=20260915-single-claude-run"></video>
-                    <div class="video-overlay"><span>20&times;</span></div>
-                  </div>
-                  <dl>
-                    <div><dt>Elapsed</dt><dd>795.5 s</dd></div>
-                    <div><dt>Outcome</dt><dd>Task failed</dd></div>
-                  </dl>
-                </article>
-              </div>
-            </section>
-
-            <section class="model-comparison self-history-comparison" aria-labelledby="self-history-comparison-title">
-              <div class="comparison-heading">
-                <div>
-                  <p class="section-kicker">Self-history comparison</p>
-                  <h3 id="self-history-comparison-title">Movable exploration</h3>
-                </div>
-              </div>
-              <div class="comparison-context">
-                <span>Task</span><b>Find the Sprite bottle and place it in the yellow basket</b>
-                <span>Condition</span><b>Interaction history</b>
-              </div>
-              <div class="comparison-grid">
-                <article class="comparison-card">
-                  <header><span>GPT-6 Astra</span><strong class="result-success">Success</strong></header>
-                  <div class="comparison-stage">
-                    <video controls muted playsinline preload="metadata" data-playback="30× robot run" src="assets/videos/mobile-gpt6.mp4?v=20260915-self-history-compare"></video>
-                    <div class="video-overlay"><span>30&times;</span><span>Head view</span></div>
-                  </div>
-                  <dl>
-                    <div><dt>Elapsed</dt><dd>22.5 min</dd></div>
-                    <div><dt>Outcome</dt><dd>Task completed</dd></div>
-                  </dl>
-                </article>
-                <article class="comparison-card">
-                  <header><span>Claude Fable 5.1</span><strong class="result-failure">Failed</strong></header>
-                  <div class="comparison-stage">
-                    <video controls muted playsinline preload="metadata" data-playback="30× robot run" src="assets/videos/mobile-fable.mp4?v=20260915-self-history-compare"></video>
-                    <div class="video-overlay"><span>30&times;</span><span>Head view</span></div>
-                  </div>
-                  <dl>
-                    <div><dt>Elapsed</dt><dd>17.5 min</dd></div>
-                    <div><dt>Outcome</dt><dd>Task failed</dd></div>
-                  </dl>
-                </article>
-              </div>
-            </section>
-
-            <section class="model-comparison kimi-comparison" aria-labelledby="kimi-comparison-title">
-              <div class="comparison-heading">
-                <div>
-                  <p class="section-kicker">Baseline comparison</p>
-                  <h3 id="kimi-comparison-title">Text-only comparison</h3>
-                </div>
-              </div>
-              <div class="comparison-context">
-                <span>Task</span><b>Remove fruit from the plate</b>
-                <span>Condition</span><b>Text only · no demonstration</b>
-              </div>
-              <div class="comparison-grid">
-                <article class="comparison-card">
-                  <header><span>GPT-6 Astra</span><strong class="result-success">Success</strong></header>
-                  <div class="comparison-stage">
-                    <video controls muted playsinline preload="metadata" data-playback="20× robot run" src="assets/videos/gpt6-remove-fruit-head.mp4?v=20260915-remove-fruit-compare"></video>
-                    <div class="video-overlay"><span>20&times;</span></div>
-                  </div>
-                  <dl>
-                    <div><dt>Elapsed</dt><dd>208.2 s</dd></div>
-                    <div><dt>Outcome</dt><dd>Task completed</dd></div>
-                  </dl>
-                </article>
-                <article class="comparison-card kimi-comparison-card">
-                  <header><span>Kimi K3</span><strong class="result-failure">Failed</strong></header>
-                  <div class="comparison-stage">
-                    <video controls muted playsinline preload="metadata" data-playback="20× robot run" src="assets/videos/kimi-remove-consistent-head.mp4?v=20260915-remove-fruit-compare"></video>
-                    <div class="video-overlay"><span>20&times;</span></div>
-                  </div>
-                  <dl>
-                    <div><dt>Elapsed</dt><dd>170.5 s</dd></div>
-                    <div><dt>Outcome</dt><dd>Interrupted → failed</dd></div>
-                  </dl>
-                </article>
-              </div>
-            </section>
 
           </section>
 
@@ -433,6 +320,6 @@
       </div>
     </footer>
 
-    <script src="script.js?v=20260915-overleaf-figures"></script>
+    <script src="script.js?v=20260915-one-demo"></script>
   </body>
 </html>
