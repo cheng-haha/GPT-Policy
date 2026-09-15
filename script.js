@@ -24,7 +24,7 @@ const sectionObserver = new IntersectionObserver(
       .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
     if (!visible) return;
     navLinks.forEach((link) => {
-      link.classList.toggle("active", link.getAttribute("href") === `#${visible.target.id}`);
+      link.classList.toggle("active", link.getAttribute("href") === `#${visible.target.closest("#results") ? "results" : visible.target.id}`);
     });
   },
   { rootMargin: "-20% 0px -65%", threshold: [0, 0.2, 0.5] }
@@ -473,6 +473,61 @@ const zhTranslations = new Map([
   [
     "Robot video + action",
     "机器人视频 + 动作"
+  ]
+].forEach(([english, chinese]) => zhTranslations.set(english, chinese));
+
+[
+  [
+    "Five experiment families",
+    "五大实验"
+  ],
+  [
+    "experiment families",
+    "实验类别"
+  ],
+  [
+    "robot tasks",
+    "机器人任务"
+  ],
+  [
+    "Experiment families",
+    "实验分类"
+  ],
+  [
+    "Human video demonstrations",
+    "人类视频示范"
+  ],
+  [
+    "Robot demonstrations and actions",
+    "机器人示范与动作"
+  ],
+  [
+    "Goal-image following",
+    "目标图像跟随"
+  ],
+  [
+    "Human–robot interaction",
+    "人机交互"
+  ],
+  [
+    "Towel and notebook pickup test whether human demonstrations improve execution without robot action labels.",
+    "毛巾与笔记本拾取实验检验：无需机器人动作标签，人类示范能否改善执行。"
+  ],
+  [
+    "Bottle opening and plug reinsertion compare no demonstration, robot video, and robot video with aligned actions.",
+    "瓶盖旋拧与插头回插实验，对比无示范、机器人视频、机器人视频加对齐动作三种条件。"
+  ],
+  [
+    "Block and fruit arrangement test whether the robot can reproduce a desired spatial configuration.",
+    "积木与水果摆放实验，检验机器人能否复现目标空间布局。"
+  ],
+  [
+    "Lemon placement and mobile exploration test how earlier observations and failures support search and recovery.",
+    "柠檬放置与移动探索实验，检验历史观测与失败经验如何支持搜索和恢复。"
+  ],
+  [
+    "Tic-tac-toe and pointed-fruit pickup test adaptation to human turns and gestures.",
+    "井字棋与所指水果拾取实验，检验机器人对人类轮次和手势的适应。"
   ]
 ].forEach(([english, chinese]) => zhTranslations.set(english, chinese));
 
@@ -1248,9 +1303,20 @@ function setupHistorySummary(group) {
 }
 
 demoTasks.forEach((task, index) => {
-  demoGrid.appendChild(task.family === "Goal image"
-    ? renderGoalImageTask(task, index)
-    : renderContextFamilyGroup([task], index));
+  const family = demoGrid.querySelector(`[data-family="${task.family}"]`);
+  const card = renderContextFamilyGroup([task], index);
+  const title = card.querySelector('.rollout-group-title h3');
+  const taskHeading = document.createElement('h4');
+  taskHeading.textContent = title.textContent;
+  title.replaceWith(taskHeading);
+  card.querySelector('.rollout-kicker').remove();
+  card.querySelector('.clip-count').remove();
+  card.querySelectorAll('figcaption h4').forEach(heading => {
+    const label = document.createElement('h5');
+    label.textContent = heading.textContent;
+    heading.replaceWith(label);
+  });
+  family.appendChild(card);
 });
 
 function formatClipDuration(seconds) {

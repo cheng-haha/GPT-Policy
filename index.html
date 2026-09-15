@@ -9,7 +9,7 @@
     />
     <meta name="theme-color" content="#f7f8fa" />
     <title>In-Context Robot Learning with VLM Agents</title>
-    <link rel="stylesheet" href="styles.css?v=20260915-overleaf-figures" />
+    <link rel="stylesheet" href="styles.css?v=20260915-five-experiments" />
   </head>
   <body id="top">
     <button class="language-toggle" id="language-toggle" type="button" aria-label="Switch to Chinese" title="Switch to Chinese">
@@ -71,7 +71,6 @@
           <a href="#context">Forms of context</a>
           <a href="#method">GPT-Policy</a>
           <a href="#results">Experiments</a>
-          <a href="#demos">Demo gallery</a>
           <a href="#findings">Findings</a>
           <a href="#discussion">Discussion</a>
           <a href="#citation">Citation</a>
@@ -167,78 +166,112 @@
             </figure>
           </section>
 
-          <section id="results" class="section ruled">
+          <section id="results" class="section ruled demo-section">
             <p class="section-kicker">Experiments</p>
-            <h2>One interface, different kinds of adaptation</h2>
+            <h2>Five experiment families</h2>
+            <p class="section-intro">One representative robot demo per task. Videos are accelerated as labeled. Success rates and mean decisions summarize all trials; the displayed outcome refers to the selected demo.</p>
             <div class="metric-row">
-              <div><strong data-count="5">5</strong><span>context families</span></div>
-              <div><strong data-count="3">3</strong><span>trials per condition</span></div>
-              <div><strong data-count="3">3</strong><span>reported metrics</span></div>
+              <div><strong>5</strong><span>experiment families</span></div>
+              <div><strong>10</strong><span>robot tasks</span></div>
+              <div><strong>3</strong><span>trials per condition</span></div>
             </div>
-            <div class="table-wrap">
-              <table>
-                <thead>
-                  <tr><th>Task</th><th>Context condition</th><th>Success</th><th>Decisions</th><th>Time (min)</th></tr>
-                </thead>
-                <tbody>
-                  <tr><td>Pick Red Towel</td><td>None</td><td>0 / 3</td><td>96.3</td><td>24.6</td></tr>
-                  <tr><td>Pick Red Towel</td><td>Human video</td><td>2 / 3</td><td>76.7</td><td>18.9</td></tr>
-                  <tr><td>Pick Up Notebook</td><td>None</td><td>0 / 3</td><td>94.0</td><td>24.6</td></tr>
-                  <tr><td>Pick Up Notebook</td><td>Human video</td><td>2 / 3</td><td>66.7</td><td>16.1</td></tr>
-                  <tr><td>Unscrew Bottle Cap</td><td>None</td><td>0 / 3</td><td>71.0</td><td>16.1</td></tr>
-                  <tr><td>Unscrew Bottle Cap</td><td>Robot video</td><td>2 / 3</td><td>74.3</td><td>15.2</td></tr>
-                  <tr><td>Unscrew Bottle Cap</td><td>Robot video + action</td><td>3 / 3</td><td>54.7</td><td>17.9</td></tr>
-                  <tr><td>Remove and Reinsert Plug</td><td>None</td><td>0 / 3</td><td>24.0</td><td>5.3</td></tr>
-                  <tr><td>Remove and Reinsert Plug</td><td>Robot video</td><td>0 / 3</td><td>33.7</td><td>7.9</td></tr>
-                  <tr><td>Remove and Reinsert Plug</td><td>Robot video + action</td><td>2 / 3</td><td>48.3</td><td>10.8</td></tr>
-                  <tr><td>Arrange T Shape</td><td>Target image</td><td>3 / 3</td><td>66.7</td><td>15.8</td></tr>
-                  <tr><td>Arrange Fruit</td><td>Target image</td><td>3 / 3</td><td>49.0</td><td>12.4</td></tr>
-                  <tr><td>Lemon To Pink Plate</td><td>Self history</td><td>3 / 3</td><td>35.3</td><td>8.1</td></tr>
-                  <tr><td>Movable Exploration</td><td>Self history</td><td>3 / 3</td><td>40.33</td><td>25.53</td></tr>
-                  <tr><td>Tic-Tac-Toe</td><td>Human-robot interaction</td><td>3 / 3</td><td>69.7</td><td>13.6</td></tr>
-                  <tr><td>Pointed Fruit Pickup</td><td>Human-robot interaction</td><td>3 / 3</td><td>67.3</td><td>15.0</td></tr>
-                </tbody>
-              </table>
-            </div>
+            <nav class="experiment-index" aria-label="Experiment families">
+              <a href="#experiment-human-video"><span>01</span>Human video demonstrations</a>
+              <a href="#experiment-robot-demonstration"><span>02</span>Robot demonstrations and actions</a>
+              <a href="#experiment-goal-image"><span>03</span>Goal-image following</a>
+              <a href="#experiment-self-history"><span>04</span>Self-interaction history</a>
+              <a href="#experiment-human-interaction"><span>05</span>Human–robot interaction</a>
+            </nav>
             <p class="table-note">GPT-6 Astra on real robots; three trials per condition. Success requires the final scene to satisfy the task-specific geometric and semantic criteria. Decisions and time are averaged over all trials, including failures. Tic-Tac-Toe wins and draws both count as success.</p>
-
-            <figure class="paper-figure" id="paper-figure-4">
-              <a href="assets/paper-figures/human-video-results.png?v=20260915-overleaf-figures" target="_blank" rel="noopener">
-                <img src="assets/paper-figures/human-video-results.png?v=20260915-overleaf-figures" alt="Human demonstrations and robot executions for towel and notebook pickup" loading="lazy" decoding="async" width="2401" height="1905" />
-              </a>
-              <figcaption><b>Figure 4.</b> Example runs for towel and notebook pickup under None and Human Video conditions. Frames progress from left to right.</figcaption>
-            </figure>
-
-            <figure class="paper-figure" id="paper-figure-5">
-              <a href="assets/paper-figures/robot-video-action-results.png?v=20260915-overleaf-figures" target="_blank" rel="noopener">
-                <img src="assets/paper-figures/robot-video-action-results.png?v=20260915-overleaf-figures" alt="Robot demonstrations and executions for bottle opening and plug reinsertion" loading="lazy" decoding="async" width="2401" height="2480" />
-              </a>
-              <figcaption><b>Figure 5.</b> Example runs under None, Robot Video, and Robot Video + Action conditions. Gold boxes mark reference regions in the demonstrations; red marks local deviations and green marks closer matches.</figcaption>
-            </figure>
-
-            <figure class="paper-figure" id="paper-figure-6">
-              <a href="assets/paper-figures/goal-history-interaction-results.png?v=20260915-overleaf-figures" target="_blank" rel="noopener">
-                <img src="assets/paper-figures/goal-history-interaction-results.png?v=20260915-overleaf-figures" alt="Goal images, self-interaction history, and online human interaction" loading="lazy" decoding="async" width="2401" height="2125" />
-              </a>
-              <figcaption><b>Figure 6.</b> Example executions for goal-image following, self-interaction history, and online human interaction, including object arrangement, exploration, tic-tac-toe, and pointed-fruit pickup.</figcaption>
-            </figure>
-
-            <figure class="paper-figure" id="paper-figure-7">
-              <a href="assets/paper-figures/action-reference-alignment.png?v=20260915-overleaf-figures" target="_blank" rel="noopener">
-                <img src="assets/paper-figures/action-reference-alignment.png?v=20260915-overleaf-figures" alt="Action references improve alignment with the demonstration" loading="lazy" decoding="async" width="2401" height="1493" />
-              </a>
-              <figcaption><b>Figure 7.</b> Selected bottle-opening runs compare Video and Video + Action. Measured supporting-gripper tilt, target-to-demonstration orientation differences, and corresponding frames show how action references guide trajectory selection. Progress is normalized separately for each run.</figcaption>
-            </figure>
-          </section>
-
-          <section id="demos" class="section ruled demo-section">
-            <p class="section-kicker">Interactive demos</p>
-            <h2>See each form of context in action</h2>
-            <p class="section-intro">
-              One representative robot demo per task. Videos are accelerated as labeled. Success rates and mean decisions summarize all trials; the displayed outcome refers to the selected demo.
-            </p>
-            <div class="demo-grid" id="demo-grid"></div>
-
+            <div id="demos" class="experiment-anchor" aria-hidden="true"></div>
+            <div id="demo-grid" class="experiment-families">
+              <section id="experiment-human-video" class="experiment-family" aria-labelledby="human-video-title" data-layout="paired">
+                <header class="experiment-family-heading">
+                  <span class="experiment-number">01</span>
+                  <div><h3 id="human-video-title">Human video demonstrations</h3><p>Towel and notebook pickup test whether human demonstrations improve execution without robot action labels.</p></div>
+                </header>
+                <div class="table-wrap">
+                  <table aria-label="Human video demonstrations">
+                    <thead><tr><th>Task</th><th>Context condition</th><th>Success</th><th>Decisions</th><th>Time (min)</th></tr></thead>
+                    <tbody>
+                      <tr><td>Pick Red Towel</td><td>None</td><td>0 / 3</td><td>96.3</td><td>24.6</td></tr>
+                      <tr><td>Pick Red Towel</td><td>Human video</td><td>2 / 3</td><td>76.7</td><td>18.9</td></tr>
+                      <tr><td>Pick Up Notebook</td><td>None</td><td>0 / 3</td><td>94.0</td><td>24.6</td></tr>
+                      <tr><td>Pick Up Notebook</td><td>Human video</td><td>2 / 3</td><td>66.7</td><td>16.1</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="demo-grid family-demos" data-family="Human video"></div>
+              </section>
+              <section id="experiment-robot-demonstration" class="experiment-family" aria-labelledby="robot-demonstration-title" data-layout="stacked">
+                <header class="experiment-family-heading">
+                  <span class="experiment-number">02</span>
+                  <div><h3 id="robot-demonstration-title">Robot demonstrations and actions</h3><p>Bottle opening and plug reinsertion compare no demonstration, robot video, and robot video with aligned actions.</p></div>
+                </header>
+                <div class="table-wrap">
+                  <table aria-label="Robot demonstrations and actions">
+                    <thead><tr><th>Task</th><th>Context condition</th><th>Success</th><th>Decisions</th><th>Time (min)</th></tr></thead>
+                    <tbody>
+                      <tr><td>Unscrew Bottle Cap</td><td>None</td><td>0 / 3</td><td>71.0</td><td>16.1</td></tr>
+                      <tr><td>Unscrew Bottle Cap</td><td>Robot video</td><td>2 / 3</td><td>74.3</td><td>15.2</td></tr>
+                      <tr><td>Unscrew Bottle Cap</td><td>Robot video + action</td><td>3 / 3</td><td>54.7</td><td>17.9</td></tr>
+                      <tr><td>Remove and Reinsert Plug</td><td>None</td><td>0 / 3</td><td>24.0</td><td>5.3</td></tr>
+                      <tr><td>Remove and Reinsert Plug</td><td>Robot video</td><td>0 / 3</td><td>33.7</td><td>7.9</td></tr>
+                      <tr><td>Remove and Reinsert Plug</td><td>Robot video + action</td><td>2 / 3</td><td>48.3</td><td>10.8</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="demo-grid family-demos" data-family="Robot video + action"></div>
+              </section>
+              <section id="experiment-goal-image" class="experiment-family" aria-labelledby="goal-image-title" data-layout="paired">
+                <header class="experiment-family-heading">
+                  <span class="experiment-number">03</span>
+                  <div><h3 id="goal-image-title">Goal-image following</h3><p>Block and fruit arrangement test whether the robot can reproduce a desired spatial configuration.</p></div>
+                </header>
+                <div class="table-wrap">
+                  <table aria-label="Goal-image following">
+                    <thead><tr><th>Task</th><th>Context condition</th><th>Success</th><th>Decisions</th><th>Time (min)</th></tr></thead>
+                    <tbody>
+                      <tr><td>Arrange T Shape</td><td>Target image</td><td>3 / 3</td><td>66.7</td><td>15.8</td></tr>
+                      <tr><td>Arrange Fruit</td><td>Target image</td><td>3 / 3</td><td>49.0</td><td>12.4</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="demo-grid family-demos" data-family="Goal image"></div>
+              </section>
+              <section id="experiment-self-history" class="experiment-family" aria-labelledby="self-history-title" data-layout="stacked">
+                <header class="experiment-family-heading">
+                  <span class="experiment-number">04</span>
+                  <div><h3 id="self-history-title">Self-interaction history</h3><p>Lemon placement and mobile exploration test how earlier observations and failures support search and recovery.</p></div>
+                </header>
+                <div class="table-wrap">
+                  <table aria-label="Self-interaction history">
+                    <thead><tr><th>Task</th><th>Context condition</th><th>Success</th><th>Decisions</th><th>Time (min)</th></tr></thead>
+                    <tbody>
+                      <tr><td>Lemon To Pink Plate</td><td>Self history</td><td>3 / 3</td><td>35.3</td><td>8.1</td></tr>
+                      <tr><td>Movable Exploration</td><td>Self history</td><td>3 / 3</td><td>40.33</td><td>25.53</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="demo-grid family-demos" data-family="Self history"></div>
+              </section>
+              <section id="experiment-human-interaction" class="experiment-family" aria-labelledby="human-interaction-title" data-layout="stacked">
+                <header class="experiment-family-heading">
+                  <span class="experiment-number">05</span>
+                  <div><h3 id="human-interaction-title">Human–robot interaction</h3><p>Tic-tac-toe and pointed-fruit pickup test adaptation to human turns and gestures.</p></div>
+                </header>
+                <div class="table-wrap">
+                  <table aria-label="Human–robot interaction">
+                    <thead><tr><th>Task</th><th>Context condition</th><th>Success</th><th>Decisions</th><th>Time (min)</th></tr></thead>
+                    <tbody>
+                      <tr><td>Tic-Tac-Toe</td><td>Human-robot interaction</td><td>3 / 3</td><td>69.7</td><td>13.6</td></tr>
+                      <tr><td>Pointed Fruit Pickup</td><td>Human-robot interaction</td><td>3 / 3</td><td>67.3</td><td>15.0</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="demo-grid family-demos" data-family="Human interaction"></div>
+              </section>
+            </div>
           </section>
 
           <section id="findings" class="section ruled">
@@ -268,13 +301,6 @@
               <p class="section-kicker">Discussion</p>
               <h2>A promising interface, with a clear boundary</h2>
             </div>
-
-            <figure class="paper-figure" id="paper-figure-8">
-              <a href="assets/paper-figures/model-comparison.png?v=20260915-overleaf-figures" target="_blank" rel="noopener">
-                <img src="assets/paper-figures/model-comparison.png?v=20260915-overleaf-figures" alt="Red-towel pickup across models and context conditions" loading="lazy" decoding="async" width="2401" height="1610" />
-              </a>
-              <figcaption><b>Figure 8.</b> Human video context helps GPT-6 Astra complete the task with fewer unnecessary intermediate actions in these individual runs. Task progress is completion degree, not success rate; these examples do not establish a reliable model ranking.</figcaption>
-            </figure>
             <div class="discussion-copy">
               <p>
                 In individual red-towel runs, human video raises GPT-6 Astra task progress from 55% to 100%, with approximately 35.6% shorter run time and 58.9% lower estimated token usage. Fable 5.1 and Kimi K3 reach 30% and 20% progress. These examples do not establish a reliable model ranking: task progress is distinct from success rate, which is 2/3 for GPT-6 Astra with human video.
@@ -320,6 +346,6 @@
       </div>
     </footer>
 
-    <script src="script.js?v=20260915-book-demo"></script>
+    <script src="script.js?v=20260915-five-experiments"></script>
   </body>
 </html>
