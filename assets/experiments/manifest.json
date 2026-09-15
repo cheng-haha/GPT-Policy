@@ -41,6 +41,38 @@
       "outputDuration": 65.291667,
       "speed": 20,
       "outputBytes": 2552063
+    },
+    {
+      "id": "bottle-astra-none-r3",
+      "sourceSha256": "6db6d3fc8a0bb09a767a8040c2a51f428e3b7d5ce5ea55281fd03af9a3f005be",
+      "sourceDuration": 1332.7,
+      "outputDuration": 66.583333,
+      "speed": 20,
+      "outputBytes": 2941665
+    },
+    {
+      "id": "bottle-astra-video-r2",
+      "sourceSha256": "e2776624ad9b45f9d54da04566cbed0bcff75d5c95f98dcf678d5e2a0b04a016",
+      "sourceDuration": 670.4,
+      "outputDuration": 33.5,
+      "speed": 20,
+      "outputBytes": 1503824
+    },
+    {
+      "id": "plug-astra-none-r1",
+      "sourceSha256": "7278b035eb4f2447f6579e6f39a3c96ab121745648c5407bd393cd6b6176badf",
+      "sourceDuration": 418.7,
+      "outputDuration": 20.916667,
+      "speed": 20,
+      "outputBytes": 931882
+    },
+    {
+      "id": "plug-astra-video-r1",
+      "sourceSha256": "142736308472aaca30c6b7e4b4d4975bda447c5ef76514fa6b15f129a8d609a3",
+      "sourceDuration": 519.9,
+      "outputDuration": 25.916667,
+      "speed": 20,
+      "outputBytes": 1154697
     }
   ]
 }

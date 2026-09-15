@@ -453,12 +453,17 @@ footer { border-top: 1px solid var(--line); background: var(--soft); }
   .experiment-family[data-layout="paired"] .rollout-group-head { min-height: 0; }
 }
 
-/* One complete three-way comparison per human-video task. */
-.human-comparison .rollout-rail { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; overflow: visible; padding: 0; }
-.human-comparison .rollout-card { width: 100%; }
-.human-comparison .rollout-nav { display: none; }
-.human-comparison .rollout-caption-head { flex-wrap: wrap; gap: 5px 10px; }
-.human-comparison .rollout-media video { width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: contain; }
+/* Aligned three-way comparisons for human and robot demonstrations. */
+.three-way-comparison .rollout-rail { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; overflow: visible; padding: 0; }
+.three-way-comparison .rollout-card { width: 100%; }
+.three-way-comparison .rollout-nav { display: none; }
+.three-way-comparison .rollout-caption-head { flex-wrap: wrap; gap: 5px 10px; }
+.three-way-comparison .rollout-media video { width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: contain; }
 @media (max-width: 760px) {
-  .human-comparison .rollout-rail { grid-template-columns: 1fr; gap: 24px; }
+  .three-way-comparison .rollout-rail { grid-template-columns: 1fr; gap: 24px; }
 }
+
+.robot-run-summary { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); }
+.robot-run-summary > summary { color: var(--blue); font-size: 11px; font-weight: 600; cursor: pointer; }
+.robot-run-summary .history-summary { margin-top: 12px; }
+.robot-run-summary .history-summary-heading { padding-bottom: 8px; }

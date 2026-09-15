@@ -1,6 +1,6 @@
 # Additional task demos
 
-Three representative successful runs were added from the [experiment record](https://morphicrobot.feishu.cn/docx/XELDdCILeoYJJFxXHdPc1svgnbe), revision 1516. Existing task videos remain unchanged. Human-video tasks show the human demonstration alongside representative robot runs with and without human-video context; other tasks retain one robot demo each.
+Three representative successful runs were added from the [experiment record](https://morphicrobot.feishu.cn/docx/XELDdCILeoYJJFxXHdPc1svgnbe), revision 1516. Existing task videos remain unchanged. Human-video tasks show the human demonstration alongside representative robot runs with and without human-video context; robot-demonstration tasks compare no video, video, and video + action; the remaining tasks retain one robot demo each.
 
 | Task | Condition | Selected run | Decisions | Full task time |
 | --- | --- | --- | --- | --- |
@@ -15,3 +15,16 @@ The bottle and plug process summaries were derived from model_decision notes ret
 Notebook comparison adds its original real-time human demonstration and the first no-demonstration trial (90 decisions, 1316.3 s, gave up). The existing towel demonstration and no-demonstration clip are reused.
 
 See manifest.json for source hashes, source and encoded durations, and file sizes.
+
+## Robot-demonstration comparisons
+
+| Task | Condition | Selected trial | Outcome |
+| --- | --- | --- | --- |
+| Bottle opening | None | 3 | Budget exhausted |
+| Bottle opening | Robot video | 2 | Success |
+| Bottle opening | Robot video + action | 1 | Success |
+| Plug reinsertion | None | 1 | Gave up |
+| Plug reinsertion | Robot video | 1 | Gave up |
+| Plug reinsertion | Robot video + action | 1 | Success |
+
+Each condition shows one illustrative trial with its trial number and outcome, while the success fraction and means cover all three trials. The bottle no-video example includes a full 100-decision attempt; the video-only example illustrates one of its two successful trials. Existing action-aligned runs and their matched summaries are unchanged. These selected examples do not replace the aggregate statistics.

@@ -532,6 +532,57 @@ const zhTranslations = new Map([
 
 [["Human-video tasks show the human demonstration beside robot runs with and without it. Other tasks retain one representative robot run. Human demonstrations play at real time; robot runs are accelerated as labeled. Success rates and mean costs summarize all trials.", "人类视频实验并排展示人类示范、有示范执行和无示范执行；其余任务保留一个代表性机器人演示。人类示范以正常速度播放，机器人录像按标注倍速播放。成功率与平均开销汇总所有试验。"]].forEach(([english, chinese]) => zhTranslations.set(english, chinese));
 
+[
+  [
+    "Human-video tasks compare runs with and without the human demonstration. Robot-demonstration tasks compare no video, video, and video + action. Other tasks show one representative run. Human demonstrations play at real time; robot runs are accelerated as labeled. Success rates and mean costs summarize all trials.",
+    "人类视频实验对比有无人类示范的执行；机器人示范实验对比无视频、视频、视频加动作三种条件。其余任务展示一个代表性演示。人类示范以正常速度播放，机器人录像按标注倍速播放。成功率与平均开销汇总所有试验。"
+  ],
+  [
+    "No video",
+    "无视频"
+  ],
+  [
+    "Video",
+    "有视频"
+  ],
+  [
+    "Video + action",
+    "视频 + 动作"
+  ],
+  [
+    "No demonstration",
+    "无示范"
+  ],
+  [
+    "Trial 3: Budget exhausted",
+    "试验 3：预算耗尽"
+  ],
+  [
+    "Trial 2: Success",
+    "试验 2：成功"
+  ],
+  [
+    "Trial 1: Success",
+    "试验 1：成功"
+  ],
+  [
+    "Trial 1: Gave up",
+    "试验 1：主动停止"
+  ],
+  [
+    "Video + action run summary",
+    "视频 + 动作执行摘要"
+  ],
+  [
+    "Recorded action sequence",
+    "记录中的动作过程"
+  ],
+  [
+    "Unscrew and remove the cap, then return the bottle upright to the table.",
+    "旋开并取下瓶盖，再将瓶子直立放回桌面。"
+  ]
+].forEach(([english, chinese]) => zhTranslations.set(english, chinese));
+
 const originalTextNodes = new WeakMap();
 const originalAttributes = new WeakMap();
 
@@ -888,7 +939,7 @@ demoTasks.splice(1, 0, {
 demoTasks.splice(2, 0, {
   "family": "Robot video + action",
   "title": "Unscrew a bottle cap",
-  "prompt": "Use the robot demonstration and aligned action references to remove the cap and return the bottle to the table.",
+  "prompt": "Unscrew and remove the cap, then return the bottle upright to the table.",
   "historyTitle": "Bottle-opening sequence",
   "historyTimeline": [
     0,
@@ -1008,6 +1059,68 @@ demoTasks.splice(2, 0, {
   ]
 });
 
+
+const robotComparisonConfigs = {
+  "Unscrew a bottle cap": [
+    {
+      "label": "No video",
+      "model": "GPT-6 Astra",
+      "context": "No demonstration",
+      "success": "0 / 3",
+      "decisions": "71.0",
+      "time": "16.1 min",
+      "src": "assets/experiments/bottle-astra-none-r3.mp4",
+      "poster": "assets/experiments/bottle-astra-none-r3.jpg",
+      "trial": "Trial 3: Budget exhausted",
+      "view": "Head view"
+    },
+    {
+      "label": "Video",
+      "model": "GPT-6 Astra",
+      "context": "Robot video",
+      "success": "2 / 3",
+      "decisions": "74.3",
+      "time": "15.2 min",
+      "src": "assets/experiments/bottle-astra-video-r2.mp4",
+      "poster": "assets/experiments/bottle-astra-video-r2.jpg",
+      "trial": "Trial 2: Success",
+      "view": "Head view"
+    }
+  ],
+  "Remove and reinsert a plug": [
+    {
+      "label": "No video",
+      "model": "GPT-6 Astra",
+      "context": "No demonstration",
+      "success": "0 / 3",
+      "decisions": "24.0",
+      "time": "5.3 min",
+      "src": "assets/experiments/plug-astra-none-r1.mp4",
+      "poster": "assets/experiments/plug-astra-none-r1.jpg",
+      "trial": "Trial 1: Gave up",
+      "view": "Head view"
+    },
+    {
+      "label": "Video",
+      "model": "GPT-6 Astra",
+      "context": "Robot video",
+      "success": "0 / 3",
+      "decisions": "33.7",
+      "time": "7.9 min",
+      "src": "assets/experiments/plug-astra-video-r1.mp4",
+      "poster": "assets/experiments/plug-astra-video-r1.jpg",
+      "trial": "Trial 1: Gave up",
+      "view": "Head view"
+    }
+  ]
+};
+demoTasks.filter(task => task.family === "Robot video + action").forEach(task => {
+  const actionRun = task.configs[0];
+  actionRun.label = "Video + action";
+  actionRun.trial = "Trial 1: Success";
+  task.configs = [...robotComparisonConfigs[task.title], actionRun];
+});
+
 const demoGrid = document.querySelector("#demo-grid");
 
 function statusClass(success) {
@@ -1034,11 +1147,11 @@ function activateRolloutRail(group) {
   window.requestAnimationFrame(updateControls);
 }
 
-function renderHumanVideoTask(task, taskIndex) {
+function renderVideoComparison(task, taskIndex) {
   const group = document.createElement("article");
-  group.className = "demo-rollout-group human-comparison";
+  group.className = `demo-rollout-group three-way-comparison ${task.reference ? "human-comparison" : "robot-comparison"}`;
   group.dataset.family = task.family;
-  group.dataset.clips = String(task.configs.length + 1);
+  group.dataset.clips = String(task.configs.length + (task.reference ? 1 : 0));
 
   const resultClips = task.configs.map((config) => `
     <figure class="rollout-card">
@@ -1053,18 +1166,7 @@ function renderHumanVideoTask(task, taskIndex) {
       </figcaption>
     </figure>`).join("");
 
-  group.innerHTML = `
-    <header class="rollout-group-head">
-      <div class="rollout-group-title">
-        <p class="rollout-kicker"><span class="demo-index">${String(taskIndex + 1).padStart(2, "0")}</span>${task.family}</p>
-        <h3>${task.title}</h3>
-        <p>${task.prompt}</p>
-      </div>
-      <span class="clip-count">${task.configs.length + 1} clips</span>
-    </header>
-    <div class="rollout-rail-wrap">
-      <button class="rollout-nav previous" type="button" aria-label="Show previous clips"><span aria-hidden="true">&#8249;</span></button>
-      <div class="rollout-rail" aria-label="${task.title}: demonstration and conditioning comparison">
+  const referenceClip = task.reference ? `
         <figure class="rollout-card">
           <div class="rollout-media">
             <video controls muted playsinline preload="metadata" data-playback="${task.reference.playback}" poster="${task.reference.poster}" src="${task.reference.src}"></video>
@@ -1075,6 +1177,21 @@ function renderHumanVideoTask(task, taskIndex) {
             <p>First-person view · Real-time playback</p>
           </figcaption>
         </figure>
+` : "";
+
+  group.innerHTML = `
+    <header class="rollout-group-head">
+      <div class="rollout-group-title">
+        <p class="rollout-kicker"><span class="demo-index">${String(taskIndex + 1).padStart(2, "0")}</span>${task.family}</p>
+        <h3>${task.title}</h3>
+        <p>${task.prompt}</p>
+      </div>
+      <span class="clip-count">${task.configs.length + (task.reference ? 1 : 0)} clips</span>
+    </header>
+    <div class="rollout-rail-wrap">
+      <button class="rollout-nav previous" type="button" aria-label="Show previous clips"><span aria-hidden="true">&#8249;</span></button>
+      <div class="rollout-rail" aria-label="${task.title}: demonstration and conditioning comparison">
+        ${referenceClip}
         ${resultClips}
       </div>
       <button class="rollout-nav next" type="button" aria-label="Show more clips"><span aria-hidden="true">&#8250;</span></button>
@@ -1083,6 +1200,22 @@ function renderHumanVideoTask(task, taskIndex) {
   group.querySelectorAll("video").forEach((video) => {
     video.addEventListener("error", () => video.closest(".rollout-media").classList.add("video-load-failed"));
   });
+  if (task.historySteps) {
+    const actionCard = group.querySelector('.rollout-card:last-child');
+    const details = document.createElement('details');
+    details.className = 'robot-run-summary';
+    details.innerHTML = `<summary>Video + action run summary</summary>
+      <aside class="history-summary" data-summary-task="${taskIndex}" aria-label="Video + action run summary">
+        <div class="history-summary-heading"><p>Recorded action sequence</p></div>
+        <ol>${task.historySteps.map((step, index) => `
+          <li data-summary-step="${index}" data-start="${task.historyTimeline[index]}">
+            <span>${String(index + 1).padStart(2, '0')}</span>
+            <p><strong>${step.title}</strong>${step.text}</p>
+          </li>`).join('')}</ol>
+      </aside>`;
+    actionCard.querySelector('figcaption').append(details);
+    setupHistorySummary(actionCard);
+  }
   activateRolloutRail(group);
   return group;
 }
@@ -1323,8 +1456,8 @@ function setupHistorySummary(group) {
 
 demoTasks.forEach((task, index) => {
   const family = demoGrid.querySelector(`[data-family="${task.family}"]`);
-  const card = task.family === "Human video"
-    ? renderHumanVideoTask(task, index)
+  const card = ["Human video", "Robot video + action"].includes(task.family)
+    ? renderVideoComparison(task, index)
     : renderContextFamilyGroup([task], index);
   const title = card.querySelector('.rollout-group-title h3');
   const taskHeading = document.createElement('h4');
