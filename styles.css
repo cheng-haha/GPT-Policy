@@ -221,7 +221,7 @@ td:nth-child(n+3) { font-family: ui-monospace, monospace; }
 .rollout-media video, .rollout-media img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: contain; }
 .rollout-media video { background: #11151b; }
 .goal-image-media { display: grid; place-items: center; background: #f3f3f1; }
-.goal-image-media img { object-fit: cover; object-position: center; }
+.goal-image-media img { object-fit: contain; object-position: center; }
 .rollout-media.video-load-failed::after { position: absolute; inset: auto 12px 12px; content: "Video could not be loaded."; padding: 7px 9px; border-radius: 4px; background: rgba(255, 241, 241, .95); color: #9b2c2c; font-size: 10px; }
 html[lang="zh-CN"] .rollout-media.video-load-failed::after { content: "视频无法加载。"; }
 .rollout-card figcaption { margin: 13px 2px 0; }
@@ -467,3 +467,12 @@ footer { border-top: 1px solid var(--line); background: var(--soft); }
 .robot-run-summary > summary { color: var(--blue); font-size: 11px; font-weight: 600; cursor: pointer; }
 .robot-run-summary .history-summary { margin-top: 12px; }
 .robot-run-summary .history-summary-heading { padding-bottom: 8px; }
+
+/* Keep each goal reference beside its corresponding execution. */
+.goal-image-group .rollout-rail { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; overflow: visible; padding: 0; }
+.goal-image-group .rollout-card { width: 100%; }
+.goal-image-group .rollout-nav { display: none; }
+.goal-image-group .rollout-media img, .goal-image-group .rollout-media video { width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: contain; }
+@media (max-width: 760px) {
+  .goal-image-group .rollout-rail { grid-template-columns: 1fr; gap: 24px; }
+}

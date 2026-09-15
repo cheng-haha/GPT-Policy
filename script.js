@@ -1458,7 +1458,9 @@ demoTasks.forEach((task, index) => {
   const family = demoGrid.querySelector(`[data-family="${task.family}"]`);
   const card = ["Human video", "Robot video + action"].includes(task.family)
     ? renderVideoComparison(task, index)
-    : renderContextFamilyGroup([task], index);
+    : task.family === "Goal image"
+      ? renderGoalImageTask(task, index)
+      : renderContextFamilyGroup([task], index);
   const title = card.querySelector('.rollout-group-title h3');
   const taskHeading = document.createElement('h4');
   taskHeading.textContent = title.textContent;
