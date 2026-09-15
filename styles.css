@@ -171,7 +171,7 @@ h1 span { display: block; white-space: nowrap; }
 
 .method-figure { margin: 45px 0 0; }
 .method-figure a { display: block; padding: 12px; border: 1px solid var(--line); background: #fff; }
-.method-figure img { width: 100%; }
+.method-figure img { width: 100%; height: auto; }
 .method-figure figcaption { margin: 18px 0 0; max-width: none; }
 .pipeline { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 42px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .pipeline article { padding: 25px 18px 28px; border-right: 1px solid var(--line); }
