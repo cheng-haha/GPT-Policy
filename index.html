@@ -9,7 +9,7 @@
     />
     <meta name="theme-color" content="#f7f8fa" />
     <title>In-Context Robot Learning with VLM Agents</title>
-    <link rel="stylesheet" href="styles.css?v=20260915-overleaf-sync" />
+    <link rel="stylesheet" href="styles.css?v=20260915-overleaf-figures" />
   </head>
   <body id="top">
     <button class="language-toggle" id="language-toggle" type="button" aria-label="Switch to Chinese" title="Switch to Chinese">
@@ -40,7 +40,7 @@
           <span>and turn it into executable, verifiable behavior from a new initial state?</span>
         </p>
         <div class="hero-actions">
-          <a class="button dark paper-button" href="paper.pdf">
+          <a class="button dark paper-button" href="paper.pdf?v=20260915-overleaf-figures">
             <svg class="arxiv-icon" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M3.842 0a1.004 1.004 0 0 0-.922.608c-.154.369-.044.627.294 1.111l6.919 8.36-1.023 1.106a1.039 1.039 0 0 0 .003 1.422l1.23 1.314-5.44 6.444c-.28.299-.453.823-.297 1.199a1.025 1.025 0 0 0 .959.635.913.913 0 0 0 .689-.341l5.783-6.126 7.49 8.005a.853.853 0 0 0 .683.26.958.958 0 0 0 .878-.614c.158-.377-.017-.75-.306-1.141l-7.052-8.342 1.063-1.13a.963.963 0 0 0 .009-1.316L4.634.464S4.26.01 3.842 0Zm14.341 1.842a.877.877 0 0 0-.655.242l-5.696 6.158 1.694 1.832 5.309-6.514c.325-.433.479-.66.325-1.029a1.12 1.12 0 0 0-.977-.689Z" />
             </svg>
@@ -57,8 +57,9 @@
         <div class="hero-figure">
           <figure class="hero-cover-figure">
             <div class="hero-cover-media">
-              <img src="assets/images/whiteboard-demo.jpg?v=20260915" alt="Whiteboard human-interaction demonstration asking Who are you?" />
+              <a href="assets/paper-figures/context-overview.png?v=20260915-overleaf-figures" target="_blank" rel="noopener"><img src="assets/paper-figures/context-overview.png?v=20260915-overleaf-figures" alt="In-context robot control with GPT-Policy: five context families" width="2401" height="1480" fetchpriority="high" /></a>
             </div>
+            <figcaption><b>Figure 1.</b> A general-purpose VLM combines the task instruction, initial state, and contextual information to guide robot actions. Context includes human videos, robot videos with recorded actions, goal images, human–robot interaction, and self-interaction history.</figcaption>
           </figure>
         </div>
       </section>
@@ -144,8 +145,8 @@
               GPT-Policy connects a general-purpose VLM to robot tools through a shared context-to-action interface. Embodiment-specific adapters translate tool requests into executable commands. Model parameters remain fixed; updated observations and execution or rejection feedback inform each subsequent decision.
             </p>
             <figure class="method-figure">
-              <a href="assets/method-overview.png" aria-label="Open method figure at full size">
-                <img src="assets/method-overview.png" alt="Overview of the GPT-Policy context-to-action framework" />
+              <a href="assets/method-overview.png?v=20260915-overleaf-figures" target="_blank" rel="noopener" aria-label="Open method figure at full size">
+                <img src="assets/method-overview.png?v=20260915-overleaf-figures" width="2401" height="1300" loading="lazy" decoding="async" alt="Overview of the GPT-Policy context-to-action framework" />
               </a>
               <figcaption>
                 <b>Figure 2.</b> The task instruction, current state, task references, and interaction history are combined with shared instructions and tool schemas to form the VLM input. A fixed VLM selects tool requests, which constrained robot tools execute. Returned observations and execution feedback update the context for the next decision.
@@ -157,6 +158,13 @@
               <article><span>3</span><h3>Select action</h3><p>A fixed general VLM chooses one structured robot-tool request.</p></article>
               <article><span>4</span><h3>Validate and execute</h3><p>The Cartesian adapter samples poses, checks inverse-kinematics residuals, times joint references, and returns execution or rejection feedback.</p></article>
             </div>
+
+            <figure class="paper-figure" id="paper-figure-3">
+              <a href="assets/paper-figures/execution-harness.png?v=20260915-overleaf-figures" target="_blank" rel="noopener">
+                <img src="assets/paper-figures/execution-harness.png?v=20260915-overleaf-figures" alt="GPT-Policy execution harness" loading="lazy" decoding="async" width="2401" height="1270" />
+              </a>
+              <figcaption><b>Figure 3.</b> The VLM generates tool requests from interleaved image and text inputs. The Cartesian adapter resolves targets, samples the pose path, checks inverse-kinematics residuals, times joint references, and executes the motion. Execution or rejection feedback returns to the next decision.</figcaption>
+            </figure>
           </section>
 
           <section id="results" class="section ruled">
@@ -193,6 +201,34 @@
               </table>
             </div>
             <p class="table-note">GPT-6 Astra on real robots; three trials per condition. Success requires the final scene to satisfy the task-specific geometric and semantic criteria. Decisions and time are averaged over all trials, including failures. Tic-Tac-Toe wins and draws both count as success.</p>
+
+            <figure class="paper-figure" id="paper-figure-4">
+              <a href="assets/paper-figures/human-video-results.png?v=20260915-overleaf-figures" target="_blank" rel="noopener">
+                <img src="assets/paper-figures/human-video-results.png?v=20260915-overleaf-figures" alt="Human demonstrations and robot executions for towel and notebook pickup" loading="lazy" decoding="async" width="2401" height="1905" />
+              </a>
+              <figcaption><b>Figure 4.</b> Example runs for towel and notebook pickup under None and Human Video conditions. Frames progress from left to right.</figcaption>
+            </figure>
+
+            <figure class="paper-figure" id="paper-figure-5">
+              <a href="assets/paper-figures/robot-video-action-results.png?v=20260915-overleaf-figures" target="_blank" rel="noopener">
+                <img src="assets/paper-figures/robot-video-action-results.png?v=20260915-overleaf-figures" alt="Robot demonstrations and executions for bottle opening and plug reinsertion" loading="lazy" decoding="async" width="2401" height="2480" />
+              </a>
+              <figcaption><b>Figure 5.</b> Example runs under None, Robot Video, and Robot Video + Action conditions. Gold boxes mark reference regions in the demonstrations; red marks local deviations and green marks closer matches.</figcaption>
+            </figure>
+
+            <figure class="paper-figure" id="paper-figure-6">
+              <a href="assets/paper-figures/goal-history-interaction-results.png?v=20260915-overleaf-figures" target="_blank" rel="noopener">
+                <img src="assets/paper-figures/goal-history-interaction-results.png?v=20260915-overleaf-figures" alt="Goal images, self-interaction history, and online human interaction" loading="lazy" decoding="async" width="2401" height="2125" />
+              </a>
+              <figcaption><b>Figure 6.</b> Example executions for goal-image following, self-interaction history, and online human interaction, including object arrangement, exploration, tic-tac-toe, and pointed-fruit pickup.</figcaption>
+            </figure>
+
+            <figure class="paper-figure" id="paper-figure-7">
+              <a href="assets/paper-figures/action-reference-alignment.png?v=20260915-overleaf-figures" target="_blank" rel="noopener">
+                <img src="assets/paper-figures/action-reference-alignment.png?v=20260915-overleaf-figures" alt="Action references improve alignment with the demonstration" loading="lazy" decoding="async" width="2401" height="1493" />
+              </a>
+              <figcaption><b>Figure 7.</b> Selected bottle-opening runs compare Video and Video + Action. Measured supporting-gripper tilt, target-to-demonstration orientation differences, and corresponding frames show how action references guide trajectory selection. Progress is normalized separately for each run.</figcaption>
+            </figure>
           </section>
 
           <section id="demos" class="section ruled demo-section">
@@ -345,6 +381,13 @@
               <p class="section-kicker">Discussion</p>
               <h2>A promising interface, with a clear boundary</h2>
             </div>
+
+            <figure class="paper-figure" id="paper-figure-8">
+              <a href="assets/paper-figures/model-comparison.png?v=20260915-overleaf-figures" target="_blank" rel="noopener">
+                <img src="assets/paper-figures/model-comparison.png?v=20260915-overleaf-figures" alt="Red-towel pickup across models and context conditions" loading="lazy" decoding="async" width="2401" height="1610" />
+              </a>
+              <figcaption><b>Figure 8.</b> Human video context helps GPT-6 Astra complete the task with fewer unnecessary intermediate actions in these individual runs. Task progress is completion degree, not success rate; these examples do not establish a reliable model ranking.</figcaption>
+            </figure>
             <div class="discussion-copy">
               <p>
                 In individual red-towel runs, human video raises GPT-6 Astra task progress from 55% to 100%, with approximately 35.6% shorter run time and 58.9% lower estimated token usage. Fable 5.1 and Kimi K3 reach 30% and 20% progress. These examples do not establish a reliable model ranking: task progress is distinct from success rate, which is 2/3 for GPT-6 Astra with human video.
@@ -386,10 +429,10 @@
       <div class="shell footer-inner">
         <a class="brand" href="#top"><span>GPT-Policy</span></a>
         <p>In-context learning for general VLM agents.</p>
-        <div><a href="paper.pdf">Paper</a><a href="#top">Back to top</a></div>
+        <div><a href="paper.pdf?v=20260915-overleaf-figures">Paper</a><a href="#top">Back to top</a></div>
       </div>
     </footer>
 
-    <script src="script.js?v=20260915-overleaf-sync"></script>
+    <script src="script.js?v=20260915-overleaf-figures"></script>
   </body>
 </html>

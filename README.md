@@ -29,3 +29,7 @@ The website layout and assets are based on `cheng-haha/in-context-robot-learning
 ## Manuscript synchronization
 
 Website text and the 16-row context-results table were synchronized with the live Overleaf abstract, introduction, method, experiments, discussion, and conclusion on 15 September 2026. English and Chinese text are updated together. The existing demo recordings remain illustrative runs; aggregate results and the model-comparison discussion follow the manuscript.
+
+## Figure synchronization
+
+All eight main-text figures and the downloadable `paper.pdf` now come from the Overleaf build compiled on 15 September 2026 at 13:49 PDT. Figure 1 replaces the cover photo; Figures 2–3 illustrate the method; Figures 4–7 accompany the results; Figure 8 accompanies the discussion. Each figure opens at full resolution and has English/Chinese captions. `assets/paper-figures/manifest.json` records source pages and the source PDF checksum. Figures are rendered directly from the PDF without changing their annotations or colors.

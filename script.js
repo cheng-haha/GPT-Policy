@@ -35,6 +35,28 @@ pageSections.forEach((section) => sectionObserver.observe(section));
 let currentLanguage = "en";
 
 const zhTranslations = new Map([
+  ["In-context robot control with GPT-Policy: five context families", "GPT-Policy 机器人上下文控制：五类上下文"],
+  ["A general-purpose VLM combines the task instruction, initial state, and contextual information to guide robot actions. Context includes human videos, robot videos with recorded actions, goal images, human–robot interaction, and self-interaction history.", "通用 VLM 将任务指令、初始状态与上下文信息结合起来，引导机器人动作。上下文包括人类视频、附带动作记录的机器人视频、目标图像、人机交互和自身交互历史。"],
+  ["Figure 1.", "图 1。"],
+  ["GPT-Policy execution harness", "GPT-Policy 执行框架"],
+  ["The VLM generates tool requests from interleaved image and text inputs. The Cartesian adapter resolves targets, samples the pose path, checks inverse-kinematics residuals, times joint references, and executes the motion. Execution or rejection feedback returns to the next decision.", "VLM 根据交错排列的图像与文本输入生成工具请求。笛卡尔适配器解析目标、采样位姿路径、检查逆运动学残差、为关节参考分配时间并执行运动。执行或拒绝反馈返回下一次决策。"],
+  ["Figure 3.", "图 3。"],
+  ["Human demonstrations and robot executions for towel and notebook pickup", "毛巾与笔记本拾取中的人类示范和机器人执行"],
+  ["Example runs for towel and notebook pickup under None and Human Video conditions. Frames progress from left to right.", "毛巾与笔记本拾取在无示范和人类视频条件下的执行示例。画面按从左至右的时间顺序排列。"],
+  ["Figure 4.", "图 4。"],
+  ["Robot demonstrations and executions for bottle opening and plug reinsertion", "瓶盖旋拧与插头重新插入的机器人示范和执行"],
+  ["Example runs under None, Robot Video, and Robot Video + Action conditions. Gold boxes mark reference regions in the demonstrations; red marks local deviations and green marks closer matches.", "无示范、机器人视频及机器人视频加动作三种条件下的执行示例。金色框标注示范中的参考区域，红色标注局部偏差，绿色标注更接近示范的动作。"],
+  ["Figure 5.", "图 5。"],
+  ["Goal images, self-interaction history, and online human interaction", "目标图像、自身交互历史与在线人机交互"],
+  ["Example executions for goal-image following, self-interaction history, and online human interaction, including object arrangement, exploration, tic-tac-toe, and pointed-fruit pickup.", "目标图像跟随、自身交互历史和在线人机交互的执行示例，涵盖物体摆放、探索、井字棋和所指水果拾取。"],
+  ["Figure 6.", "图 6。"],
+  ["Action references improve alignment with the demonstration", "动作参考改善与示范的对齐"],
+  ["Selected bottle-opening runs compare Video and Video + Action. Measured supporting-gripper tilt, target-to-demonstration orientation differences, and corresponding frames show how action references guide trajectory selection. Progress is normalized separately for each run.", "选取的瓶盖旋拧试验对比视频与视频加动作条件。支撑夹爪的实测倾角、目标与示范的姿态差异以及对应画面展示了动作参考如何引导轨迹选择。进度在每次试验内分别归一化。"],
+  ["Figure 7.", "图 7。"],
+  ["Red-towel pickup across models and context conditions", "不同模型与上下文条件下的红毛巾拾取"],
+  ["Human video context helps GPT-6 Astra complete the task with fewer unnecessary intermediate actions in these individual runs. Task progress is completion degree, not success rate; these examples do not establish a reliable model ranking.", "在这些单次试验中，人类视频上下文帮助 GPT-6 Astra 减少不必要的中间动作并完成任务。任务进度表示完成程度，而非成功率；这些示例不足以确立可靠的模型排名。"],
+  ["Figure 8.", "图 8。"],
+
   ["Enabling robots to adapt to unfamiliar environments as readily as humans remains a moonshot goal of embodied AI. No finite collection of demonstrations can cover every task and situation a robot will encounter, making the ability to learn from context at deployment essential for generalization. Such in-context learning (ICL), however, remains largely beyond the reach of existing robotic policies. The broad agentic capabilities of commercial vision-language models (VLMs), such as GPT-6 Astra, raise a compelling question: can these models learn from demonstrations, examples, and interaction feedback, then translate that information into executable and verifiable robot behavior from a new initial state without gradient updates or persistent changes to task-specific parameters?", "让机器人像人类一样适应陌生环境，仍是具身人工智能的长远目标。有限的示范无法覆盖机器人将遇到的所有任务与情境，因此在部署时从上下文中学习是实现泛化的关键。然而，现有机器人策略在很大程度上仍缺乏这种上下文学习（ICL）能力。GPT-6 Astra 等商用视觉语言模型（VLM）的通用智能体能力引出了一个问题：这些模型能否从示范、样例和交互反馈中学习，并在不更新梯度、不持久改变任务特定参数的前提下，从新的初始状态出发，将这些信息转化为可执行、可验证的机器人行为？"],
   [", a general-agent framework for in-context robot learning. GPT-Policy integrates a context compiler that preserves task-relevant visual transitions, a VLM that proposes robot-tool actions, and a constrained controller that verifies and executes each action and reports its outcome. We evaluate its reliability and limitations through task success and efficiency metrics, matched comparisons across models, and controlled context ablations. In real-robot trials, human video demonstrations improve task completion even without robot action labels, while aligned action references yield further gains on contact-sensitive tasks. These findings position GPT-Policy as a step toward robot adaptation through in-context learning, providing an empirical foundation for translating the general-purpose capabilities of VLMs into physical behavior and clarifying the challenges that must be overcome for reliable deployment.", "，一个面向机器人上下文学习的通用智能体框架。GPT-Policy 整合了保留任务相关视觉变化的上下文编译器、提出机器人工具动作的 VLM，以及验证、执行并报告动作结果的受约束控制器。我们通过任务成功率与效率指标、配对模型比较和受控上下文消融评估其可靠性与局限。在真实机器人试验中，即使没有机器人动作标签，人类视频示范也能改善任务完成情况；对齐的动作参考则进一步提升接触敏感任务的表现。这些发现为通过上下文学习实现机器人适应迈出了一步，为将 VLM 的通用能力转化为物理行为提供了实证基础，也明确了可靠部署仍需克服的挑战。"],
   ["How much robotic in-context learning is already accessible through general VLMs that were not trained as dedicated robot policies?", "未经专用机器人策略训练的通用视觉语言模型，已经具备多大程度的机器人上下文学习能力？"],
@@ -435,7 +457,7 @@ const demoTasks = [
     prompt: "Match the target image's T shape, including block colors, relative positions, and spacing.",
     targetImage: "assets/images/5cubes-in-T-shape.jpg?v=20260915-latest-target",
     configs: [
-      { label: "Goal image", model: "GPT-6 Astra", context: "Target image", success: "3 / 3", decisions: "59.3", time: "13.3 min", src: "assets/videos/blocks-t.mp4", poster: "assets/images/blocks-t-run-poster.jpg", trial: "Success", view: "Head view" }
+      { label: "Goal image", model: "GPT-6 Astra", context: "Target image", success: "3 / 3", decisions: "66.7", time: "15.8 min", src: "assets/videos/blocks-t.mp4", poster: "assets/images/blocks-t-run-poster.jpg", trial: "Success", view: "Head view" }
     ]
   },
   {
@@ -484,7 +506,7 @@ const demoTasks = [
       }
     ],
     configs: [
-      { label: "Self history", model: "GPT-6 Astra", context: "Interaction history", success: "3 / 3", decisions: "35.0", time: "8.1 min", src: "assets/videos/lemon-search.mp4", trial: "Success", view: "Head view" }
+      { label: "Self history", model: "GPT-6 Astra", context: "Interaction history", success: "3 / 3", decisions: "35.3", time: "8.1 min", src: "assets/videos/lemon-search.mp4", trial: "Success", view: "Head view" }
     ]
   },
   {

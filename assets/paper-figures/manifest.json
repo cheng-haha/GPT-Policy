@@ -1,0 +1,62 @@
+{
+  "source": "Overleaf project 6aa022fe56f647092f7070de, compiled 2026-09-15 13:49 PDT",
+  "pdf_sha256": "b81115d476920c377416a750d3a68f99471061951cfc298a1bb472aec1ddee16",
+  "figures": [
+    {
+      "figure": 1,
+      "source_page": 2,
+      "file": "assets/paper-figures/context-overview.png",
+      "width": 2401,
+      "height": 1480
+    },
+    {
+      "figure": 2,
+      "source_page": 4,
+      "file": "assets/method-overview.png",
+      "width": 2401,
+      "height": 1300
+    },
+    {
+      "figure": 3,
+      "source_page": 5,
+      "file": "assets/paper-figures/execution-harness.png",
+      "width": 2401,
+      "height": 1270
+    },
+    {
+      "figure": 4,
+      "source_page": 8,
+      "file": "assets/paper-figures/human-video-results.png",
+      "width": 2401,
+      "height": 1905
+    },
+    {
+      "figure": 5,
+      "source_page": 9,
+      "file": "assets/paper-figures/robot-video-action-results.png",
+      "width": 2401,
+      "height": 2480
+    },
+    {
+      "figure": 6,
+      "source_page": 10,
+      "file": "assets/paper-figures/goal-history-interaction-results.png",
+      "width": 2401,
+      "height": 2125
+    },
+    {
+      "figure": 7,
+      "source_page": 11,
+      "file": "assets/paper-figures/action-reference-alignment.png",
+      "width": 2401,
+      "height": 1493
+    },
+    {
+      "figure": 8,
+      "source_page": 12,
+      "file": "assets/paper-figures/model-comparison.png",
+      "width": 2401,
+      "height": 1610
+    }
+  ]
+}

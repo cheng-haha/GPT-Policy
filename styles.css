@@ -99,9 +99,10 @@ h1 span { display: block; white-space: nowrap; }
 .paper-button { padding-inline: 17px 20px; }
 .hero-figure { margin-top: 72px; text-align: left; }
 .hero-cover-figure { width: min(100%, 1080px); margin: 0 auto; }
-.hero-cover-media { position: relative; overflow: hidden; aspect-ratio: 16 / 10; border: 1px solid #cfd4dc; border-radius: 18px; background: #eef0f2; box-shadow: 0 30px 72px -42px rgba(13, 20, 31, .48); }
+.hero-cover-media { position: relative; overflow: hidden; border: 1px solid #cfd4dc; border-radius: 18px; background: #eef0f2; box-shadow: 0 30px 72px -42px rgba(13, 20, 31, .48); }
 .hero-cover-media::after { position: absolute; inset: 0; border-radius: inherit; box-shadow: inset 0 0 0 1px rgba(255,255,255,.38); content: ""; pointer-events: none; }
-.hero-cover-media img { width: 100%; height: 100%; object-fit: cover; object-position: center; filter: saturate(.92) contrast(1.035); }
+.hero-cover-media a { display: block; }
+.hero-cover-media img { display: block; width: 100%; height: auto; }
 .method-figure figcaption { max-width: 860px; margin: 25px auto 0; color: #666c78; font: 13px/1.55 ui-monospace, monospace; }
 
 .content-layout { display: grid; grid-template-columns: 165px minmax(0, 1fr); gap: 70px; padding-bottom: 100px; }
@@ -383,7 +384,7 @@ footer { border-top: 1px solid var(--line); background: var(--soft); }
   .hero { padding-top: 74px; }
   h1 { font-size: clamp(27px, 7.2vw, 44px); }
   .hero-lead span { display: inline; white-space: normal; }
-  .hero-cover-media { aspect-ratio: 4 / 3; border-radius: 12px; }
+  .hero-cover-media { border-radius: 12px; }
   .pipeline, .metric-row, .split-section, .footer-inner { grid-template-columns: 1fr; }
   .comparison-heading, .comparison-grid { grid-template-columns: 1fr; }
   .demo-rollout-group { padding: 28px 0 34px; }
@@ -412,3 +413,9 @@ footer { border-top: 1px solid var(--line); background: var(--soft); }
 .future-directions { padding-left: 20px; color: #515762; font-size: 14px; line-height: 1.65; }
 .future-directions li { margin: 16px 0; }
 .future-directions b, .future-directions span { display: block; }
+
+.hero-cover-figure figcaption, .paper-figure figcaption { margin: 18px 0 0; color: #666c78; font: 13px/1.6 ui-monospace, monospace; text-align: left; }
+.paper-figure { margin: 46px 0 0; }
+.paper-figure a { display: block; padding: 12px; border: 1px solid var(--line); background: #fff; }
+.paper-figure img { display: block; width: 100%; height: auto; }
+.paper-figure figcaption b { color: #4f5968; }
