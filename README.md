@@ -14,9 +14,9 @@ Open `index.html` directly, or serve the folder with any static web server.
 
 ## Deploy
 
-GitHub Pages publishes this website from the root (`/`) of the `page` branch in `cheng-haha/GPT-Policy-Eval`, with no build step.
+GitHub Pages publishes this website from the root (`/`) of the `page` branch in `cheng-haha/GPT-Policy`, with no build step.
 
-Published website: https://cheng-haha.github.io/GPT-Policy-Eval/
+Published website: https://cheng-haha.github.io/GPT-Policy/
 
 The website layout and assets are based on `cheng-haha/in-context-robot-learning` at commit `7f59dbc7b94506506f7a61997b6773c3203f3a79` (Update project page from latest manuscript). This is the final corrected version before the subsequent page redesign, including the VLM Agents title, revised abstract, synchronized video summaries, and experiment-table corrections.
 
