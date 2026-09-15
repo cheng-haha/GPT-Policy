@@ -225,8 +225,6 @@ const zhTranslations = new Map([
   ["Gave up", "放弃"],
   ["Pick up a red towel", "拿起红毛巾"],
   ["Imitate the demonstrated two-hand grasp and lift the red towel with the robot's right hand.", "模仿示范中的双手抓取方式，并用机器人的右手抬起红毛巾。"],
-  ["Remove a glue-stick cap", "拔下胶棒帽"],
-  ["Use the observed pulling procedure to separate the cap from the glue stick.", "采用观察到的拉拔流程，将胶帽与胶棒分离。"],
   ["Arrange blocks into a T", "将积木摆成 T 形"],
   ["Match the target image's T shape, including block colors, relative positions, and spacing.", "复现目标图像中的 T 形，包括积木颜色、相对位置与间距。"],
   ["Arrange four fruits", "摆放四种水果"],
@@ -600,21 +598,6 @@ const demoTasks = [
     ]
   },
   {
-    family: "Human video",
-    title: "Remove a glue-stick cap",
-    prompt: "Use the observed pulling procedure to separate the cap from the glue stick.",
-    reference: {
-      src: "assets/videos/glue-reference.mp4?v=20260914-human-source",
-      poster: "assets/images/glue-human-poster.jpg",
-      label: "Original human video",
-      playback: "Real time"
-    },
-    configs: [
-      { label: "With human video", model: "GPT-6 Astra", context: "Human demonstration", success: "3 / 3", decisions: "65.7", time: "16.9 min", src: "assets/videos/glue-with-demo.mp4", poster: "assets/images/glue-with-human-poster.jpg", trial: "Success", view: "Head view", usesReference: true },
-      { label: "Without human video", model: "GPT-6 Astra", context: "No human demonstration", success: "3 / 3", decisions: "49.3", time: "12.2 min", src: "assets/videos/glue-no-demo.mp4", poster: "assets/images/glue-without-human-poster.jpg", trial: "Success", view: "Head view", usesReference: false }
-    ]
-  },
-  {
     family: "Goal image",
     title: "Arrange blocks into a T",
     prompt: "Match the target image's T shape, including block colors, relative positions, and spacing.",
@@ -828,7 +811,7 @@ demoTasks.splice(1, 0, {
     }
   ]
 });
-demoTasks.splice(3, 0, {
+demoTasks.splice(2, 0, {
   "family": "Robot video + action",
   "title": "Unscrew a bottle cap",
   "prompt": "Use the robot demonstration and aligned action references to remove the cap and return the bottle to the table.",
