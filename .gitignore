@@ -1,0 +1,6 @@
+tmp/
+public/
+.openwam-reference/
+.openwam-src/
+*.crdownload
+assets/videos/source/
