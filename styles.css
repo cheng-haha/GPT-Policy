@@ -186,8 +186,8 @@ table { width: 100%; min-width: 700px; border-collapse: collapse; font-size: 12p
 th { padding: 13px 12px; border-bottom: 1px solid var(--ink); color: #7a808b; font: 700 9px ui-monospace, monospace; letter-spacing: .08em; text-align: left; text-transform: uppercase; }
 td { padding: 14px 12px; border-bottom: 1px solid var(--line); }
 tbody tr { transition: background 150ms ease; }
-tbody tr:hover, tbody tr.highlight:hover { background: #edf3fc; }
-tbody tr.highlight { background: #f7faff; }
+tbody tr:nth-child(even) { background: #f5f8fc; }
+tbody tr:hover { background: #eaf1fb; }
 td:nth-child(n+3) { font-family: ui-monospace, monospace; }
 .table-note { margin: 14px 0 0; color: #7b818c; font: 11px/1.55 ui-monospace, monospace; }
 .demo-section { --demo-blue: #275da8; }
@@ -246,17 +246,23 @@ html[lang="zh-CN"] .rollout-media.video-load-failed::after { content: "视频无
 .history-enriched-layout > .rollout-rail-wrap { position: sticky; top: 24px; }
 .history-enriched-group .rollout-rail { justify-content: stretch; }
 .history-enriched-group .rollout-card { flex-basis: 100%; }
-.history-summary { min-width: 0; padding: 2px 0 0; }
-.history-summary-heading { display: flex; align-items: end; justify-content: space-between; gap: 18px; padding-bottom: 13px; border-bottom: 1px solid var(--line); }
+.history-summary { position: relative; display: grid; grid-template-rows: auto minmax(0, 1fr); min-width: 0; min-height: 0; padding: 2px 0 0; overflow: hidden; }
+.history-summary-heading { position: relative; z-index: 2; display: flex; align-items: end; justify-content: space-between; gap: 18px; padding: 0 10px 13px 0; border-bottom: 1px solid var(--line); background: #fff; }
 .history-summary-heading p { margin: 0; color: var(--blue); font-size: 10px; font-weight: 650; }
 .history-summary-heading h4 { margin: 0; font-size: 16px; font-weight: 650; letter-spacing: -.025em; }
-.history-summary ol { margin: 0; padding: 0; list-style: none; }
-.history-summary li { position: relative; display: grid; grid-template-columns: 29px minmax(0, 1fr); gap: 11px; padding: 12px 0 12px; border-bottom: 1px solid #eceef1; }
-.history-summary li:last-child { padding-bottom: 0; border-bottom: 0; }
+.history-summary ol { min-height: 0; margin: 0; padding: 0 8px 0 0; overflow-y: auto; overscroll-behavior: contain; scroll-behavior: smooth; scrollbar-color: #c8d2df transparent; scrollbar-width: thin; list-style: none; }
+.history-summary ol::-webkit-scrollbar { width: 5px; }
+.history-summary ol::-webkit-scrollbar-track { background: transparent; }
+.history-summary ol::-webkit-scrollbar-thumb { border-radius: 999px; background: #c8d2df; }
+.history-summary li { position: relative; display: grid; grid-template-columns: 29px minmax(0, 1fr); gap: 11px; padding: 12px 8px 12px 10px; border-bottom: 1px solid #eceef1; border-left: 2px solid transparent; transition: border-color 240ms ease, background-color 240ms ease, opacity 240ms ease; }
+.history-summary li:last-child { border-bottom: 0; }
 .history-summary li > span { display: grid; place-items: center; align-self: start; width: 25px; height: 25px; border-radius: 50%; background: #eef3fa; color: var(--blue); font-size: 8px; font-weight: 720; font-variant-numeric: tabular-nums; }
 .history-summary li p { margin: 0; color: #646c77; font-size: 10.5px; line-height: 1.48; text-align: justify; text-justify: inter-word; }
 .history-summary li strong { display: block; margin-bottom: 2px; color: var(--ink); font-size: 11px; font-weight: 680; }
 .history-summary code { padding: 1px 3px; border-radius: 3px; background: #f1f3f6; color: #38475c; font: .92em ui-monospace, "SFMono-Regular", Consolas, monospace; }
+.history-summary.is-synced li.is-complete { opacity: .58; }
+.history-summary.is-synced li.is-active { border-left-color: var(--blue); background: linear-gradient(90deg, #f2f6fc 0%, rgba(247, 250, 255, .7) 72%, transparent 100%); opacity: 1; }
+.history-summary.is-synced li.is-active > span { background: var(--blue); color: #fff; box-shadow: 0 4px 12px rgba(34, 86, 166, .2); }
 .rollout-config-tabs { display: flex; gap: 18px; margin-top: 12px; overflow-x: auto; border-bottom: 1px solid var(--line); scrollbar-width: none; }
 .rollout-config-tabs::-webkit-scrollbar { display: none; }
 .rollout-config-tabs button { flex: 0 0 auto; padding: 5px 0 8px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: #808791; font: 620 10px/1.2 "Geist", sans-serif; cursor: pointer; }

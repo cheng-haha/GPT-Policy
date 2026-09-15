@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Project page for In-Context Robot Learning with General Agents and GPT-Policy."
+      content="Project page for In-Context Robot Learning with VLM Agents and GPT-Policy."
     />
     <meta name="theme-color" content="#f7f8fa" />
-    <title>In-Context Robot Learning with General Agents</title>
-    <link rel="stylesheet" href="styles.css?v=20260915-bilingual-toggle" />
+    <title>In-Context Robot Learning with VLM Agents</title>
+    <link rel="stylesheet" href="styles.css?v=20260915-paper-metadata" />
   </head>
   <body id="top">
     <button class="language-toggle" id="language-toggle" type="button" aria-label="Switch to Chinese" title="Switch to Chinese">
@@ -33,11 +33,11 @@
 
     <main>
       <section class="hero shell">
-        <h1><span>In-Context Robot Learning</span><span>with General Agents</span></h1>
+        <h1><span>In-Context Robot Learning</span><span>with VLM Agents</span></h1>
         <p class="authors">Anonymous authors</p>
         <p class="hero-lead">
-          <span>Can a fixed, general-purpose vision-language model learn a new robotic task</span>
-          <span>from a small test-time context - then turn that context into executable, verifiable behavior?</span>
+          <span>Can a fixed commercial LLM or VLM extract new task information at test time</span>
+          <span>and turn it into executable, verifiable behavior from a new initial state?</span>
         </p>
         <div class="hero-actions">
           <a class="button dark paper-button" href="paper.pdf">
@@ -79,30 +79,38 @@
         <div class="article">
           <section id="overview" class="section ruled">
             <p class="section-kicker">Overview</p>
-            <h2>Robotic adaptation, without parameter updates</h2>
+            <h2>Robotic in-context learning, without parameter updates</h2>
             <div class="abstract-grid">
               <h3>Abstract</h3>
               <p>
                 Humans continually adapt to new situations, whereas a robot trained on a finite
                 set of demonstrations must face tasks and environments that training cannot
                 exhaustively cover. We ask whether a fixed commercial language or vision-language
-                model can extract new task information from a small test-time context and turn it
-                into executable, verifiable behavior from a new initial state.
+                model (LLM/VLM) can extract new task information from a small test-time context and
+                turn it into executable, verifiable behavior from a new initial state. We define
+                robotic in-context learning as adaptation during the target task that uses
+                demonstrations, examples, or interaction feedback while forbidding gradient updates
+                and persistent task-specific parameter changes.
               </p>
               <p>
                 We introduce <b>GPT-Policy</b>, a general-agent framework that accepts human videos,
                 robot demonstrations, goal images, self-interaction history, and experience of
-                environmental rules or human intent through a shared closed-loop interface. A
-                context compiler preserves task-relevant visual transitions, the VLM proposes
-                robot-tool actions, and a constrained controller checks, executes, and reports
-                each action.
+                environmental rules or human intent through a shared closed-loop interface for
+                manipulation and exploration. A context compiler preserves task-relevant visual
+                transitions, the VLM proposes robot-tool actions, and a constrained controller
+                checks, executes, and reports each action. Initial task records and case analyses
+                illustrate goal specification, changes in operation order, and online coordination,
+                while exposing a gap between task reasoning and verified physical execution. The
+                evaluation combines task-level success and efficiency reporting with matched model
+                comparisons and planned context ablations to test the reliability and limits of
+                these behaviors.
               </p>
             </div>
             <div class="research-question">
               <span>Central question</span>
               <p>
                 How much robotic in-context learning is already accessible through general VLMs
-                that were not trained as dedicated robot policies?
+                that were not exposed as dedicated robot policies?
               </p>
             </div>
           </section>
@@ -184,19 +192,19 @@
             <div class="table-wrap">
               <table>
                 <thead>
-                  <tr><th>Context condition</th><th>Task</th><th>Success</th><th>Decisions</th><th>Time (min)</th></tr>
+                  <tr><th>Task</th><th>Context condition</th><th>Success</th><th>Decisions</th><th>Time (min)</th></tr>
                 </thead>
                 <tbody>
-                  <tr><td>Without human video</td><td>Pick Red Towel</td><td>0 / 3</td><td>96.3</td><td>24.6</td></tr>
-                  <tr class="highlight"><td>Human video</td><td>Pick Red Towel</td><td>2 / 3</td><td>76.7</td><td>18.9</td></tr>
-                  <tr><td>Without human video</td><td>Remove Glue Cap</td><td>3 / 3</td><td>49.3</td><td>12.2</td></tr>
-                  <tr class="highlight"><td>Human video</td><td>Remove Glue Cap</td><td>3 / 3</td><td>65.7</td><td>16.9</td></tr>
-                  <tr><td>Target image</td><td>Arrange T Shape</td><td>3 / 3</td><td>59.3</td><td>13.3</td></tr>
-                  <tr><td>Target image</td><td>Arrange Fruit</td><td>3 / 3</td><td>49.0</td><td>12.4</td></tr>
-                  <tr><td>Self history</td><td>Lemon To Pink Plate</td><td>3 / 3</td><td>35.0</td><td>8.1</td></tr>
-                  <tr><td>Self history</td><td>Movable Exploration</td><td>3 / 3</td><td>40.33</td><td>25.53</td></tr>
-                  <tr><td>Human-robot interaction</td><td>Tic-Tac-Toe</td><td>3 / 3</td><td>69.7</td><td>13.6</td></tr>
-                  <tr><td>Human-robot interaction</td><td>Pointed Fruit Pickup</td><td>3 / 3</td><td>67.3</td><td>15.0</td></tr>
+                  <tr><td>Pick Red Towel</td><td>Without human video</td><td>0 / 3</td><td>96.3</td><td>24.6</td></tr>
+                  <tr><td>Pick Red Towel</td><td>Human video</td><td>2 / 3</td><td>76.7</td><td>18.9</td></tr>
+                  <tr><td>Remove Glue Cap</td><td>Without human video</td><td>3 / 3</td><td>49.3</td><td>12.2</td></tr>
+                  <tr><td>Remove Glue Cap</td><td>Human video</td><td>3 / 3</td><td>65.7</td><td>16.9</td></tr>
+                  <tr><td>Arrange T Shape</td><td>Target image</td><td>3 / 3</td><td>59.3</td><td>13.3</td></tr>
+                  <tr><td>Arrange Fruit</td><td>Target image</td><td>3 / 3</td><td>49.0</td><td>12.4</td></tr>
+                  <tr><td>Lemon To Pink Plate</td><td>Self history</td><td>3 / 3</td><td>35.0</td><td>8.1</td></tr>
+                  <tr><td>Movable Exploration</td><td>Self history</td><td>3 / 3</td><td>40.33</td><td>25.53</td></tr>
+                  <tr><td>Tic-Tac-Toe</td><td>Human-robot interaction</td><td>3 / 3</td><td>69.7</td><td>13.6</td></tr>
+                  <tr><td>Pointed Fruit Pickup</td><td>Human-robot interaction</td><td>3 / 3</td><td>67.3</td><td>15.0</td></tr>
                 </tbody>
               </table>
             </div>
@@ -373,7 +381,7 @@
             <div class="code-block">
               <button id="copy-citation" type="button">Copy citation</button>
               <pre id="bibtex">@article{anonymous2027incontext,
-  title   = {In-Context Robot Learning with General Agents},
+  title   = {In-Context Robot Learning with VLM Agents},
   author  = {Anonymous Authors},
   year    = {2027},
   journal = {ICLR submission}
@@ -387,11 +395,11 @@
     <footer>
       <div class="shell footer-inner">
         <a class="brand" href="#top"><span>GPT-Policy</span></a>
-        <p>In-context learning for general robotic agents.</p>
+        <p>In-context learning for general VLM agents.</p>
         <div><a href="paper.pdf">Paper</a><a href="#top">Back to top</a></div>
       </div>
     </footer>
 
-    <script src="script.js?v=20260915-bilingual-toggle"></script>
+    <script src="script.js?v=20260915-paper-metadata"></script>
   </body>
 </html>
