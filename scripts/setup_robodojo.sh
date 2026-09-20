@@ -76,6 +76,15 @@ bash "$ROOT_DIR/scripts/install_robodojo_policy.sh" \
 if [[ "$INSTALL_SIM_DEPS" == 1 ]]; then
   export OMNI_KIT_ACCEPT_EULA=YES
   bash "$ROOT_DIR/third_party/RoboDojo/scripts/install.sh" --install
+  # The upstream installer can leave an editable IsaacLab entry pointing at
+  # the checkout path used on its build machine. Rebind it to this checkout
+  # so the RoboDojo client can import isaaclab from the current workspace.
+  ROBO_DOJO_PYTHON="${HOME}/miniconda3/envs/RoboDojo/bin/python"
+  ISAACLAB_SOURCE="$ROOT_DIR/third_party/RoboDojo/third_party/IsaacLab/source/isaaclab"
+  if [[ -x "$ROBO_DOJO_PYTHON" && -f "$ISAACLAB_SOURCE/pyproject.toml" ]]; then
+    PIP_INDEX_URL="$PIP_INDEX_URL" "$ROBO_DOJO_PYTHON" -m pip install \
+      --no-build-isolation -e "$ISAACLAB_SOURCE"
+  fi
 else
   echo "Source checkouts ready. Isaac Sim dependencies not installed."
   echo "Run with --install-sim-deps on the GPU simulator host when ready."
