@@ -167,9 +167,17 @@ class RoboDojoAdapter:
             if grip_key in action:
                 output[grip_key] = _jsonable(action[grip_key])
             elif "positions" in action and isinstance(action["positions"], Mapping) and arm in action["positions"]:
-                output[grip_key] = [float(action["positions"][arm])]
+                # In the bimanual tool schema, null explicitly means hold
+                # this side's current gripper reference. Do not coerce it to
+                # float(None); the model layer fills the measured state for
+                # omitted targets before the action reaches RoboDojo.
+                position = action["positions"][arm]
+                if position is not None:
+                    output[grip_key] = [float(position)]
             elif len(self.arms) == 1 and "gripper" in action:
-                output[grip_key] = [float(action["gripper"])]
+                position = action["gripper"]
+                if position is not None:
+                    output[grip_key] = [float(position)]
         if not output:
             raise ValueError("GPT-Policy action contains no RoboDojo pose or gripper target")
         return output

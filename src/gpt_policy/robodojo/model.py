@@ -186,7 +186,15 @@ class GPTPolicyModel:
         if name == "move_eef_chunk":
             actions = [self.adapter.action({"target": point}) for point in arguments.get("poses", [])]
         elif name in {"move_to", "set_gripper"}:
-            actions = [self.adapter.action(arguments)]
+            # A null gripper target is an explicit hold request. If every
+            # selected side is null, emit a complete measured-state hold
+            # action instead of asking the adapter to build an empty dict.
+            positions = arguments.get("positions") if name == "set_gripper" else None
+            single_hold = name == "set_gripper" and arguments.get("gripper") is None
+            all_hold = isinstance(positions, Mapping) and all(
+                positions.get(arm) is None for arm in self.arms
+            )
+            actions = [self._hold_action()] if single_hold or all_hold else [self.adapter.action(arguments)]
         else:
             raise ValueError(f"RoboDojo cannot execute GPT-Policy tool {name!r} directly")
         # XPolicyLab's bimanual action contract requires a gripper field for
