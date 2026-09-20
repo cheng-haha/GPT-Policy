@@ -96,6 +96,15 @@ fi
 bash "$ROOT_DIR/scripts/install_robodojo_policy.sh" \
   --xpolicylab-dir "$ROOT_DIR/third_party/XPolicyLab"
 
+# Current public assets publish curobo_tmp.yml while the robot classes resolve
+# curobo.yml. Provide the expected stable name once assets are present.
+for robot_name in x5 franka; do
+  robot_assets="$ROOT_DIR/third_party/RoboDojo/Assets/Robots/$robot_name"
+  if [[ -f "$robot_assets/curobo_tmp.yml" && ! -e "$robot_assets/curobo.yml" ]]; then
+    ln -s curobo_tmp.yml "$robot_assets/curobo.yml"
+  fi
+done
+
 # RoboDojo's client resolves policy deploy adapters relative to its own root.
 # Reuse the separately pinned XPolicyLab checkout instead of maintaining a
 # second copy under RoboDojo/XPolicyLab. Do this after the upstream installer,
