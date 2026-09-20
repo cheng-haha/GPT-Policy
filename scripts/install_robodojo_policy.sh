@@ -101,6 +101,7 @@ def eval_one_episode_batch(TASK_ENV, model_client):
 EOF
 cat >"${POLICY_DIR}/deploy.yml" <<EOF
 policy_name: ${POLICY_NAME}
+model: gpt-5.6-sol
 protocol: ws
 host: localhost
 port: 19000
@@ -163,6 +164,7 @@ cp -a "${POLICY_DIR}/__init__.py" "${POLICY_DIR}/model.py" "${POLICY_DIR}/deploy
   "${POLICY_DIR}/setup_eval_policy_server.sh" "${POLICY_DIR}/eval.sh" "${FRANKA_POLICY_DIR}/"
 cat >"${FRANKA_POLICY_DIR}/deploy.yml" <<EOF
 policy_name: GPT_Policy_Franka
+model: gpt-5.6-sol
 protocol: ws
 host: localhost
 port: 19000
