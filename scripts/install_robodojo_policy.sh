@@ -78,7 +78,7 @@ export PYTHONPATH="$(realpath "$ROOT_DIR/src"):\$PWD\${PYTHONPATH:+:\$PYTHONPATH
 if ! command -v codex >/dev/null 2>&1; then
   for candidate in /mnt/workspace/.local/share/*/export_bin/codex; do
     if [[ -x "\$candidate" ]]; then
-      export PATH="$(dirname "\$candidate"):\$PATH"
+      export PATH="\$(dirname "\$candidate"):\$PATH"
       break
     fi
   done
