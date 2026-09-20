@@ -1,0 +1,8 @@
+{
+  "world_from_base": {
+    "franka": [[0, 1, 0, 0.0], [-1, 0, 0, 0.6], [0, 0, 1, 0.765], [0, 0, 0, 1]]
+  },
+  "tcp_from_link6": {},
+  "intrinsics": {},
+  "camera_extrinsics_world": {}
+}

@@ -43,11 +43,17 @@ class RoboDojoAdapter:
     normalized state follows the same keys consumed by the real hardware loop.
     """
 
-    def __init__(self, calibration: RoboDojoCalibration, arms: tuple[str, ...] = ("left", "right")) -> None:
+    def __init__(
+        self,
+        calibration: RoboDojoCalibration,
+        arms: tuple[str, ...] = ("left", "right"),
+        robot_model: str = "X5",
+    ) -> None:
         if not arms:
             raise ValueError("at least one arm is required")
         self.calibration = calibration
         self.arms = arms
+        self.robot_model = robot_model
 
     def state(self, frame: Mapping[str, Any]) -> dict[str, Any]:
         source = frame.get("state", {})
@@ -88,7 +94,7 @@ class RoboDojoAdapter:
         result: dict[str, Any] = {
             "arms": arm_states,
             "backend": "robodojo",
-            "robot_model": "x5" if len(self.arms) == 2 else "x5-single",
+            "robot_model": self.robot_model,
             "interface": "robodojo",
             "interfaces": {arm: "robodojo" for arm in self.arms},
             "calibration": self.calibration.context_manifest(),

@@ -1,0 +1,31 @@
+{
+  "machine": "robodojo",
+  "agent": "codex",
+  "agent_config_dir": "..",
+  "backend": "robodojo",
+  "tool_catalog": "configs/tools.json",
+  "runtime": {
+    "robot_model": "Franka",
+    "interface": "robodojo",
+    "camera_width": 640,
+    "camera_height": 480,
+    "convert_camera_images_to_jpeg": true,
+    "camera_jpeg_quality": 85,
+    "task_name": "push_T",
+    "record_dir": null,
+    "input_json": null,
+    "max_decisions": 100
+  },
+  "robodojo": {
+    "env_cfg_type": "gpt_policy_franka",
+    "action_type": "ee",
+    "cameras": ["cam_head", "cam_left_wrist", "cam_right_wrist"],
+    "calibration_manifest": "configs/examples/robodojo_franka_calibration.json"
+  },
+  "robot": {"gravity_compensation": false},
+  "motion": {},
+  "recording": {"fps": 10, "jpeg_quality": 75, "state_hz": 20},
+  "cameras": {},
+  "scene": {"safety_notes": []},
+  "vision": {"camera_intrinsics": {}, "distortion_coefficients": {}}
+}

@@ -14,6 +14,9 @@ while [[ $# -gt 0 ]]; do
     *) echo "Unknown argument: $1" >&2; exit 2 ;;
   esac
 done
+XPOLICYLAB_DIR="$(realpath "$XPOLICYLAB_DIR")"
+GPT_CONFIG="$(realpath "$GPT_CONFIG")"
+CALIBRATION="$(realpath "$CALIBRATION")"
 BASE_ENV_CFG="${XPOLICYLAB_DIR}/../RoboDojo/env_cfg/arx_x5.yml"
 OVERLAY_ENV_CFG="${XPOLICYLAB_DIR}/../RoboDojo/env_cfg/gpt_policy_x5.yml"
 if [[ -f "$BASE_ENV_CFG" ]]; then
@@ -21,6 +24,46 @@ if [[ -f "$BASE_ENV_CFG" ]]; then
       -e 's/extrinsic_matrix: false/extrinsic_matrix: true/' \
       "$BASE_ENV_CFG" >"$OVERLAY_ENV_CFG"
 fi
+FRANKA_ENV_CFG="${XPOLICYLAB_DIR}/../RoboDojo/env_cfg/gpt_policy_franka.yml"
+cat >"${FRANKA_ENV_CFG}" <<'EOF'
+config_name: gpt_policy_franka
+config:
+  sim: sim_config
+  scene: default
+  robot: franka
+  camera: camera_config
+observation:
+  collect_freq: 25
+  robot:
+    joint_states: true
+    world_ee_state: true
+  vision:
+    approximate_depth: false
+    depth: false
+    intrinsic_matrix: true
+    extrinsic_matrix: true
+    shape: true
+robots:
+  - {
+    robot_type: arm,
+    robot_name: franka,
+    coupled: False,
+    default_root_pos: [0.0, 0.6, 0.765],
+    default_root_rot: [0.707, 0, 0, -0.707],
+    grasp_perfect_direction: "back"
+  }
+EOF
+cat >"${XPOLICYLAB_DIR}/../RoboDojo/env_cfg/robot/franka.yml" <<'EOF'
+robots:
+  - {
+    robot_type: arm,
+    robot_name: franka,
+    coupled: False,
+    default_root_pos: [0.0, 0.6, 0.765],
+    default_root_rot: [0.707, 0, 0, -0.707],
+    grasp_perfect_direction: "back"
+  }
+EOF
 POLICY_DIR="${XPOLICYLAB_DIR}/policy/${POLICY_NAME}"
 mkdir -p "$POLICY_DIR"
 printf '%s\n' '"""GPT-Policy adapter for RoboDojo/XPolicyLab."""' >"${POLICY_DIR}/__init__.py"
@@ -110,3 +153,29 @@ exec bash "${ROOT_DIR}/third_party/RoboDojo/scripts/robodojo.sh" client \\
 EOF
 chmod +x "${POLICY_DIR}/eval.sh"
 echo "Installed ${POLICY_NAME} wrapper at ${POLICY_DIR}"
+
+# Generate a single-arm Franka profile from the same adapter. The transport
+# and calibration plumbing are shared; only the embodiment, DOF, arm key and
+# environment overlay differ.
+FRANKA_POLICY_DIR="${XPOLICYLAB_DIR}/policy/GPT_Policy_Franka"
+mkdir -p "${FRANKA_POLICY_DIR}"
+cp -a "${POLICY_DIR}/__init__.py" "${POLICY_DIR}/model.py" "${POLICY_DIR}/deploy.py" \
+  "${POLICY_DIR}/setup_eval_policy_server.sh" "${POLICY_DIR}/eval.sh" "${FRANKA_POLICY_DIR}/"
+cat >"${FRANKA_POLICY_DIR}/deploy.yml" <<EOF
+policy_name: GPT_Policy_Franka
+protocol: ws
+host: localhost
+port: 19000
+env_cfg_type: gpt_policy_franka
+action_type: ee
+eval_batch: false
+gpt_policy_config: $(realpath "${ROOT_DIR}/configs/examples/robodojo_franka.json")
+calibration_manifest: $(realpath "${ROOT_DIR}/configs/examples/robodojo_franka_calibration.json")
+robot_model: Franka
+dof: 7
+arms: [franka]
+EOF
+sed -i 's/GPT_Policy/GPT_Policy_Franka/g; s/gpt_policy_x5/gpt_policy_franka/g' "${FRANKA_POLICY_DIR}/eval.sh"
+sed -i 's/GPT_Policy/GPT_Policy_Franka/g' "${FRANKA_POLICY_DIR}/setup_eval_policy_server.sh"
+chmod +x "${FRANKA_POLICY_DIR}"/*.sh
+echo "Installed Franka wrapper at ${FRANKA_POLICY_DIR}"

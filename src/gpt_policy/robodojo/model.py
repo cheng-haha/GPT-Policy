@@ -74,11 +74,14 @@ class GPTPolicyModel:
         settings["backend"] = "robodojo"
         self.settings = settings
         self.model_cfg = dict(model_cfg)
+        self.robot_model = str(model_cfg.get("robot_model", "X5"))
         self.arms = tuple(model_cfg.get("arms", ("left", "right")))
         calibration_path = Path(str(model_cfg["calibration_manifest"])).expanduser().resolve()
         manifest = json.loads(calibration_path.read_text(encoding="utf-8"))
         self._calibration_manifest = manifest
-        self.adapter = RoboDojoAdapter(RoboDojoCalibration.from_manifest(manifest), self.arms)
+        self.adapter = RoboDojoAdapter(
+            RoboDojoCalibration.from_manifest(manifest), self.arms, self.robot_model
+        )
         self.catalog = load_tool_catalog(settings)
         self.agent_cfg = agent_config(settings, config_path.parent)
         self.agent: AgentSession = create_agent(self.agent_cfg, model_cfg.get("model") or self.agent_cfg.model or "gpt-6-astra", True, 85)
@@ -93,7 +96,7 @@ class GPTPolicyModel:
         dof = int(self.model_cfg.get("dof", 6))
         schema = output_schema(dof, self.arms, self.catalog)
         tools = tool_schemas(dof, self.arms, self.catalog)
-        prompt = instructions("X5", "robodojo", dof, self.arms, self.settings, self.catalog, task_instruction=instruction)
+        prompt = instructions(self.robot_model, "robodojo", dof, self.arms, self.settings, self.catalog, task_instruction=instruction)
         self.agent.start(AgentContext(prompt, tools, schema))
         self._started = True
 

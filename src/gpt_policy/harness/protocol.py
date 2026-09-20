@@ -32,8 +32,9 @@ def _robot_calibration_notes(arms: tuple[str, ...], settings: dict[str, Any] | N
     if (settings or {}).get("backend") == "robodojo":
         sim = (settings or {}).get("robodojo", {})
         cameras = sim.get("cameras", ["cam_head", "cam_left_wrist", "cam_right_wrist"])
+        model = str((settings or {}).get("runtime", {}).get("robot_model", "X5"))
         return f"""Robot and calibration conventions:
-- RoboDojo controls {len(arms)} simulated X5 arm(s); each arm has its own base_link frame.
+- RoboDojo controls {len(arms)} simulated {model} arm(s); each arm has its own base_link frame.
 - All GPT-Policy poses are absolute TCP poses in the selected arm base_link frame, in metres.
 - GPT-Policy quaternion order is [qx,qy,qz,qw]. RoboDojo's source ee_pose is [x,y,z,qw,qx,qy,qz]; the host performs this conversion.
 - TCP is the calibrated fingertip TCP: its +z axis points toward the fingertips and +y is the gripper opening axis.
@@ -112,7 +113,12 @@ def instructions(
     multi_text = "Bimanual parameters use left/right for the two arms; null holds that side's submitted targets." if len(arms) == 2 else "Only one arm is controlled."
     calibration = _robot_calibration_notes(arms, settings)
     scene_safety = _scene_safety_notes(settings)
-    robot_label = "YAM" if (settings or {}).get("backend") == "yam" else "ARX"
+    if (settings or {}).get("backend") == "yam":
+        robot_label = "YAM"
+    elif (settings or {}).get("backend") == "robodojo":
+        robot_label = str((settings or {}).get("runtime", {}).get("robot_model", "ARX"))
+    else:
+        robot_label = "ARX"
     plug_profile = control_prompt_profile(task_instruction)
     tool_text = active_catalog.prompt_catalog(dof, arms, overrides={"done": PLUG_DONE} if plug_profile else None)
     common = f"""You are a {robot_label} robot controller using the native Codex harness. You control {model} on {interface}, arms: {arm_text}, with {dof} joints per arm.
