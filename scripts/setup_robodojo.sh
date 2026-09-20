@@ -60,6 +60,10 @@ checkout RoboDojo https://github.com/RoboDojo-Benchmark/RoboDojo.git \
 checkout XPolicyLab https://github.com/XPolicyLab/XPolicyLab.git \
   e75f56b57d68561bf223faaf1198908a401602b4
 
+# Install the lightweight XPolicyLab transport/client dependencies into the
+# same venv. Isaac Sim itself remains opt-in below.
+python -m pip install -e "$ROOT_DIR/third_party/XPolicyLab"
+
 bash "$ROOT_DIR/scripts/install_robodojo_policy.sh" \
   --xpolicylab-dir "$ROOT_DIR/third_party/XPolicyLab"
 

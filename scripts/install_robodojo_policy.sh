@@ -47,4 +47,15 @@ gpt_policy_config: $(realpath "$GPT_CONFIG")
 calibration_manifest: $(realpath "$CALIBRATION")
 arms: [left, right]
 EOF
+cat >"${POLICY_DIR}/setup_eval_policy_server.sh" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+PORT="\${9:-19000}"
+HOST="\${10:-0.0.0.0}"
+cd "$(realpath "$XPOLICYLAB_DIR")"
+export PYTHONPATH="$(realpath "$ROOT_DIR/src"):\$PWD\${PYTHONPATH:+:\$PYTHONPATH}"
+exec "${ROOT_DIR}/.venv/bin/python" -m client_server.ws.model_server \\
+  --config-path "$(realpath "${POLICY_DIR}/deploy.yml")" --host "\${HOST}" --port "\${PORT}"
+EOF
+chmod +x "${POLICY_DIR}/setup_eval_policy_server.sh"
 echo "Installed ${POLICY_NAME} wrapper at ${POLICY_DIR}"
