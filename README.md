@@ -105,6 +105,9 @@ This step does not download Isaac Sim or CUDA packages. On the dedicated GPU
 simulator host, run `./scripts/setup_robodojo.sh --install-sim-deps` to invoke
 RoboDojo's upstream installer. The simulator and policy process communicate
 through XPolicyLab's WebSocket contract, so they may run on separate machines.
+The current tested simulator stack is Isaac Sim 5.1/IsaacLab 0.54.3 on an
+NVIDIA driver with CUDA support; the policy host only needs the Python virtual
+environment and an authenticated Codex CLI.
 See [third_party/README.md](third_party/README.md) and
 [THIRD_PARTY.md](THIRD_PARTY.md) for pinned revisions and license notices.
 
@@ -114,10 +117,22 @@ calibration manifest must be populated from the active RoboDojo camera manager
 and USD robot frames before evaluation; the identity/empty values in the
 example are only a schema, not a valid calibrated run.
 
-After setup, generate the XPolicyLab policy wrapper:
+After setup, generate the XPolicyLab policy wrapper. This creates both the
+dual-arm ARX X5 profile and the single-arm Franka profile:
 
 ```bash
 ./scripts/install_robodojo_policy.sh
+```
+
+GPT-Policy uses the native Codex app-server interface. GPT-6-Astra requires a
+recent Codex release (0.155.1 or newer in the tested setup) and an existing
+`codex login`; the generated server wrapper prefers the authenticated
+standalone release when an older npm wrapper is also present. Verify the
+active binary with:
+
+```bash
+codex login status
+/root/.codex/packages/standalone/releases/0.155.1-x86_64-unknown-linux-musl/bin/codex --version
 ```
 
 On the policy host, start the WebSocket server (the server does not require
@@ -139,6 +154,36 @@ bash third_party/RoboDojo/scripts/robodojo.sh client \
 Use `eval_batch=false` for the current GPT-Policy closed-loop VLM adapter;
 it intentionally processes one environment at a time so every new image,
 state, calibration matrix, and execution result reaches the same model turn.
+
+For a local one-episode smoke evaluation (the first Isaac Sim startup can take
+about a minute), use the generated convenience script:
+
+```bash
+source .venv/bin/activate
+export PATH=/root/.codex/packages/standalone/releases/0.155.1-x86_64-unknown-linux-musl/bin:$PATH
+export EVAL_NUM=1
+bash third_party/XPolicyLab/policy/GPT_Policy/eval.sh \
+  RoboDojo push_T none gpt_policy_x5 ee 0 0 0
+```
+
+The simulator-side transcript is written by the command's caller; for the
+repository's long-running runs, use `var/runs/robodojo/`. GPT-Policy's own
+structured observations, calibration context, decisions, and timing continue
+to use the usual `var/runs/gpt/` recording format. The RoboDojo evaluator, not
+the policy, assigns the final task success label.
+
+List the canonical tasks and capability dimensions before launching a larger
+run:
+
+```bash
+bash third_party/RoboDojo/scripts/robodojo.sh tasks
+bash third_party/RoboDojo/scripts/robodojo.sh dimensions
+```
+
+If Astra temporarily reports `Selected model is at capacity`, the adapter
+retries the same turn with bounded backoff. A persistent capacity error is a
+provider-side condition; it should be distinguished from simulator, asset,
+or action-schema failures in the run log.
 
 ### Franka profile
 
@@ -219,7 +264,9 @@ python -m compileall -q src
 
 - [x] Release the GPT-Policy pipeline for real-world ARX robots, including the complete harness and format adapters for different context types.
 - [x] Release the YAM pipeline with hardware integration and flexible context support.
-- [ ] Release the RoboDojo simulation pipeline for reproducible evaluation.
+- [x] Release the RoboDojo policy bridge, calibration-aware context, X5/Franka
+  profiles, and reproducible single-episode evaluation entry point.
+- [ ] Complete and publish the full RoboDojo task/seed score matrix.
 - [ ] Optimize the agent harness for context construction, feedback, and execution efficiency.
 
 ## Limitations and safety
