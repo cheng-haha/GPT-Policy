@@ -42,8 +42,14 @@ if [[ ! -d "$VENV_DIR" ]]; then
 fi
 # shellcheck disable=SC1091
 source "$VENV_DIR/bin/activate"
-python -m pip install --upgrade pip
-python -m pip install -e "$ROOT_DIR"
+VENV_PYTHON="$VENV_DIR/bin/python"
+# The base image already contains a Miniconda installation outside PATH.
+# Make the upstream installer reuse it instead of attempting a second install.
+if [[ -x "${HOME}/miniconda3/bin/conda" ]]; then
+  export PATH="${HOME}/miniconda3/bin:${HOME}/miniconda3/condabin:${PATH}"
+fi
+"$VENV_PYTHON" -m pip install --upgrade pip
+"$VENV_PYTHON" -m pip install -e "$ROOT_DIR"
 
 checkout() {
   local name="$1" url="$2" commit="$3" dest="$ROOT_DIR/third_party/$1"
@@ -62,7 +68,7 @@ checkout XPolicyLab https://github.com/XPolicyLab/XPolicyLab.git \
 
 # Install the lightweight XPolicyLab transport/client dependencies into the
 # same venv. Isaac Sim itself remains opt-in below.
-python -m pip install -e "$ROOT_DIR/third_party/XPolicyLab"
+"$VENV_PYTHON" -m pip install -e "$ROOT_DIR/third_party/XPolicyLab"
 
 bash "$ROOT_DIR/scripts/install_robodojo_policy.sh" \
   --xpolicylab-dir "$ROOT_DIR/third_party/XPolicyLab"
@@ -74,6 +80,12 @@ else
   echo "Source checkouts ready. Isaac Sim dependencies not installed."
   echo "Run with --install-sim-deps on the GPU simulator host when ready."
 fi
+
+# Generate the adapter again after the upstream installer.  Its submodule
+# setup may reset the separate XPolicyLab checkout while initializing policy
+# sources.
+bash "$ROOT_DIR/scripts/install_robodojo_policy.sh" \
+  --xpolicylab-dir "$ROOT_DIR/third_party/XPolicyLab"
 
 # RoboDojo's client resolves policy deploy adapters relative to its own root.
 # Reuse the separately pinned XPolicyLab checkout instead of maintaining a
