@@ -7,6 +7,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VENV_DIR="${GPT_POLICY_VENV:-${ROOT_DIR}/.venv}"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
 INSTALL_SIM_DEPS=0
+ROBO_DOJO_PYTHON="${HOME}/miniconda3/envs/RoboDojo/bin/python"
 # The container's global pip.conf points at an unavailable internal mirror.
 # Allow an explicit override, but use public PyPI by default for a fresh venv.
 export PIP_INDEX_URL="${GPT_POLICY_PYPI_INDEX:-https://pypi.org/simple}"
@@ -79,7 +80,6 @@ if [[ "$INSTALL_SIM_DEPS" == 1 ]]; then
   # The upstream installer can leave an editable IsaacLab entry pointing at
   # the checkout path used on its build machine. Rebind it to this checkout
   # so the RoboDojo client can import isaaclab from the current workspace.
-  ROBO_DOJO_PYTHON="${HOME}/miniconda3/envs/RoboDojo/bin/python"
   ISAACLAB_SOURCE="$ROOT_DIR/third_party/RoboDojo/third_party/IsaacLab/source/isaaclab"
   if [[ -x "$ROBO_DOJO_PYTHON" && -f "$ISAACLAB_SOURCE/pyproject.toml" ]]; then
     PIP_INDEX_URL="$PIP_INDEX_URL" "$ROBO_DOJO_PYTHON" -m pip install \
@@ -96,14 +96,14 @@ fi
 bash "$ROOT_DIR/scripts/install_robodojo_policy.sh" \
   --xpolicylab-dir "$ROOT_DIR/third_party/XPolicyLab"
 
-# Current public assets publish curobo_tmp.yml while the robot classes resolve
-# curobo.yml. Provide the expected stable name once assets are present.
-for robot_name in x5 franka; do
-  robot_assets="$ROOT_DIR/third_party/RoboDojo/Assets/Robots/$robot_name"
-  if [[ -f "$robot_assets/curobo_tmp.yml" && ! -e "$robot_assets/curobo.yml" ]]; then
-    ln -s curobo_tmp.yml "$robot_assets/curobo.yml"
-  fi
-done
+# Public assets publish CuRobo templates containing ${ASSETS_PATH}. Materialize
+# the runtime files with this checkout's absolute path once assets are present.
+if [[ -x "$ROBO_DOJO_PYTHON" && -d "$ROOT_DIR/third_party/RoboDojo/Assets/Robots" ]]; then
+  (
+    cd "$ROOT_DIR/third_party/RoboDojo"
+    "$ROBO_DOJO_PYTHON" utils/update_embodiment_config_path.py
+  )
+fi
 
 # RoboDojo's client resolves policy deploy adapters relative to its own root.
 # Reuse the separately pinned XPolicyLab checkout instead of maintaining a

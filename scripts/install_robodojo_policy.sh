@@ -101,7 +101,7 @@ def eval_one_episode_batch(TASK_ENV, model_client):
 EOF
 cat >"${POLICY_DIR}/deploy.yml" <<EOF
 policy_name: ${POLICY_NAME}
-model: gpt-5.6-sol
+model: gpt-6-astra
 protocol: ws
 host: localhost
 port: 19000
@@ -127,6 +127,15 @@ if ! command -v codex >/dev/null 2>&1; then
     fi
   done
 fi
+# The Codex plugin may leave an older npm wrapper earlier in PATH while the
+# authenticated standalone release is newer. Prefer the standalone binary
+# when it is present so RoboDojo and GPT-Policy use the same model capability
+# that `codex` itself advertises after an upgrade.
+for candidate in /root/.codex/packages/standalone/releases/*/bin; do
+  if [[ -x "\$candidate/codex" ]]; then
+    export PATH="\$candidate:\$PATH"
+  fi
+done
 command -v codex >/dev/null 2>&1 || {
   echo "Codex CLI not found; install/authenticate Codex or set PATH before starting the server." >&2
   exit 1
@@ -138,6 +147,12 @@ chmod +x "${POLICY_DIR}/setup_eval_policy_server.sh"
 cat >"${POLICY_DIR}/eval.sh" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
+# RoboDojo's simulator-side shell scripts invoke `python3` directly. Use the
+# simulator conda environment for those helpers (the policy server itself
+# remains in GPT-Policy's .venv).
+if [[ -d "\${HOME}/miniconda3/envs/RoboDojo/bin" ]]; then
+  export PATH="\${HOME}/miniconda3/envs/RoboDojo/bin:\${PATH}"
+fi
 BENCH="\${1}"; TASK="\${2}"; CKPT="\${3}"; ENV_CFG="\${4}"
 ACTION="\${5}"; SEED="\${6}"; POLICY_GPU="\${7}"; ENV_GPU="\${8}"
 # The generated overlay enables simulator intrinsics/extrinsics and is the
@@ -164,7 +179,7 @@ cp -a "${POLICY_DIR}/__init__.py" "${POLICY_DIR}/model.py" "${POLICY_DIR}/deploy
   "${POLICY_DIR}/setup_eval_policy_server.sh" "${POLICY_DIR}/eval.sh" "${FRANKA_POLICY_DIR}/"
 cat >"${FRANKA_POLICY_DIR}/deploy.yml" <<EOF
 policy_name: GPT_Policy_Franka
-model: gpt-5.6-sol
+model: gpt-6-astra
 protocol: ws
 host: localhost
 port: 19000

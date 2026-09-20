@@ -156,12 +156,30 @@ class GPTPolicyModel:
         name, arguments = str(decision.get("name")), decision.get("arguments", {})
         if name in {"terminal.done", "terminal.give_up"}:
             return [self._hold_action()]
+        if name in {"locate_point", "check_path"}:
+            # These GPT-Policy tools are analytical/read-only. RoboDojo does
+            # not expose a separate tool-call channel, so preserve the
+            # simulator state for this cycle and let the next observation
+            # provide the result (all raw camera/calibration fields remain in
+            # the context).
+            return [self._hold_action()]
         if name == "move_eef_chunk":
             actions = [self.adapter.action({"target": point}) for point in arguments.get("poses", [])]
         elif name in {"move_to", "set_gripper"}:
             actions = [self.adapter.action(arguments)]
         else:
             raise ValueError(f"RoboDojo cannot execute GPT-Policy tool {name!r} directly")
+        # XPolicyLab's bimanual action contract requires a gripper field for
+        # every arm on every waypoint, even when the selected GPT-Policy tool
+        # only changes TCP pose. Hold the simulator's measured gripper values
+        # explicitly so no information is silently invented or omitted.
+        state = self.latest_frame.get("state", {})
+        for action in actions:
+            for arm in self.arms:
+                prefix = f"{arm}_" if len(self.arms) > 1 else ""
+                grip_key = f"{prefix}ee_joint_state"
+                if grip_key not in action and grip_key in state:
+                    action[grip_key] = _jsonable(state[grip_key])
         self.previous = json.dumps({"tool": name, "result": {"accepted": True}}, ensure_ascii=False)
         return actions
 
