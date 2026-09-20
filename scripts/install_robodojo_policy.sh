@@ -75,6 +75,18 @@ PORT="\${9:-19000}"
 HOST="\${10:-0.0.0.0}"
 cd "$(realpath "$XPOLICYLAB_DIR")"
 export PYTHONPATH="$(realpath "$ROOT_DIR/src"):\$PWD\${PYTHONPATH:+:\$PYTHONPATH}"
+if ! command -v codex >/dev/null 2>&1; then
+  for candidate in /mnt/workspace/.local/share/*/export_bin/codex; do
+    if [[ -x "\$candidate" ]]; then
+      export PATH="$(dirname "\$candidate"):\$PATH"
+      break
+    fi
+  done
+fi
+command -v codex >/dev/null 2>&1 || {
+  echo "Codex CLI not found; install/authenticate Codex or set PATH before starting the server." >&2
+  exit 1
+}
 exec "${ROOT_DIR}/.venv/bin/python" -m client_server.ws.model_server \\
   --config-path "$(realpath "${POLICY_DIR}/deploy.yml")" --host "\${HOST}" --port "\${PORT}"
 EOF
