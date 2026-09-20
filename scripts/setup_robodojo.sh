@@ -60,6 +60,9 @@ checkout RoboDojo https://github.com/RoboDojo-Benchmark/RoboDojo.git \
 checkout XPolicyLab https://github.com/XPolicyLab/XPolicyLab.git \
   e75f56b57d68561bf223faaf1198908a401602b4
 
+bash "$ROOT_DIR/scripts/install_robodojo_policy.sh" \
+  --xpolicylab-dir "$ROOT_DIR/third_party/XPolicyLab"
+
 if [[ "$INSTALL_SIM_DEPS" == 1 ]]; then
   export OMNI_KIT_ACCEPT_EULA=YES
   bash "$ROOT_DIR/third_party/RoboDojo/scripts/install.sh" --install
