@@ -7,6 +7,9 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VENV_DIR="${GPT_POLICY_VENV:-${ROOT_DIR}/.venv}"
 PYTHON_BIN="${PYTHON_BIN:-python3}"
 INSTALL_SIM_DEPS=0
+# The container's global pip.conf points at an unavailable internal mirror.
+# Allow an explicit override, but use public PyPI by default for a fresh venv.
+export PIP_INDEX_URL="${GPT_POLICY_PYPI_INDEX:-https://pypi.org/simple}"
 
 usage() {
   cat <<'EOF'

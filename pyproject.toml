@@ -23,6 +23,11 @@ kimi-policy = "gpt_policy.main:kimi_main"
 [tool.hatch.build.targets.wheel]
 packages = ["src/gpt_policy"]
 
+# The optional YAM backend intentionally pins an upstream Git revision.
+# Hatchling requires this opt-in for PEP 508 direct references.
+[tool.hatch.metadata]
+allow-direct-references = true
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]

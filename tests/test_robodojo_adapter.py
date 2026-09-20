@@ -12,7 +12,7 @@ class RoboDojoAdapterTest(unittest.TestCase):
                 "left": np.eye(4).tolist(),
                 "right": np.eye(4).tolist(),
             },
-            "intrinsics": {"cam_head": np.diag([100.0, 100.0, 1.0]).tolist()},
+            "intrinsics": {"cam_head": [[100.0, 0.0, 50.0], [0.0, 100.0, 50.0], [0.0, 0.0, 1.0]]},
             "camera_extrinsics_world": {"cam_head": np.eye(4).tolist()},
         })
         self.adapter = RoboDojoAdapter(self.calibration, ("left", "right"))
@@ -33,7 +33,7 @@ class RoboDojoAdapterTest(unittest.TestCase):
         self.assertEqual(state["arms"]["left"]["tcp_xyzquat"], [0.1, 0.2, 0.3, 0, 0, 0, 1])
         self.assertIn("simulator_raw", state)
         cameras = self.adapter.cameras(frame)
-        self.assertEqual(cameras[0]["intrinsic_matrix"], np.diag([100.0, 100.0, 1.0]).tolist())
+        self.assertEqual(cameras[0]["intrinsic_matrix"], [[100.0, 0.0, 50.0], [0.0, 100.0, 50.0], [0.0, 0.0, 1.0]])
 
     def test_action_converts_policy_xyzw_to_robo_wxyz(self):
         action = self.adapter.action({"target": {"left": [0.1, 0.2, 0.3, 0, 0, 0, 1], "right": None}})
