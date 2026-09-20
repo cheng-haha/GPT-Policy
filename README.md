@@ -108,6 +108,12 @@ through XPolicyLab's WebSocket contract, so they may run on separate machines.
 See [third_party/README.md](third_party/README.md) and
 [THIRD_PARTY.md](THIRD_PARTY.md) for pinned revisions and license notices.
 
+The adapter implementation lives under `src/gpt_policy/robodojo/`. Use
+`configs/examples/robodojo.json` as the starting configuration. Its
+calibration manifest must be populated from the active RoboDojo camera manager
+and USD robot frames before evaluation; the identity/empty values in the
+example are only a schema, not a valid calibrated run.
+
 ## Quick start
 
 For the default ARX profile, edit the placeholders in `configs/default.json` once, then run a task directly:

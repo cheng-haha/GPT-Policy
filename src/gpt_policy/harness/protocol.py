@@ -29,6 +29,22 @@ def _scene_safety_notes(settings: dict[str, Any] | None = None) -> str:
 
 
 def _robot_calibration_notes(arms: tuple[str, ...], settings: dict[str, Any] | None = None) -> str:
+    if (settings or {}).get("backend") == "robodojo":
+        sim = (settings or {}).get("robodojo", {})
+        cameras = sim.get("cameras", ["cam_head", "cam_left_wrist", "cam_right_wrist"])
+        return f"""Robot and calibration conventions:
+- RoboDojo controls {len(arms)} simulated X5 arm(s); each arm has its own base_link frame.
+- All GPT-Policy poses are absolute TCP poses in the selected arm base_link frame, in metres.
+- GPT-Policy quaternion order is [qx,qy,qz,qw]. RoboDojo's source ee_pose is [x,y,z,qw,qx,qy,qz]; the host performs this conversion.
+- TCP is the calibrated fingertip TCP: its +z axis points toward the fingertips and +y is the gripper opening axis.
+- The host performs all world/base/TCP conversion, IK validation, interpolation, and gripper normalization. Do not emit simulator-world poses.
+Camera calibration and views:
+- Available simulated cameras: {", ".join(str(name) for name in cameras)}.
+- cam_head is fixed; wrist cameras move with their corresponding simulated arm.
+- RoboDojo intrinsics and camera-to-world extrinsics are captured from the simulator and converted by the host to base-from-camera rays.
+- locate_point returns a calibrated ray in an arm base_link frame. A single RGB image still does not establish metric depth.
+- Camera matrices are retained in the host observation and run record; use the named camera/frame semantics rather than guessing pixel-to-metre scale.
+"""
     camera_lines = [
         "- left/right: D405 RGB cameras mounted on the corresponding wrists; they move with the end effectors.",
         "- top: fixed overhead D405 RGB camera with stored extrinsics to both arm base_link frames.",
@@ -137,6 +153,7 @@ def observation(
     cameras: list[dict[str, Any]],
     previous: str | None = None,
     step: int = 0,
+    metadata: dict[str, Any] | None = None,
 ) -> str:
     """Format the GPT-Policy-style JSON observation sent to Codex."""
     payload: dict[str, Any] = {
@@ -150,6 +167,8 @@ def observation(
             "interfaces": state.get("interfaces"),
         },
     }
+    if metadata:
+        payload["extra"].update(metadata)
     if previous is not None:
         previous_payload = _without_temperature_telemetry(json.loads(previous))
         if isinstance(previous_payload, dict):
@@ -206,7 +225,11 @@ def _model_numbers(value: Any) -> Any:
 
 def _state_payload(state: dict[str, Any]) -> dict[str, Any]:
     if "arms" in state:
-        return {side: _single_state_payload(value) for side, value in state["arms"].items()}
+        payload: dict[str, Any] = {side: _single_state_payload(value) for side, value in state["arms"].items()}
+        for key in ("backend", "robot_model", "calibration", "simulator_raw"):
+            if key in state:
+                payload[key] = state[key]
+        return payload
     return _single_state_payload(state)
 
 
