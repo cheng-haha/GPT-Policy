@@ -68,16 +68,16 @@ chmod +x "${POLICY_DIR}/setup_eval_policy_server.sh"
 cat >"${POLICY_DIR}/eval.sh" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
-BENCH=\"\${1}\"; TASK=\"\${2}\"; CKPT=\"\${3}\"; ENV_CFG=\"\${4}\"
-ACTION=\"\${5}\"; SEED=\"\${6}\"; POLICY_GPU=\"\${7}\"; ENV_GPU=\"\${8}\"
-PORT=\"\$(\"${ROOT_DIR}/.venv/bin/python\" -c 'import socket; s=socket.socket(); s.bind(("127.0.0.1",0)); print(s.getsockname()[1]); s.close()')\"
-\"${POLICY_DIR}/setup_eval_policy_server.sh\" \"\${BENCH}\" \"\${TASK}\" \"\${CKPT}\" \"\${ENV_CFG}\" \"\${ACTION}\" \"\${SEED}\" \"\${POLICY_GPU}\" RoboDojo \"\${PORT}\" 127.0.0.1 &
+BENCH="\${1}"; TASK="\${2}"; CKPT="\${3}"; ENV_CFG="\${4}"
+ACTION="\${5}"; SEED="\${6}"; POLICY_GPU="\${7}"; ENV_GPU="\${8}"
+PORT="\$("${ROOT_DIR}/.venv/bin/python" -c 'import socket; s=socket.socket(); s.bind(("127.0.0.1",0)); print(s.getsockname()[1]); s.close()')"
+"${POLICY_DIR}/setup_eval_policy_server.sh" "\${BENCH}" "\${TASK}" "\${CKPT}" "\${ENV_CFG}" "\${ACTION}" "\${SEED}" "\${POLICY_GPU}" RoboDojo "\${PORT}" 127.0.0.1 &
 SERVER_PID=\$!
-cleanup() { kill \"\${SERVER_PID}\" 2>/dev/null || true; }
+cleanup() { kill "\${SERVER_PID}" 2>/dev/null || true; }
 trap cleanup EXIT
-exec bash \"${ROOT_DIR}/third_party/RoboDojo/scripts/robodojo.sh\" client \\
-  --task \"\${TASK}\" --env-cfg \"\${ENV_CFG}\" --policy-name GPT_Policy \\
-  --policy-host 127.0.0.1 --policy-port \"\${PORT}\" --env-gpu \"\${ENV_GPU}\"
+exec bash "${ROOT_DIR}/third_party/RoboDojo/scripts/robodojo.sh" client \\
+  --task "\${TASK}" --env-cfg "\${ENV_CFG}" --policy-name GPT_Policy \\
+  --policy-host 127.0.0.1 --policy-port "\${PORT}" --env-gpu "\${ENV_GPU}"
 EOF
 chmod +x "${POLICY_DIR}/eval.sh"
 echo "Installed ${POLICY_NAME} wrapper at ${POLICY_DIR}"
