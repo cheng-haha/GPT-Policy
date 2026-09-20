@@ -14,6 +14,13 @@ while [[ $# -gt 0 ]]; do
     *) echo "Unknown argument: $1" >&2; exit 2 ;;
   esac
 done
+BASE_ENV_CFG="${XPOLICYLAB_DIR}/../RoboDojo/env_cfg/arx_x5.yml"
+OVERLAY_ENV_CFG="${XPOLICYLAB_DIR}/../RoboDojo/env_cfg/gpt_policy_x5.yml"
+if [[ -f "$BASE_ENV_CFG" ]]; then
+  sed -e 's/intrinsic_matrix: false/intrinsic_matrix: true/' \
+      -e 's/extrinsic_matrix: false/extrinsic_matrix: true/' \
+      "$BASE_ENV_CFG" >"$OVERLAY_ENV_CFG"
+fi
 POLICY_DIR="${XPOLICYLAB_DIR}/policy/${POLICY_NAME}"
 mkdir -p "$POLICY_DIR"
 printf '%s\n' '"""GPT-Policy adapter for RoboDojo/XPolicyLab."""' >"${POLICY_DIR}/__init__.py"
@@ -40,7 +47,7 @@ policy_name: ${POLICY_NAME}
 protocol: ws
 host: localhost
 port: 19000
-env_cfg_type: arx_x5
+env_cfg_type: gpt_policy_x5
 action_type: ee
 eval_batch: false
 gpt_policy_config: $(realpath "$GPT_CONFIG")

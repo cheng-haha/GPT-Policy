@@ -125,14 +125,14 @@ Isaac Sim):
 
 ```bash
 third_party/XPolicyLab/policy/GPT_Policy/setup_eval_policy_server.sh \
-  RoboDojo push_T none arx_x5 ee 0 0 RoboDojo 19000 0.0.0.0
+  RoboDojo push_T none gpt_policy_x5 ee 0 0 RoboDojo 19000 0.0.0.0
 ```
 
 On the Isaac Sim host, point RoboDojo's client at that server:
 
 ```bash
 bash third_party/RoboDojo/scripts/robodojo.sh client \
-  --task push_T --env-cfg arx_x5 --policy-name GPT_Policy \
+  --task push_T --env-cfg gpt_policy_x5 --policy-name GPT_Policy \
   --policy-host POLICY_HOST --policy-port 19000 --env-gpu 0
 ```
 
