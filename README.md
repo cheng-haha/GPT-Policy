@@ -140,6 +140,23 @@ Use `eval_batch=false` for the current GPT-Policy closed-loop VLM adapter;
 it intentionally processes one environment at a time so every new image,
 state, calibration matrix, and execution result reaches the same model turn.
 
+### Franka profile
+
+The RoboDojo bridge also provides a single-arm Franka profile. Generate it
+alongside the X5 profile with `scripts/install_robodojo_policy.sh`; it uses
+`gpt_policy_franka`, `GPT_Policy_Franka`, seven arm joints, and the runtime
+camera intrinsic/extrinsic matrices emitted by RoboDojo. Launch it with:
+
+```bash
+bash third_party/RoboDojo/scripts/robodojo.sh client \
+  --task push_T --env-cfg gpt_policy_franka \
+  --policy-dir XPolicyLab/policy/GPT_Policy_Franka \
+  --policy-host 127.0.0.1 --policy-port 19000 --env-gpu 0
+```
+
+The Franka profile is single-arm; the mixed X5/X5/Franka competition scene is
+not yet exposed as one three-arm GPT-Policy action schema.
+
 ## Quick start
 
 For the default ARX profile, edit the placeholders in `configs/default.json` once, then run a task directly:
