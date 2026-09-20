@@ -67,6 +67,14 @@ python -m pip install -e "$ROOT_DIR/third_party/XPolicyLab"
 bash "$ROOT_DIR/scripts/install_robodojo_policy.sh" \
   --xpolicylab-dir "$ROOT_DIR/third_party/XPolicyLab"
 
+# RoboDojo's client resolves policy deploy adapters relative to its own root.
+# Reuse the separately pinned XPolicyLab checkout instead of maintaining a
+# second copy under RoboDojo/XPolicyLab.
+if [[ -d "$ROOT_DIR/third_party/RoboDojo/XPolicyLab" && ! -e "$ROOT_DIR/third_party/RoboDojo/XPolicyLab/policy" ]]; then
+  rmdir "$ROOT_DIR/third_party/RoboDojo/XPolicyLab"
+  ln -s ../XPolicyLab "$ROOT_DIR/third_party/RoboDojo/XPolicyLab"
+fi
+
 if [[ "$INSTALL_SIM_DEPS" == 1 ]]; then
   export OMNI_KIT_ACCEPT_EULA=YES
   bash "$ROOT_DIR/third_party/RoboDojo/scripts/install.sh" --install

@@ -42,6 +42,20 @@ class Model(ModelTemplate):
     def get_action_batch(self, env_idx_list=None):
         return self.impl.get_action_batch(env_idx_list)
 EOF
+cat >"${POLICY_DIR}/deploy.py" <<'EOF'
+def eval_one_episode(TASK_ENV, model_client):
+    model_client.call(func_name="reset")
+    while not TASK_ENV.is_episode_end():
+        model_client.call(func_name="update_obs", obs=TASK_ENV.get_obs())
+        actions = model_client.call(func_name="get_action")
+        for action in actions:
+            TASK_ENV.take_action(action)
+            if TASK_ENV.is_episode_end():
+                break
+
+def eval_one_episode_batch(TASK_ENV, model_client):
+    raise NotImplementedError("GPT-Policy RoboDojo adapter requires eval_batch=false")
+EOF
 cat >"${POLICY_DIR}/deploy.yml" <<EOF
 policy_name: ${POLICY_NAME}
 protocol: ws
