@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import io
 import json
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping
@@ -20,6 +21,7 @@ from PIL import Image
 from ..harness.config import agent_config
 from ..harness.contract import AgentSession
 from ..harness.factory import create_agent
+from ..harness.errors import AgentOverloadedError
 from ..harness.models import AgentContext, AgentTurn
 from ..harness.protocol import instructions, observation, output_schema, tool_schemas
 from ..settings import load_settings
@@ -84,7 +86,8 @@ class GPTPolicyModel:
         )
         self.catalog = load_tool_catalog(settings)
         self.agent_cfg = agent_config(settings, config_path.parent)
-        self.agent: AgentSession = create_agent(self.agent_cfg, model_cfg.get("model") or self.agent_cfg.model or "gpt-6-astra", True, 85)
+        self._agent_model = model_cfg.get("model") or self.agent_cfg.model or "gpt-6-astra"
+        self.agent: AgentSession = create_agent(self.agent_cfg, self._agent_model, True, 85)
         self.previous: str | None = None
         self.latest_frame: Mapping[str, Any] | None = None
         self.latest_state: dict[str, Any] | None = None
@@ -103,6 +106,10 @@ class GPTPolicyModel:
     def reset(self):
         if self._started:
             self.agent.close()
+        # A Codex app-server session is single-use after close(). RoboDojo
+        # may reset and reuse the same policy object across seeds, so create a
+        # fresh session instead of sending requests to the closed process.
+        self.agent = create_agent(self.agent_cfg, self._agent_model, True, 85)
         self.previous = None
         self.latest_frame = None
         self.latest_state = None
@@ -151,7 +158,20 @@ class GPTPolicyModel:
             self.step,
             self.adapter.observation_metadata(self.latest_frame, self.step),
         )
-        decision = self.agent.decide(AgentTurn(text, self.latest_images))
+        turn = AgentTurn(text, self.latest_images)
+        decision = None
+        for attempt in range(5):
+            try:
+                decision = self.agent.decide(turn)
+                break
+            except AgentOverloadedError:
+                if attempt == 4:
+                    raise
+                # Astra capacity errors are transient. Keep the same thread
+                # and request, with bounded backoff, instead of aborting a
+                # simulator episode and losing its observations.
+                time.sleep(2.0 * (attempt + 1))
+        assert decision is not None
         self.step += 1
         name, arguments = str(decision.get("name")), decision.get("arguments", {})
         if name in {"terminal.done", "terminal.give_up"}:
@@ -177,6 +197,9 @@ class GPTPolicyModel:
         for action in actions:
             for arm in self.arms:
                 prefix = f"{arm}_" if len(self.arms) > 1 else ""
+                pose_key = f"{prefix}ee_pose"
+                if pose_key not in action and pose_key in state:
+                    action[pose_key] = _jsonable(state[pose_key])
                 grip_key = f"{prefix}ee_joint_state"
                 if grip_key not in action and grip_key in state:
                     action[grip_key] = _jsonable(state[grip_key])
