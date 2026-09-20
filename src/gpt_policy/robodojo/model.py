@@ -77,6 +77,7 @@ class GPTPolicyModel:
         self.arms = tuple(model_cfg.get("arms", ("left", "right")))
         calibration_path = Path(str(model_cfg["calibration_manifest"])).expanduser().resolve()
         manifest = json.loads(calibration_path.read_text(encoding="utf-8"))
+        self._calibration_manifest = manifest
         self.adapter = RoboDojoAdapter(RoboDojoCalibration.from_manifest(manifest), self.arms)
         self.catalog = load_tool_catalog(settings)
         self.agent_cfg = agent_config(settings, config_path.parent)
@@ -108,6 +109,14 @@ class GPTPolicyModel:
 
     def update_obs(self, obs: Mapping[str, Any]):
         self.latest_frame = obs
+        # RoboDojo emits the active camera matrices when the env overlay has
+        # intrinsic_matrix/extrinsic_matrix enabled. Merge those matrices into
+        # the same calibration object used for state and context metadata so
+        # the model never sees raw camera geometry without its semantic
+        # calibration summary.
+        self.adapter.calibration = RoboDojoCalibration.from_observation(
+            self._calibration_manifest, obs
+        )
         self.latest_state = self.adapter.state(obs)
         self.latest_images = {
             str(name): _image(str(name), data["color"])
