@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Bootstrap source checkouts and a Python environment without silently
+# downloading Isaac Sim (which is large, GPU/driver-specific, and licensed).
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+VENV_DIR="${GPT_POLICY_VENV:-${ROOT_DIR}/.venv}"
+PYTHON_BIN="${PYTHON_BIN:-python3}"
+INSTALL_SIM_DEPS=0
+
+usage() {
+  cat <<'EOF'
+Usage: scripts/setup_robodojo.sh [--install-sim-deps]
+
+Creates/uses .venv, installs GPT-Policy, and checks out pinned RoboDojo and
+XPolicyLab revisions. --install-sim-deps also runs RoboDojo's upstream
+installer; it may install Isaac Sim 5.1, Isaac Lab, CuRobo and large CUDA
+packages and should only be used on the simulator host.
+EOF
+}
+
+for arg in "$@"; do
+  case "$arg" in
+    --install-sim-deps) INSTALL_SIM_DEPS=1 ;;
+    -h|--help) usage; exit 0 ;;
+    *) echo "Unknown argument: $arg" >&2; usage >&2; exit 2 ;;
+  esac
+done
+
+command -v git >/dev/null || { echo "git is required" >&2; exit 1; }
+"$PYTHON_BIN" - <<'PY'
+import sys
+if sys.version_info < (3, 11):
+    raise SystemExit("RoboDojo requires Python 3.11 or newer")
+PY
+
+if [[ ! -d "$VENV_DIR" ]]; then
+  "$PYTHON_BIN" -m venv "$VENV_DIR"
+fi
+# shellcheck disable=SC1091
+source "$VENV_DIR/bin/activate"
+python -m pip install --upgrade pip
+python -m pip install -e "$ROOT_DIR"
+
+checkout() {
+  local name="$1" url="$2" commit="$3" dest="$ROOT_DIR/third_party/$1"
+  if [[ ! -d "$dest/.git" ]]; then
+    git clone "$url" "$dest"
+  fi
+  git -C "$dest" fetch --depth 1 origin "$commit"
+  git -C "$dest" checkout --detach "$commit"
+  echo "$name: $(git -C "$dest" rev-parse HEAD)"
+}
+
+checkout RoboDojo https://github.com/RoboDojo-Benchmark/RoboDojo.git \
+  726e9aabfaa642203722eb126f5eaf0f37f3e1ad
+checkout XPolicyLab https://github.com/XPolicyLab/XPolicyLab.git \
+  e75f56b57d68561bf223faaf1198908a401602b4
+
+if [[ "$INSTALL_SIM_DEPS" == 1 ]]; then
+  export OMNI_KIT_ACCEPT_EULA=YES
+  bash "$ROOT_DIR/third_party/RoboDojo/scripts/install.sh" --install
+else
+  echo "Source checkouts ready. Isaac Sim dependencies not installed."
+  echo "Run with --install-sim-deps on the GPU simulator host when ready."
+fi

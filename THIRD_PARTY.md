@@ -7,3 +7,16 @@ The optional hardware backends use these upstream projects:
 - Intel RealSense Python bindings, installed with `python scripts/install_drivers.py realsense`.
 
 The public package does not vendor these SDKs. Check each upstream project's terms before redistribution.
+
+## RoboDojo simulation (optional)
+
+The simulation integration uses two separate upstream checkouts:
+
+- [RoboDojo](https://github.com/RoboDojo-Benchmark/RoboDojo), pinned in `third_party/manifest.json`.
+- [XPolicyLab](https://github.com/XPolicyLab/XPolicyLab), pinned in `third_party/manifest.json` and used for the policy-server/WebSocket contract.
+
+Run `./scripts/setup_robodojo.sh` to create/use `.venv`, install this package,
+and recreate both checkouts at the pinned revisions. This intentionally does
+not install Isaac Sim, Isaac Lab, CuRobo, or CUDA packages. On a compatible
+GPU host, opt in with `./scripts/setup_robodojo.sh --install-sim-deps` and
+review RoboDojo's non-commercial research license first.

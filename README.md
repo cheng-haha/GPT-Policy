@@ -90,6 +90,24 @@ python scripts/install_drivers.py realsense
 
 Agent CLIs are external dependencies. Install and authenticate the provider you select; credentials are stored outside this repository.
 
+### Optional RoboDojo simulation
+
+RoboDojo and XPolicyLab are kept as pinned third-party checkouts, with their
+own licenses and histories. To prepare the policy-side environment and source
+trees:
+
+```bash
+./scripts/setup_robodojo.sh
+source .venv/bin/activate
+```
+
+This step does not download Isaac Sim or CUDA packages. On the dedicated GPU
+simulator host, run `./scripts/setup_robodojo.sh --install-sim-deps` to invoke
+RoboDojo's upstream installer. The simulator and policy process communicate
+through XPolicyLab's WebSocket contract, so they may run on separate machines.
+See [third_party/README.md](third_party/README.md) and
+[THIRD_PARTY.md](THIRD_PARTY.md) for pinned revisions and license notices.
+
 ## Quick start
 
 For the default ARX profile, edit the placeholders in `configs/default.json` once, then run a task directly:

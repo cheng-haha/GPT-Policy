@@ -9,3 +9,7 @@ configs/machine.local.json
 request_json/*.json
 .pytest_cache/
 **/__pycache__/
+
+# Third-party checkouts are created by scripts/setup_robodojo.sh.
+third_party/RoboDojo/
+third_party/XPolicyLab/

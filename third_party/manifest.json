@@ -1,0 +1,10 @@
+{
+  "RoboDojo": {
+    "repository": "https://github.com/RoboDojo-Benchmark/RoboDojo.git",
+    "commit": "726e9aabfaa642203722eb126f5eaf0f37f3e1ad"
+  },
+  "XPolicyLab": {
+    "repository": "https://github.com/XPolicyLab/XPolicyLab.git",
+    "commit": "e75f56b57d68561bf223faaf1198908a401602b4"
+  }
+}
