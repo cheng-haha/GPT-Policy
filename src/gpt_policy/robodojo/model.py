@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import io
 import json
+import os
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -67,6 +68,11 @@ def _jsonable(value: Any) -> Any:
     return value
 
 
+def _canonical_tool_name(name: str) -> str:
+    """Accept both GPT tool aliases and the namespaced protocol names."""
+    return {"done": "terminal.done", "give_up": "terminal.give_up"}.get(name, name)
+
+
 class GPTPolicyModel:
     """ModelTemplate-shaped class without importing XPolicyLab at import time."""
 
@@ -94,6 +100,20 @@ class GPTPolicyModel:
         self.latest_images: dict[str, _Image] = {}
         self.step = 0
         self._started = False
+        # RoboDojo runs this wrapper in a long-lived policy server, outside
+        # the normal hardware runner that owns RunRecorder. Keep an equivalent
+        # lightweight trace here so every simulator turn has durable JSONL
+        # evidence and camera frames.
+        default_trace_root = Path(__file__).resolve().parents[3] / "var/runs/gpt/robodojo"
+        trace_root = Path(str(model_cfg.get("trace_dir") or default_trace_root)).expanduser()
+        trace_root.mkdir(parents=True, exist_ok=True)
+        run_name = f"{time.strftime('%Y%m%d-%H%M%S')}-{time.time_ns() % 1_000_000:06d}-push_T-pid{os.getpid()}"
+        self.trace_dir = trace_root / run_name
+        self.trace_dir.mkdir(parents=True, exist_ok=False)
+        self.trace_frames = self.trace_dir / "frames"
+        self.trace_frames.mkdir()
+        self.trace_events = (self.trace_dir / "events.jsonl").open("a", encoding="utf-8")
+        self._trace_event("run_started", {"model": self._agent_model, "robot_model": self.robot_model, "arms": self.arms})
 
     def _start(self, instruction: str) -> None:
         dof = int(self.model_cfg.get("dof", 6))
@@ -116,6 +136,7 @@ class GPTPolicyModel:
         self.latest_images = {}
         self.step = 0
         self._started = False
+        self._trace_event("reset", {})
 
     def update_obs(self, obs: Mapping[str, Any]):
         self.latest_frame = obs
@@ -133,6 +154,7 @@ class GPTPolicyModel:
             for name, data in (obs.get("vision") or {}).items()
             if isinstance(data, Mapping) and data.get("color") is not None
         }
+        self._trace_observation(obs)
         if not self._started:
             instruction = str(obs.get("instruction") or self.model_cfg.get("task_name") or "Complete the RoboDojo task.")
             self._start(instruction)
@@ -174,29 +196,39 @@ class GPTPolicyModel:
         assert decision is not None
         self.step += 1
         name, arguments = str(decision.get("name")), decision.get("arguments", {})
-        if name in {"terminal.done", "terminal.give_up"}:
+        # The model may emit the canonical tool names without the namespace.
+        # Treat both spellings identically at this integration boundary.
+        canonical_name = _canonical_tool_name(name)
+        self._trace_event("model_decision", {
+            "step": self.step, "name": name, "canonical_name": canonical_name,
+            "arguments": _jsonable(arguments), "state": _jsonable(self.latest_state),
+        })
+        if canonical_name in {"terminal.done", "terminal.give_up"}:
+            self._trace_event("action", {"step": self.step, "name": canonical_name, "actions": self._hold_action()})
             return [self._hold_action()]
-        if name in {"locate_point", "check_path"}:
+        if canonical_name in {"locate_point", "check_path"}:
             # These GPT-Policy tools are analytical/read-only. RoboDojo does
             # not expose a separate tool-call channel, so preserve the
             # simulator state for this cycle and let the next observation
             # provide the result (all raw camera/calibration fields remain in
             # the context).
-            return [self._hold_action()]
-        if name == "move_eef_chunk":
+            actions = [self._hold_action()]
+        elif canonical_name == "move_eef_chunk":
             actions = [self.adapter.action({"target": point}) for point in arguments.get("poses", [])]
-        elif name in {"move_to", "set_gripper"}:
+        elif canonical_name in {"move_to", "set_gripper"}:
             # A null gripper target is an explicit hold request. If every
             # selected side is null, emit a complete measured-state hold
             # action instead of asking the adapter to build an empty dict.
-            positions = arguments.get("positions") if name == "set_gripper" else None
-            single_hold = name == "set_gripper" and arguments.get("gripper") is None
+            positions = arguments.get("positions") if canonical_name == "set_gripper" else None
+            single_hold = canonical_name == "set_gripper" and arguments.get("gripper") is None
             all_hold = isinstance(positions, Mapping) and all(
                 positions.get(arm) is None for arm in self.arms
             )
             actions = [self._hold_action()] if single_hold or all_hold else [self.adapter.action(arguments)]
         else:
-            raise ValueError(f"RoboDojo cannot execute GPT-Policy tool {name!r} directly")
+            error = ValueError(f"RoboDojo cannot execute GPT-Policy tool {name!r} directly")
+            self._trace_event("error", {"step": self.step, "error": str(error), "name": name})
+            raise error
         # XPolicyLab's bimanual action contract requires a gripper field for
         # every arm on every waypoint, even when the selected GPT-Policy tool
         # only changes TCP pose. Hold the simulator's measured gripper values
@@ -211,7 +243,8 @@ class GPTPolicyModel:
                 grip_key = f"{prefix}ee_joint_state"
                 if grip_key not in action and grip_key in state:
                     action[grip_key] = _jsonable(state[grip_key])
-        self.previous = json.dumps({"tool": name, "result": {"accepted": True}}, ensure_ascii=False)
+        self.previous = json.dumps({"tool": canonical_name, "result": {"accepted": True}}, ensure_ascii=False)
+        self._trace_event("action", {"step": self.step, "name": canonical_name, "actions": _jsonable(actions)})
         return actions
 
     def get_action_batch(self, env_idx_list=None):
@@ -228,3 +261,29 @@ class GPTPolicyModel:
             action[f"{prefix}ee_pose"] = state[f"{prefix}ee_pose"]
             action[f"{prefix}ee_joint_state"] = state.get(f"{prefix}ee_joint_state", [0.0])
         return action
+
+    def _trace_event(self, event: str, payload: Mapping[str, Any]) -> None:
+        record = {"at": time.time(), "event": event, **_jsonable(dict(payload))}
+        self.trace_events.write(json.dumps(record, ensure_ascii=False, default=str) + "\n")
+        self.trace_events.flush()
+
+    def _trace_observation(self, frame: Mapping[str, Any]) -> None:
+        images = []
+        for name, image in self.latest_images.items():
+            path = self.trace_frames / f"step-{self.step:05d}-{name.replace('/', '_')}.jpg"
+            path.write_bytes(image.data)
+            images.append({"name": name, "path": str(path.relative_to(self.trace_dir)),
+                           "width": image.width, "height": image.height,
+                           "mime_type": image.mime_type})
+        camera_metadata = []
+        for name, data in (frame.get("vision") or {}).items():
+            if isinstance(data, Mapping):
+                camera_metadata.append(_jsonable({key: value for key, value in data.items()
+                                                  if key != "color"} | {"name": name}))
+        self._trace_event("observation", {
+            "step": self.step, "instruction": frame.get("instruction"),
+            "state": _jsonable(self.latest_state), "images": images,
+            "camera_metadata": camera_metadata,
+            "success": frame.get("success"), "end_flag": frame.get("end_flag"),
+            "action_feedback": _jsonable(frame.get("action")),
+        })

@@ -3,6 +3,7 @@ import unittest
 import numpy as np
 
 from gpt_policy.robodojo import RoboDojoAdapter, RoboDojoCalibration
+from gpt_policy.robodojo.model import _canonical_tool_name
 
 
 class RoboDojoAdapterTest(unittest.TestCase):
@@ -43,6 +44,11 @@ class RoboDojoAdapterTest(unittest.TestCase):
         ray = self.calibration.camera_ray_in_base("cam_head", [50, 50], "left")
         self.assertEqual(ray["frame"], "left_base_link")
         np.testing.assert_allclose(ray["ray_direction_base_xyz"], [0, 0, 1])
+
+    def test_terminal_tool_aliases_are_normalized(self):
+        self.assertEqual(_canonical_tool_name("done"), "terminal.done")
+        self.assertEqual(_canonical_tool_name("give_up"), "terminal.give_up")
+        self.assertEqual(_canonical_tool_name("terminal.done"), "terminal.done")
 
 
 if __name__ == "__main__":
