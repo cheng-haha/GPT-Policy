@@ -22,18 +22,6 @@ def _jsonable(value: Any) -> Any:
     return value
 
 
-def _pose_wxyz_to_xyzw(pose: Any, base_from_world: np.ndarray | None = None) -> list[float]:
-    values = np.asarray(pose, dtype=np.float64).reshape(7)
-    transform = np.eye(4)
-    transform[:3, :3] = quat_wxyz_to_matrix(values[3:])
-    transform[:3, 3] = values[:3]
-    if base_from_world is not None:
-        transform = base_from_world @ transform
-    result = transform[:3, 3].tolist()
-    result.extend(matrix_to_quat_xyzw(transform[:3, :3]))
-    return result
-
-
 class RoboDojoAdapter:
     """Bridge one RoboDojo environment frame to GPT-Policy.
 
@@ -68,15 +56,15 @@ class RoboDojoAdapter:
                 raise ValueError(f"RoboDojo frame is missing state.{pose_key}")
             joints = _jsonable(source.get(joint_key, []))
             grip = _jsonable(source.get(gripper_key, [0.0]))
-            base_from_world = None
+            tcp_transform = self.calibration.world_from_tcp(arm, pose)
             if arm in self.calibration.world_from_base:
-                base_from_world = self.calibration.base_from_world(arm)
+                tcp_transform = self.calibration.base_from_world(arm) @ tcp_transform
             arm_states[arm] = {
                 "joint_positions_rad": joints,
                 "joint_velocities_rad_s": _jsonable(source.get(f"{prefix}arm_joint_velocity", [])),
                 "joint_torques_nm": _jsonable(source.get(f"{prefix}arm_joint_torque", [])),
                 "tcp_xyzrpy": None,
-                "tcp_xyzquat": _pose_wxyz_to_xyzw(pose, base_from_world),
+                "tcp_xyzquat": tcp_transform[:3, 3].tolist() + matrix_to_quat_xyzw(tcp_transform[:3, :3]),
                 # ObsManager exposes ee_joint_state in the normalized action
                 # convention, not metres. Keep metres explicitly unavailable
                 # instead of relabelling a normalized value as hardware width.
@@ -120,11 +108,17 @@ class RoboDojoAdapter:
             if not isinstance(data, Mapping):
                 continue
             item = {"name": name, "device": "robodojo"}
-            item.update(_jsonable(dict(data)))
+            item.update(_jsonable({key: value for key, value in data.items() if key != "color"}))
+            item["extrinsic_axes"] = self.calibration.camera_extrinsic_axes
             if name in self.calibration.intrinsics and "intrinsic_matrix" not in item:
                 item["intrinsic_matrix"] = self.calibration.intrinsics[name].tolist()
             if name in self.calibration.camera_extrinsics_world and "extrinsic_matrix" not in item:
                 item["extrinsic_matrix"] = self.calibration.camera_extrinsics_world[name].tolist()
+            if name in self.calibration.camera_extrinsics_world:
+                item["base_from_optical_camera"] = {
+                    arm: self.calibration.base_from_camera(name, arm).tolist()
+                    for arm in self.arms if arm in self.calibration.world_from_base
+                }
             result.append(item)
         return result
 
@@ -161,6 +155,7 @@ class RoboDojoAdapter:
                 transform[:3, 3] = values[:3]
                 if arm in self.calibration.world_from_base:
                     transform = self.calibration.world_from_base[arm] @ transform
+                transform = np.linalg.inv(self.calibration.world_from_environment) @ transform @ self.calibration.tcp_from_link6.get(arm, np.eye(4))
                 q = matrix_to_quat_xyzw(transform[:3, :3])
                 output[f"{prefix}ee_pose"] = np.r_[transform[:3, 3], q[3], q[:3]].tolist()
             grip_key = f"{prefix}ee_joint_state"

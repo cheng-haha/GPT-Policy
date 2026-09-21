@@ -12,6 +12,7 @@ import io
 import json
 import os
 import time
+from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Mapping
@@ -29,6 +30,8 @@ from ..settings import load_settings
 from ..tools import load_tool_catalog
 from .adapter import RoboDojoAdapter
 from .calibration import RoboDojoCalibration
+from .icl import RoboDojoICL
+from ..vision.perception import _triangulate
 
 
 @dataclass(frozen=True)
@@ -54,6 +57,11 @@ def _image(name: str, value: Any, quality: int = 85) -> _Image:
     Image.fromarray(rgb, mode="RGB").save(output, format="JPEG", quality=quality)
     height, width = rgb.shape[:2]
     return _Image(name, output.getvalue(), "image/jpeg", width, height, rgb.tobytes())
+
+
+def _image_file(name: str, path: Path) -> _Image:
+    with Image.open(path) as image:
+        return _image(name, np.asarray(image.convert("RGB")))
 
 
 def _jsonable(value: Any) -> Any:
@@ -98,6 +106,31 @@ class GPTPolicyModel:
         self.latest_frame: Mapping[str, Any] | None = None
         self.latest_state: dict[str, Any] | None = None
         self.latest_images: dict[str, _Image] = {}
+        dataset_root = model_cfg.get("icl_dataset_root") or os.environ.get("ROBODOJO_ICL_ROOT", "/mnt/data/cpfs/b5/post_train_data/robodojo_sim")
+        cache_root = model_cfg.get("icl_cache_dir") or os.environ.get("ROBODOJO_ICL_CACHE", str(Path(__file__).resolve().parents[3] / "var/cache/robodojo_icl"))
+        icl_mode = os.environ.get("ROBODOJO_ICL_MODE", str(model_cfg.get("icl_mode", "video+action"))).lower()
+        if icl_mode not in {"video+action", "video", "none"}:
+            raise ValueError("ROBODOJO_ICL_MODE must be video+action, video, or none")
+        self.icl_mode = icl_mode
+        self.icl = RoboDojoICL(dataset_root, cache_root, keyframes=int(model_cfg.get("icl_keyframes", 6))) if model_cfg.get("icl_enabled", True) and icl_mode != "none" else None
+        self._icl_summary: str | None = None
+        self._icl_images: dict[str, _Image] = {}
+        self._icl_loaded = False
+        self._observation_history: dict[int, Mapping[str, Any]] = {}
+        self._last_commanded_world: dict[str, list[float]] = {}
+        self._last_execution_feedback: dict[str, Any] | None = None
+        self._tracking_failure_count = 0
+        self._max_tracking_error_m = float(model_cfg.get("robodojo_max_tracking_error_m", 0.03))
+        self._max_tracking_error_rad = float(model_cfg.get("robodojo_max_tracking_error_rad", 0.20))
+        self._max_consecutive_tracking_failures = int(model_cfg.get("robodojo_max_consecutive_tracking_failures", 2))
+        # These are deliberately conservative pre-flight limits. They prevent
+        # a guessed EEF pose from reaching RoboDojo's IK solver, which may
+        # otherwise return a large, misleading joint-space deviation.
+        self._reachability_bounds = model_cfg.get("robodojo_reachability_bounds", {
+            "x": [-0.05, 0.65], "y": [-0.55, 0.55], "z": [0.04, 0.45],
+        })
+        self._max_reachability_step_m = float(model_cfg.get("robodojo_max_step_m", 0.30))
+        self._terminal_reason: str | None = None
         self.step = 0
         self._started = False
         # RoboDojo runs this wrapper in a long-lived policy server, outside
@@ -134,12 +167,29 @@ class GPTPolicyModel:
         self.latest_frame = None
         self.latest_state = None
         self.latest_images = {}
+        self._icl_summary = None
+        self._icl_images = {}
+        self._icl_loaded = False
+        self._observation_history = {}
+        self._last_commanded_world = {}
+        self._last_execution_feedback = None
+        self._tracking_failure_count = 0
+        self._terminal_reason = None
         self.step = 0
         self._started = False
         self._trace_event("reset", {})
 
+    def is_episode_done(self) -> bool:
+        """Tell the environment loop to stop after a terminal model decision."""
+        return self._terminal_reason is not None
+
     def update_obs(self, obs: Mapping[str, Any]):
         self.latest_frame = obs
+        snapshot = deepcopy(dict(obs))
+        for camera in (snapshot.get("vision") or {}).values():
+            if isinstance(camera, dict):
+                camera.pop("color", None)
+        self._observation_history[self.step] = snapshot
         # RoboDojo emits the active camera matrices when the env overlay has
         # intrinsic_matrix/extrinsic_matrix enabled. Merge those matrices into
         # the same calibration object used for state and context metadata so
@@ -149,11 +199,76 @@ class GPTPolicyModel:
             self._calibration_manifest, obs
         )
         self.latest_state = self.adapter.state(obs)
+        # The deploy loop executes the complete action list before asking for
+        # the next observation. Therefore feedback must be compared with the
+        # final waypoint of the previous chunk, not with its first waypoint.
+        self._last_execution_feedback = self._execution_feedback(obs)
+        ik_feedback = obs.get("ik_feedback")
+        if ik_feedback is not None:
+            if self._last_execution_feedback is None:
+                self._last_execution_feedback = {
+                    "measured_after_previous_action": True,
+                    "arms": {},
+                    "all_within_tolerance": False,
+                }
+            self._last_execution_feedback["ik_feedback"] = _jsonable(ik_feedback)
+            if ik_feedback.get("status") == "ik_failed":
+                self._last_execution_feedback["warning"] = (
+                    "RoboDojo 的逆运动学未能为部分目标位姿找到关节解；该机械臂目标没有执行。"
+                )
+        if self._last_execution_feedback is not None:
+            bad_tracking = bool(ik_feedback and ik_feedback.get("status") in {"ik_failed", "tracking_failed"}) or any(
+                item["translation_error_m"] > self._max_tracking_error_m
+                or item["rotation_error_rad"] > self._max_tracking_error_rad
+                for item in self._last_execution_feedback["arms"].values()
+            )
+            self._tracking_failure_count = self._tracking_failure_count + 1 if bad_tracking else 0
+            self._last_execution_feedback["tracking_failure_count"] = self._tracking_failure_count
+            if self._tracking_failure_count >= self._max_consecutive_tracking_failures:
+                self._last_execution_feedback["execution_blocked"] = True
+                self._last_execution_feedback["blocked_reason"] = (
+                    "连续动作的 TCP 实测误差超过安全阈值；已停止继续运动，避免继续尝试造成碰撞。"
+                )
+                self._terminal_reason = "execution_tracking_failed"
+                self._trace_event("execution_blocked", {
+                    "step": self.step,
+                    "reason": self._terminal_reason,
+                    "tracking_failure_count": self._tracking_failure_count,
+                    "feedback": self._last_execution_feedback,
+                })
+            self.latest_state["execution_feedback"] = self._last_execution_feedback
+            self._attach_feedback_to_previous(self._last_execution_feedback)
         self.latest_images = {
             str(name): _image(str(name), data["color"])
             for name, data in (obs.get("vision") or {}).items()
             if isinstance(data, Mapping) and data.get("color") is not None
         }
+        if not self._icl_loaded and self.icl is not None:
+            self._icl_loaded = True
+            try:
+                prepared = self.icl.prepare(str(obs.get("instruction") or self.model_cfg.get("task_name") or ""))
+            except Exception as exc:
+                self._trace_event("icl_unavailable", {"error": repr(exc)})
+                prepared = None
+            if prepared is not None:
+                summary, paths = prepared
+                self._icl_summary = summary if self.icl_mode == "video+action" else None
+                self._icl_images = {name: _image_file(name, path) for name, path in paths.items()}
+                try:
+                    matched_task = json.loads(summary).get("task")
+                except (TypeError, ValueError):
+                    matched_task = None
+                self._trace_event("icl_loaded", {
+                    "mode": self.icl_mode,
+                    "task": matched_task,
+                    "image_count": len(self._icl_images),
+                    "action_summary": self._icl_summary is not None,
+                })
+            else:
+                self._trace_event("icl_unavailable", {
+                    "mode": self.icl_mode,
+                    "instruction": str(obs.get("instruction") or ""),
+                })
         self._trace_observation(obs)
         if not self._started:
             instruction = str(obs.get("instruction") or self.model_cfg.get("task_name") or "Complete the RoboDojo task.")
@@ -167,11 +282,7 @@ class GPTPolicyModel:
     def get_action(self):
         if self.latest_frame is None or self.latest_state is None or not self._started:
             raise RuntimeError("update_obs must be called before get_action")
-        camera_meta = []
-        for name, data in (self.latest_frame.get("vision") or {}).items():
-            if not isinstance(data, Mapping):
-                continue
-            camera_meta.append(_jsonable({key: value for key, value in data.items() if key != "color"} | {"name": name}))
+        camera_meta = self.adapter.cameras(self.latest_frame)
         text = observation(
             str(self.latest_frame.get("instruction") or self.model_cfg.get("task_name") or "Complete the RoboDojo task."),
             self.latest_state,
@@ -180,8 +291,17 @@ class GPTPolicyModel:
             self.step,
             self.adapter.observation_metadata(self.latest_frame, self.step),
         )
-        turn = AgentTurn(text, self.latest_images)
+        if self._icl_images and self.step == 0:
+            text += "\n\nHistorical visual demonstration (reference only; adapt to the current scene and never replay blindly)."
+            if self._icl_summary is not None:
+                text += "\nIn-context state/action trajectory summary:\n" + self._icl_summary
+        images = dict(self.latest_images)
+        if self._icl_images and self.step == 0:
+            images.update(self._icl_images)
+        turn = AgentTurn(text, images)
         decision = None
+        if self._terminal_reason is not None:
+            return [self._hold_action()]
         for attempt in range(5):
             try:
                 decision = self.agent.decide(turn)
@@ -204,14 +324,19 @@ class GPTPolicyModel:
             "arguments": _jsonable(arguments), "state": _jsonable(self.latest_state),
         })
         if canonical_name in {"terminal.done", "terminal.give_up"}:
+            self._terminal_reason = str(arguments.get("reason") or canonical_name)
             self._trace_event("action", {"step": self.step, "name": canonical_name, "actions": self._hold_action()})
             return [self._hold_action()]
-        if canonical_name in {"locate_point", "check_path"}:
-            # These GPT-Policy tools are analytical/read-only. RoboDojo does
-            # not expose a separate tool-call channel, so preserve the
-            # simulator state for this cycle and let the next observation
-            # provide the result (all raw camera/calibration fields remain in
-            # the context).
+        result: dict[str, Any] = {"accepted": True}
+        if canonical_name == "locate_point":
+            result = self._locate_point(arguments)
+            actions = [self._hold_action()]
+        elif canonical_name == "check_path":
+            # RoboDojo does not expose a separate path-check endpoint. Keep
+            # the simulator state unchanged while returning an explicit
+            # diagnostic result to the next model turn.
+            result = {"accepted": True, "path_check_available": False,
+                      "explanation": "RoboDojo executes the requested path only through move tools."}
             actions = [self._hold_action()]
         elif canonical_name == "move_eef_chunk":
             actions = [self.adapter.action({"target": point}) for point in arguments.get("poses", [])]
@@ -243,9 +368,233 @@ class GPTPolicyModel:
                 grip_key = f"{prefix}ee_joint_state"
                 if grip_key not in action and grip_key in state:
                     action[grip_key] = _jsonable(state[grip_key])
-        self.previous = json.dumps({"tool": canonical_name, "result": {"accepted": True}}, ensure_ascii=False)
-        self._trace_event("action", {"step": self.step, "name": canonical_name, "actions": _jsonable(actions)})
+        if canonical_name in {"move_to", "move_eef_chunk"}:
+            rejection = self._validate_reachability(actions)
+            if rejection is not None:
+                result = rejection
+                self._trace_event("action_rejected", {
+                    "step": self.step, "name": canonical_name, "result": rejection,
+                })
+                # A rejected motion is represented by a measured-state hold;
+                # the rejection itself is returned in ``previous`` below.
+                actions = [self._hold_action()]
+        commanded_trajectory = [
+            {
+                arm: _jsonable(action[f"{arm}_ee_pose" if len(self.arms) > 1 else "ee_pose"])
+                for arm in self.arms
+                if (f"{arm}_ee_pose" if len(self.arms) > 1 else "ee_pose") in action
+            }
+            for action in actions
+        ]
+        self._last_commanded_world = commanded_trajectory[-1] if commanded_trajectory else {}
+        self.previous = json.dumps({"tool": canonical_name, "result": result}, ensure_ascii=False)
+        self._trace_event("action", {
+            "step": self.step, "name": canonical_name,
+            "result": _jsonable(result),
+            "actions": _jsonable(actions),
+            "commanded_trajectory_world": commanded_trajectory,
+            "commanded_targets_world": self._last_commanded_world,
+        })
         return actions
+
+    def _validate_reachability(self, actions: list[Mapping[str, Any]]) -> dict[str, Any] | None:
+        """Reject obviously unreachable EEF targets before simulator IK.
+
+        This is a safety pre-check, not a proof that IK will succeed. The
+        simulator remains the final authority, but it must never be asked to
+        solve a target outside the configured per-arm workspace or a single
+        jump larger than the safe step limit.
+        """
+        if not self.latest_frame:
+            return None
+        measured = self.latest_frame.get("state") or {}
+        previous_targets: dict[str, np.ndarray] = {}
+        for action_index, action in enumerate(actions):
+            for arm in self.arms:
+                key = f"{arm}_ee_pose" if len(self.arms) > 1 else "ee_pose"
+                raw_target = action.get(key)
+                if raw_target is None:
+                    continue
+                target = np.asarray(raw_target, dtype=np.float64).reshape(7)
+                if not np.all(np.isfinite(target)):
+                    return {
+                        "accepted": False, "executed": False,
+                        "reason": "unreachable",
+                        "error": "target pose contains non-finite values",
+                        "arm": arm, "waypoint_index": action_index,
+                    }
+                base_from_world = self.adapter.calibration.base_from_world(arm)
+                target_h = self.adapter.calibration.world_from_tcp(arm, target)
+                target_base = (base_from_world @ target_h)[:3, 3]
+                limits = self._reachability_bounds
+                for axis, value in zip(("x", "y", "z"), target_base):
+                    low, high = map(float, limits[axis])
+                    if value < low or value > high:
+                        return {
+                            "accepted": False, "executed": False,
+                            "reason": "unreachable",
+                            "error": f"{arm} target is outside the configured RoboDojo workspace",
+                            "arm": arm, "waypoint_index": action_index,
+                            "target_base_xyz": target_base.tolist(),
+                            "workspace_bounds": {name: list(map(float, limits[name])) for name in ("x", "y", "z")},
+                            "axis": axis, "value": float(value),
+                        }
+                if arm in previous_targets:
+                    start_world = previous_targets[arm]
+                else:
+                    actual = measured.get(key)
+                    if actual is None:
+                        continue
+                    start_world = np.asarray(actual, dtype=np.float64).reshape(7)
+                start_tcp = self.adapter.calibration.world_from_tcp(arm, start_world)
+                distance = float(np.linalg.norm(target_h[:3, 3] - start_tcp[:3, 3]))
+                if distance > self._max_reachability_step_m:
+                    return {
+                        "accepted": False, "executed": False,
+                        "reason": "unreachable",
+                        "error": f"{arm} target requires a {distance:.3f} m TCP jump, above the {self._max_reachability_step_m:.3f} m safety limit",
+                        "arm": arm, "waypoint_index": action_index,
+                        "target_base_xyz": target_base.tolist(),
+                        "distance_from_previous_m": distance,
+                        "max_step_m": self._max_reachability_step_m,
+                    }
+                previous_targets[arm] = target
+        return None
+
+    @staticmethod
+    def _camera_alias(name: Any) -> str:
+        return {"left": "cam_left_wrist", "right": "cam_right_wrist", "top": "cam_head"}.get(str(name), str(name))
+
+    def _frame_ray(self, frame: Mapping[str, Any], camera: str, pixel: Any, arm: str):
+        data = (frame.get("vision") or {}).get(camera)
+        if not isinstance(data, Mapping):
+            return None
+        extrinsic = data.get("extrinsic_matrix")
+        intrinsic = data.get("intrinsic_matrix")
+        if extrinsic is None or intrinsic is None:
+            return None
+        dynamic = RoboDojoCalibration.from_observation(self._calibration_manifest, frame)
+        ray = dynamic.camera_ray_in_base(camera, pixel, arm)
+        return (np.asarray(ray["ray_origin_base_xyz"], dtype=np.float64),
+                np.asarray(ray["ray_direction_base_xyz"], dtype=np.float64))
+
+    def _locate_point(self, arguments: Mapping[str, Any]) -> dict[str, Any]:
+        assert self.latest_frame is not None
+        camera = self._camera_alias(arguments.get("camera", ""))
+        pixel = arguments.get("pixel_xy")
+        if camera not in (self.latest_frame.get("vision") or {}):
+            raise ValueError(f"RoboDojo observation has no camera {camera}")
+        result: dict[str, Any] = {"camera": camera, "pixel_xy": pixel,
+                                  "metric_position_available": False}
+        rays = {}
+        for arm in self.arms:
+            ray = self._frame_ray(self.latest_frame, camera, pixel, arm)
+            if ray is not None:
+                origin, direction = ray
+                rays[arm] = {"frame": f"{arm}_base_link",
+                             "ray_origin_base_xyz": origin.tolist(),
+                             "ray_direction_base_xyz": direction.tolist()}
+        result["base_frame_rays"] = rays
+        ref_step = arguments.get("reference_step")
+        ref_pixel = arguments.get("reference_pixel_xy")
+        if ref_step is None or ref_pixel is None:
+            result["explanation"] = "当前视图已转换为左右 arm base 坐标系射线；单张 RGB 图像不提供深度。"
+            return result
+        reference = self._observation_history.get(int(ref_step))
+        if reference is None:
+            result["explanation"] = f"找不到 step {ref_step} 的历史观测。"
+            return result
+        for arm in self.arms:
+            current = self._frame_ray(self.latest_frame, camera, pixel, arm)
+            previous = self._frame_ray(reference, camera, ref_pixel, arm)
+            if current is None or previous is None:
+                continue
+            point, residual, quality = _triangulate(current[0], current[1], previous[0], previous[1])
+            reasons = []
+            if quality["parallax_angle_deg"] < 5.0:
+                reasons.append("parallax_angle_too_small")
+            if quality["condition_number"] > 500.0:
+                reasons.append("triangulation_ill_conditioned")
+            if residual > 0.01:
+                reasons.append("ray_residual_too_large")
+            if any(depth <= 0 for depth in quality["ray_depths_m"]):
+                reasons.append("intersection_behind_camera")
+            candidate = {
+                "arm": arm, "triangulation_candidate_base_xyz": point.tolist(),
+                "triangulation_residual_m": residual, "triangulation_valid": not reasons,
+                "triangulation_rejection_reasons": reasons, "reference_step": int(ref_step),
+                **quality,
+            }
+            result.setdefault("triangulation_by_arm", {})[arm] = candidate
+        candidates = list(result.get("triangulation_by_arm", {}).values())
+        valid = [item for item in candidates if item["triangulation_valid"]]
+        if valid:
+            chosen = min(valid, key=lambda item: item["triangulation_residual_m"])
+            result.update({
+                "metric_position_base_xyz": chosen["triangulation_candidate_base_xyz"],
+                "metric_position_available": True,
+                "triangulation_residual_m": chosen["triangulation_residual_m"],
+                "parallax_angle_deg": chosen["parallax_angle_deg"],
+                "condition_number": chosen["condition_number"],
+                "ray_depths_m": chosen["ray_depths_m"],
+                "arm": chosen["arm"],
+                "explanation": "两次 RGB 视线交会通过视差、条件数、残差和深度检查。",
+            })
+        elif candidates:
+            result["explanation"] = "两次 RGB 视线交会未通过视差、条件数、残差或深度检查。"
+        return result
+
+    @staticmethod
+    def _quat_angle_wxyz(first: Any, second: Any) -> float:
+        a = np.asarray(first, dtype=np.float64).reshape(4)
+        b = np.asarray(second, dtype=np.float64).reshape(4)
+        a /= max(np.linalg.norm(a), 1e-12)
+        b /= max(np.linalg.norm(b), 1e-12)
+        return float(2.0 * np.arccos(np.clip(abs(float(np.dot(a, b))), -1.0, 1.0)))
+
+    def _execution_feedback(self, frame: Mapping[str, Any]) -> dict[str, Any] | None:
+        if not self._last_commanded_world:
+            return None
+        state = frame.get("state") or {}
+        arms: dict[str, Any] = {}
+        for arm, commanded in self._last_commanded_world.items():
+            actual = state.get(f"{arm}_ee_pose" if len(self.arms) > 1 else "ee_pose")
+            if actual is None:
+                continue
+            target = np.asarray(commanded, dtype=np.float64).reshape(7)
+            measured = np.asarray(actual, dtype=np.float64).reshape(7)
+            target_tcp = self.adapter.calibration.world_from_tcp(arm, target)
+            measured_tcp = self.adapter.calibration.world_from_tcp(arm, measured)
+            translation_error = float(np.linalg.norm(target_tcp[:3, 3] - measured_tcp[:3, 3]))
+            rotation_error = self._quat_angle_wxyz(target[3:], measured[3:])
+            arms[arm] = {
+                "commanded_world_xyz_wxyz": target.tolist(),
+                "measured_world_xyz_wxyz": measured.tolist(),
+                "commanded_tcp_world_xyz": target_tcp[:3, 3].tolist(),
+                "measured_tcp_world_xyz": measured_tcp[:3, 3].tolist(),
+                "source_pose_frame": "RoboDojo environment-relative source EE link, wxyz",
+                "translation_error_m": translation_error,
+                "rotation_error_rad": rotation_error,
+                "within_tolerance": translation_error <= 0.015 and rotation_error <= 0.20,
+            }
+        if not arms:
+            return None
+        return {
+            "measured_after_previous_action": True,
+            "arms": arms,
+            "all_within_tolerance": all(item["within_tolerance"] for item in arms.values()),
+            "warning": "命令被接受不等于 TCP 已到位；后续动作必须依据此实测误差和新图像调整。",
+        }
+
+    def _attach_feedback_to_previous(self, feedback: Mapping[str, Any]) -> None:
+        if not self.previous:
+            return
+        try:
+            payload = json.loads(self.previous)
+        except (TypeError, ValueError):
+            return
+        payload["execution_feedback"] = _jsonable(feedback)
+        self.previous = json.dumps(payload, ensure_ascii=False)
 
     def get_action_batch(self, env_idx_list=None):
         if env_idx_list not in (None, [0]):
@@ -275,11 +624,7 @@ class GPTPolicyModel:
             images.append({"name": name, "path": str(path.relative_to(self.trace_dir)),
                            "width": image.width, "height": image.height,
                            "mime_type": image.mime_type})
-        camera_metadata = []
-        for name, data in (frame.get("vision") or {}).items():
-            if isinstance(data, Mapping):
-                camera_metadata.append(_jsonable({key: value for key, value in data.items()
-                                                  if key != "color"} | {"name": name}))
+        camera_metadata = self.adapter.cameras(frame)
         self._trace_event("observation", {
             "step": self.step, "instruction": frame.get("instruction"),
             "state": _jsonable(self.latest_state), "images": images,

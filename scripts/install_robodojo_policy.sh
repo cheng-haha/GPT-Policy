@@ -17,6 +17,16 @@ done
 XPOLICYLAB_DIR="$(realpath "$XPOLICYLAB_DIR")"
 GPT_CONFIG="$(realpath "$GPT_CONFIG")"
 CALIBRATION="$(realpath "$CALIBRATION")"
+ROBODOJO_DIR="${XPOLICYLAB_DIR}/../RoboDojo"
+CAMERA_PATCH="${ROOT_DIR}/scripts/patches/robodojo-camera-calibration.patch"
+if git -C "$ROBODOJO_DIR" apply --reverse --check "$CAMERA_PATCH" 2>/dev/null; then
+  printf '%s\n' 'RoboDojo camera calibration patch is already applied.'
+elif git -C "$ROBODOJO_DIR" apply --check "$CAMERA_PATCH"; then
+  git -C "$ROBODOJO_DIR" apply "$CAMERA_PATCH"
+else
+  echo 'RoboDojo camera source differs from the pinned version; review the calibration patch before installing.' >&2
+  exit 1
+fi
 BASE_ENV_CFG="${XPOLICYLAB_DIR}/../RoboDojo/env_cfg/arx_x5.yml"
 OVERLAY_ENV_CFG="${XPOLICYLAB_DIR}/../RoboDojo/env_cfg/gpt_policy_x5.yml"
 if [[ -f "$BASE_ENV_CFG" ]]; then
@@ -95,6 +105,8 @@ def eval_one_episode(TASK_ENV, model_client):
             TASK_ENV.take_action(action)
             if TASK_ENV.is_episode_end():
                 break
+        if model_client.call(func_name="is_episode_done"):
+            break
 
 def eval_one_episode_batch(TASK_ENV, model_client):
     raise NotImplementedError("GPT-Policy RoboDojo adapter requires eval_batch=false")
@@ -111,6 +123,11 @@ eval_batch: false
 gpt_policy_config: $(realpath "$GPT_CONFIG")
 calibration_manifest: $(realpath "$CALIBRATION")
 arms: [left, right]
+icl_enabled: true
+icl_mode: video+action
+icl_dataset_root: /mnt/data/cpfs/b5/post_train_data/robodojo_sim
+icl_cache_dir: ${ROOT_DIR}/var/cache/robodojo_icl
+icl_keyframes: 6
 EOF
 cat >"${POLICY_DIR}/setup_eval_policy_server.sh" <<EOF
 #!/usr/bin/env bash
@@ -130,7 +147,7 @@ fi
 # The Codex plugin may leave an older npm wrapper earlier in PATH while the
 # authenticated standalone release is newer. Prefer the standalone binary
 # when it is present so RoboDojo and GPT-Policy use the same model capability
-# that `codex` itself advertises after an upgrade.
+# that the codex command itself advertises after an upgrade.
 for candidate in /root/.codex/packages/standalone/releases/*/bin; do
   if [[ -x "\$candidate/codex" ]]; then
     export PATH="\$candidate:\$PATH"
@@ -144,12 +161,33 @@ exec "${ROOT_DIR}/.venv/bin/python" -m client_server.ws.model_server \\
   --config-path "$(realpath "${POLICY_DIR}/deploy.yml")" --host "\${HOST}" --port "\${PORT}"
 EOF
 chmod +x "${POLICY_DIR}/setup_eval_policy_server.sh"
+cat >"${POLICY_DIR}/setup_eval_env_client.sh" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+BENCH="\${1}"; TASK="\${2}"; CKPT="\${3}"; ENV_CFG="\${4}"
+ACTION="\${5}"; SEED="\${6}"; ENV_GPU="\${7}"; EVAL_ENV="\${8}"
+ADDITIONAL_INFO="\${9}"; PORT="\${10}"; HOST="\${11:-localhost}"
+
+# Keep the calibration-complete overlay even when the generic RoboDojo sweep
+# passes its default environment configuration.
+ENV_CFG="gpt_policy_x5"
+if [[ -d "\${HOME}/miniconda3/envs/\${EVAL_ENV}/bin" ]]; then
+  export PATH="\${HOME}/miniconda3/envs/\${EVAL_ENV}/bin:\${PATH}"
+fi
+exec bash "${ROOT_DIR}/third_party/RoboDojo/scripts/eval_policy.sh" \\
+  --dataset_name "\${BENCH}" --task_name "\${TASK}" \\
+  --env_cfg_type "\${ENV_CFG}" --policy_name GPT_Policy \\
+  --host "\${HOST}" --port "\${PORT}" --protocol ws \\
+  --root_dir "${ROOT_DIR}/third_party/RoboDojo" --device_id "\${ENV_GPU}" \\
+  --additional_info "\${ADDITIONAL_INFO}" --seed "\${SEED}"
+EOF
+chmod +x "${POLICY_DIR}/setup_eval_env_client.sh"
 cat >"${POLICY_DIR}/eval.sh" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
-# RoboDojo's simulator-side shell scripts invoke `python3` directly. Use the
+# RoboDojo's simulator-side shell scripts invoke python3 directly. Use the
 # simulator conda environment for those helpers (the policy server itself
-# remains in GPT-Policy's .venv).
+# remains in GPT-Policy's local virtual environment).
 if [[ -d "\${HOME}/miniconda3/envs/RoboDojo/bin" ]]; then
   export PATH="\${HOME}/miniconda3/envs/RoboDojo/bin:\${PATH}"
 fi
@@ -163,9 +201,13 @@ PORT="\$("${ROOT_DIR}/.venv/bin/python" -c 'import socket; s=socket.socket(); s.
 SERVER_PID=\$!
 cleanup() { kill "\${SERVER_PID}" 2>/dev/null || true; }
 trap cleanup EXIT
-exec bash "${ROOT_DIR}/third_party/RoboDojo/scripts/robodojo.sh" client \\
+set +e
+bash "${ROOT_DIR}/third_party/RoboDojo/scripts/robodojo.sh" client \\
   --task "\${TASK}" --env-cfg "\${ENV_CFG}" --policy-name GPT_Policy \\
   --policy-host 127.0.0.1 --policy-port "\${PORT}" --env-gpu "\${ENV_GPU}"
+STATUS=\$?
+set -e
+exit "\${STATUS}"
 EOF
 chmod +x "${POLICY_DIR}/eval.sh"
 echo "Installed ${POLICY_NAME} wrapper at ${POLICY_DIR}"
@@ -176,7 +218,8 @@ echo "Installed ${POLICY_NAME} wrapper at ${POLICY_DIR}"
 FRANKA_POLICY_DIR="${XPOLICYLAB_DIR}/policy/GPT_Policy_Franka"
 mkdir -p "${FRANKA_POLICY_DIR}"
 cp -a "${POLICY_DIR}/__init__.py" "${POLICY_DIR}/model.py" "${POLICY_DIR}/deploy.py" \
-  "${POLICY_DIR}/setup_eval_policy_server.sh" "${POLICY_DIR}/eval.sh" "${FRANKA_POLICY_DIR}/"
+  "${POLICY_DIR}/setup_eval_policy_server.sh" "${POLICY_DIR}/setup_eval_env_client.sh" \
+  "${POLICY_DIR}/eval.sh" "${FRANKA_POLICY_DIR}/"
 cat >"${FRANKA_POLICY_DIR}/deploy.yml" <<EOF
 policy_name: GPT_Policy_Franka
 model: gpt-6-astra
@@ -193,6 +236,7 @@ dof: 7
 arms: [franka]
 EOF
 sed -i 's/GPT_Policy/GPT_Policy_Franka/g; s/gpt_policy_x5/gpt_policy_franka/g' "${FRANKA_POLICY_DIR}/eval.sh"
+sed -i 's/GPT_Policy/GPT_Policy_Franka/g; s/gpt_policy_x5/gpt_policy_franka/g' "${FRANKA_POLICY_DIR}/setup_eval_env_client.sh"
 sed -i 's/GPT_Policy/GPT_Policy_Franka/g' "${FRANKA_POLICY_DIR}/setup_eval_policy_server.sh"
 chmod +x "${FRANKA_POLICY_DIR}"/*.sh
 echo "Installed Franka wrapper at ${FRANKA_POLICY_DIR}"

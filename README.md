@@ -113,9 +113,90 @@ See [third_party/README.md](third_party/README.md) and
 
 The adapter implementation lives under `src/gpt_policy/robodojo/`. Use
 `configs/examples/robodojo.json` as the starting configuration. Its
-calibration manifest must be populated from the active RoboDojo camera manager
-and USD robot frames before evaluation; the identity/empty values in the
-example are only a schema, not a valid calibrated run.
+calibration manifest specifies the embodiment's grasp-center offset and a
+nominal base pose. The patched simulator supplies actual base poses,
+environment origins, and camera matrices on every observation; these take
+precedence over static values.
+
+Camera geometry uses an explicit coordinate convention: RoboDojo emits USD
+camera-to-world poses (+X right, +Y up, -Z forward), while pixel rays use
+OpenCV optical axes (+X right, +Y down, +Z forward). The bridge applies
+`diag(1,-1,-1,1)` on the camera side before converting into an arm base frame.
+Model observations include both labeled raw extrinsics and
+`base_from_optical_camera`; do not apply a second axis flip to the latter.
+Calibration manifests default to `camera_extrinsic_axes: "usd"`; use
+`"opencv"` only for extrinsics that have already been converted upstream.
+
+`install_robodojo_policy.sh` also applies the versioned camera-export patch in
+`scripts/patches/`: sensor poses come from live Fabric transforms, not stale
+USD transforms or camera housings. Standard pinhole vertical aperture is
+matched to the render resolution's square pixels, so SDK intrinsics and
+rendered images agree. The bridge still supports independent `fx` and `fy`.
+TCP commands and observations apply the configured grasp-center offset:
+X5 is 145 mm along `link6` +X (mapped to TCP +Z); Franka is 102 mm along
+`panda_hand` +Z. These are configured grasp centers, not raw flange origins
+or a claim that the distal mesh boundary is exactly at the TCP.
+After upgrading an existing checkout, rerun the installer and restart the
+simulator and policy server. Camera regression checks:
+
+```bash
+.venv/bin/python -m pytest -q tests/test_robodojo_calibration.py tests/test_robodojo_adapter.py
+/root/miniconda3/envs/RoboDojo/bin/python scripts/verify_robodojo_camera_calibration.py
+/root/miniconda3/envs/RoboDojo/bin/python scripts/verify_robodojo_scene_calibration.py \
+  --env-cfg gpt_policy_x5 --seeds 0,1,2 --output var/runs/robodojo/calibration_x5
+/root/miniconda3/envs/RoboDojo/bin/python scripts/verify_robodojo_scene_calibration.py \
+  --env-cfg gpt_policy_franka --seeds 0,1,2 --output var/runs/robodojo/calibration_franka
+```
+
+The offline tests replay three wrist-camera baselines from a recorded Push-T
+failure. The live check compares SDK-projected known landmarks with the
+bridge's back-projected rays. The scene test exercises the actual Push-T
+environment, multiple joint configurations and resets, live camera/base/TCP
+transforms, rendered markers, temporal triangulation, and small IK-driven
+motions. It saves numerical checks and RGB evidence. The existing policy's
+5-degree parallax criterion distinguishes usable rendered triangulation
+from separately reported weak-baseline diagnostics. These tests do not call
+a VLM, move physical hardware, or expose diagnostic ground truth to a policy.
+
+When `/mnt/data/cpfs/b5/post_train_data/robodojo_sim` is available, the
+generated RoboDojo policy wrapper also enables bounded in-context examples.
+It matches the live task instruction to the corresponding dataset, reads one
+historical episode's Parquet state/action trajectory, and extracts six
+synchronized keyframes from the three camera videos into
+`var/cache/robodojo_icl/`. Only that compact summary and those keyframes are
+sent to Codex on the first decision; the full 62 GB dataset is never loaded
+into the policy context. Set `ROBODOJO_ICL_ROOT` to another dataset location,
+or set `icl_enabled: false` in the generated `deploy.yml` to disable it.
+
+The three rollout modes use the same evaluator. `video+action` supplies the
+historical keyframes and compressed state/action samples; `video` supplies
+only the historical keyframes; `none` disables historical examples and leaves
+the normal task prompt plus live observations:
+
+```bash
+# Default: video + action context.
+./scripts/eval_robodojo_8gpu.sh smoke --icl-mode video+action --only push_T --eval-num 1
+
+# Visual demonstration only.
+./scripts/eval_robodojo_8gpu.sh smoke --icl-mode video --only push_T --eval-num 1
+
+# Prompt/live-observation baseline.
+./scripts/eval_robodojo_8gpu.sh smoke --icl-mode none --only push_T --eval-num 1
+```
+
+For a multi-GPU sweep, pass a comma-separated worker list. Each selected task
+is assigned to one worker/GPU and the workers run concurrently:
+
+```bash
+ROBODOJO_GPU_IDS=0,1,2 \
+./scripts/eval_robodojo_8gpu.sh smoke --icl-mode video+action \
+  --only push_T,build_tower,insert_key --eval-num 1
+```
+
+Each worker starts its own Isaac Sim client, GPT-Policy WebSocket server, and
+Codex app-server process. This is task-level parallelism: one task is not
+split across eight GPUs. Use `--dry-run` to inspect the GPU-to-task assignment
+without launching the simulator.
 
 After setup, generate the XPolicyLab policy wrapper. This creates both the
 dual-arm ARX X5 profile and the single-arm Franka profile:
@@ -179,6 +260,44 @@ run:
 bash third_party/RoboDojo/scripts/robodojo.sh tasks
 bash third_party/RoboDojo/scripts/robodojo.sh dimensions
 ```
+
+Eight-GPU smoke and benchmark sweeps use RoboDojo's runtime-weighted task
+partitioner. Each GPU runs an independent Isaac Sim client and GPT-Policy
+server, so the closed-loop adapter remains single-environment while tasks run
+in parallel:
+
+```bash
+# One episode per selected task on GPUs 0-7.
+./scripts/eval_robodojo_8gpu.sh smoke --dimension memory --eval-num 1
+
+# Full task-defined episode counts on GPUs 0-7.
+./scripts/eval_robodojo_8gpu.sh benchmark --all --eval-num native
+
+# Validate task assignment and commands without starting Isaac Sim.
+./scripts/eval_robodojo_8gpu.sh smoke --all --eval-num 1 --dry-run
+```
+
+运行中的 RoboDojo worker 可以用监控脚本查看 GPU、任务、seed、当前步数和结果状态：
+
+```bash
+python scripts/monitor_robodojo.py
+python scripts/monitor_robodojo.py --watch --interval 5
+python scripts/monitor_robodojo.py --watch --running-only
+```
+
+`--watch` 会持续刷新；按 `Ctrl-C` 退出监控，不会停止评测进程。
+
+修改 RoboDojo action/TCP 转换后，可以先运行固定低位侧推的无仿真诊断：
+
+```bash
+python scripts/verify_robodojo_tcp_path.py
+```
+
+Set `ROBODOJO_GPU_IDS` to a comma-separated subset and
+`ROBODOJO_SIM_ENV` if the simulator environment has a different name. The
+policy process always uses this repository's `.venv`; RoboDojo's Isaac Sim
+runtime remains in its isolated simulator environment because Isaac Sim pins
+packages that conflict with the policy transport dependencies.
 
 If Astra temporarily reports `Selected model is at capacity`, the adapter
 retries the same turn with bounded backoff. A persistent capacity error is a

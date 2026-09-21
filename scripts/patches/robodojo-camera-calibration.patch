@@ -1,0 +1,115 @@
+diff --git a/env/camera_manager/camera_manager.py b/env/camera_manager/camera_manager.py
+index 501b741..bbbd945 100644
+--- a/env/camera_manager/camera_manager.py
++++ b/env/camera_manager/camera_manager.py
+@@ -3,7 +3,7 @@ from copy import deepcopy
+ import os
+ from typing import List, Tuple
+ 
+-from isaacsim.core.prims import SingleGeometryPrim
++from isaacsim.core.prims import SingleGeometryPrim, XFormPrim
+ from isaacsim.core.simulation_manager import SimulationManager
+ from isaacsim.core.utils.prims import is_prim_path_valid
+ from isaacsim.core.utils.semantics import add_labels, remove_labels
+@@ -103,6 +103,7 @@ class CameraManager:
+ 
+     def _remove_camera_prims(self):
+         """Remove existing camera prims when rebuilding after a hard scene reset."""
++        self._calibration_sensor_views = {}
+         stage = get_current_stage()
+         for env_paths in self.cameras_xform_path:
+             for prim_path in env_paths:
+@@ -329,7 +330,8 @@ class CameraManager:
+                     if args_info.get("horizontal_aperture") is not None:
+                         cur_camera.set_horizontal_aperture(args_info["horizontal_aperture"], False)
+                     if args_info.get("vertical_aperture") is not None:
+-                        cur_camera.set_vertical_aperture(args_info["vertical_aperture"], False)
++                        width, height = cur_camera_resolution
++                        cur_camera.set_vertical_aperture(args_info["horizontal_aperture"] * height / width, False)
+                     if args_info.get("clipping_range") is not None:
+                         cur_camera.set_clipping_range(
+                             near_distance=args_info["clipping_range"][0],
+@@ -452,30 +454,33 @@ class CameraManager:
+         self.sim.sim_step()
+ 
+     def get_camera_intrinsics(self, cam_id: int, env_id: int = 0) -> np.ndarray:
+-        """
+-        Return 3x3 intrinsic matrix K for the given camera, computed from config params.
+-        Falls back to identity if the camera type has no focal/aperture info (e.g. Kinect USD).
+-        """
+-        camera_name = self.camera_names[env_id][cam_id]
+-        camera_cfg = self.camera_config[camera_name]
+-        args_info = REAL_MAP.get(camera_cfg.camera.type, None)
+-        if args_info is None or "focal_length" not in args_info or "horizontal_aperture" not in args_info:
+-            return np.eye(3, dtype=np.float64)
+-        width, height = args_info["resolution"]
+-        fx = (width * args_info["focal_length"]) / args_info["horizontal_aperture"]
+-        cx, cy = width / 2.0, height / 2.0
+-        return np.array([[fx, 0, cx], [0, fx, cy], [0, 0, 1]], dtype=np.float64)
++        """Return the active sensor's intrinsics, including its independent fy."""
++        intrinsics = self.cameras[env_id][cam_id].get_intrinsics_matrix()
++        if isinstance(intrinsics, torch.Tensor):
++            intrinsics = intrinsics.detach().cpu().numpy()
++        return np.asarray(intrinsics, dtype=np.float64)
+ 
+     def get_camera_extrinsics(self, cam_id: int, env_id: int) -> np.ndarray:
+         """
+-        Return 4x4 camera-to-world matrix for the given camera (world frame).
+-        Uses get_world_pose so mounted (wrist) cameras are correctly handled.
++        Return the active sensor's USD camera-to-world matrix (-Z forward, +Y up).
++        Includes the sensor's local pose relative to its camera mount.
+         Quaternion convention: (w, x, y, z).
+         """
+-        camera_xform = self.cameras_xform[env_id][cam_id]
+-        pos, quat = camera_xform.get_world_pose()
+-        pos = pos.cpu().numpy().astype(np.float64)
+-        quat = quat.cpu().numpy().astype(np.float64)
++        sensor_path = str(self.cameras[env_id][cam_id].prim.GetPath())
++        if not hasattr(self, "_calibration_sensor_views"):
++            self._calibration_sensor_views = {}
++        if sensor_path not in self._calibration_sensor_views:
++            view = XFormPrim(sensor_path, reset_xform_properties=False)
++            self._calibration_sensor_views[sensor_path] = view
++        positions, orientations = self._calibration_sensor_views[sensor_path].get_world_poses(usd=False)
++        pos, quat = positions[0], orientations[0]
++        if isinstance(pos, torch.Tensor):
++            pos = pos.detach().cpu().numpy()
++        if isinstance(quat, torch.Tensor):
++            quat = quat.detach().cpu().numpy()
++        pos = np.asarray(pos, dtype=np.float64)
++        quat = np.asarray(quat, dtype=np.float64)
++        quat = quat / np.linalg.norm(quat)
+         w, x, y, z = quat[0], quat[1], quat[2], quat[3]
+         R = np.array(
+             [
+diff --git a/env/observation_manager/obs_manager.py b/env/observation_manager/obs_manager.py
+index b64743f..ffabca3 100644
+--- a/env/observation_manager/obs_manager.py
++++ b/env/observation_manager/obs_manager.py
+@@ -2,6 +2,7 @@ from copy import deepcopy
+ from typing import List
+ 
+ import numpy as np
++from transforms3d.quaternions import quat2mat
+ 
+ from env.description_manager.desc_manager import DescManager
+ 
+@@ -165,6 +166,18 @@ class ObsManager:
+                 for robot in self.robot_manager.robot_list:
+                     if robot.type != "target":
+                         continue
++                    if self.collect_extrinsic_matrix:
++                        base_poses = self.robot_manager.get_link_pose(robot, robot.base_link, env_idx_list, is_relative=False)
++                        arm = robot.robot_name if self.robot_manager.target_arm_nums == 1 else robot.arm_name.split("_")[0]
++                        for env_idx in env_idx_list:
++                            world_from_base = np.eye(4)
++                            world_from_base[:3, :3] = quat2mat(np.asarray(base_poses[env_idx][3:], dtype=np.float64))
++                            world_from_base[:3, 3] = base_poses[env_idx][:3]
++                            world_from_environment = np.eye(4)
++                            world_from_environment[:3, 3] = self.robot_manager.scene.env_origins[env_idx].detach().cpu().numpy()
++                            calibration = obs[env_idx].setdefault("calibration", {"world_from_base": {}})
++                            calibration["world_from_base"][arm] = world_from_base
++                            calibration["world_from_environment"] = world_from_environment
+                     if self.robot_cfg["joint_states"]:
+                         if robot.robot_type == "arm":
+                             joints = self.robot_manager.get_joint(robot=robot, env_idx_list=env_idx_list)

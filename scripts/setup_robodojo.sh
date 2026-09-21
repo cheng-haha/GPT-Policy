@@ -85,6 +85,19 @@ if [[ "$INSTALL_SIM_DEPS" == 1 ]]; then
     PIP_INDEX_URL="$PIP_INDEX_URL" "$ROBO_DOJO_PYTHON" -m pip install \
       --no-build-isolation -e "$ISAACLAB_SOURCE"
   fi
+  CUROBO_SOURCE="$ROOT_DIR/third_party/RoboDojo/third_party/curobo"
+  if [[ -x "$ROBO_DOJO_PYTHON" && -f "$CUROBO_SOURCE/pyproject.toml" ]]; then
+    PIP_INDEX_URL="$PIP_INDEX_URL" "$ROBO_DOJO_PYTHON" -m pip install \
+      --no-build-isolation -e "${CUROBO_SOURCE}[cu12]"
+  fi
+
+  if [[ ! -d "$ROOT_DIR/third_party/RoboDojo/Assets/Robots" ]]; then
+    command -v git-lfs >/dev/null 2>&1 || {
+      echo "git-lfs is required to download RoboDojo assets." >&2
+      exit 1
+    }
+    bash "$ROOT_DIR/third_party/RoboDojo/scripts/init_assets.sh"
+  fi
 else
   echo "Source checkouts ready. Isaac Sim dependencies not installed."
   echo "Run with --install-sim-deps on the GPU simulator host when ready."
@@ -109,7 +122,9 @@ fi
 # Reuse the separately pinned XPolicyLab checkout instead of maintaining a
 # second copy under RoboDojo/XPolicyLab. Do this after the upstream installer,
 # which may initialize its own submodule at that path.
-if [[ -d "$ROOT_DIR/third_party/RoboDojo/XPolicyLab" && ! -e "$ROOT_DIR/third_party/RoboDojo/XPolicyLab/policy" ]]; then
+if [[ -L "$ROOT_DIR/third_party/RoboDojo/XPolicyLab" ]]; then
+  : # Already linked to the separately pinned checkout.
+elif [[ -d "$ROOT_DIR/third_party/RoboDojo/XPolicyLab" && ! -e "$ROOT_DIR/third_party/RoboDojo/XPolicyLab/policy" ]]; then
   rmdir "$ROOT_DIR/third_party/RoboDojo/XPolicyLab"
   ln -s ../XPolicyLab "$ROOT_DIR/third_party/RoboDojo/XPolicyLab"
 elif [[ -d "$ROOT_DIR/third_party/RoboDojo/XPolicyLab" ]]; then

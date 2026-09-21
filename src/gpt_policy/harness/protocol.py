@@ -37,12 +37,17 @@ def _robot_calibration_notes(arms: tuple[str, ...], settings: dict[str, Any] | N
 - RoboDojo controls {len(arms)} simulated {model} arm(s); each arm has its own base_link frame.
 - All GPT-Policy poses are absolute TCP poses in the selected arm base_link frame, in metres.
 - GPT-Policy quaternion order is [qx,qy,qz,qw]. RoboDojo's source ee_pose is [x,y,z,qw,qx,qy,qz]; the host performs this conversion.
-- TCP is the calibrated fingertip TCP: its +z axis points toward the fingertips and +y is the gripper opening axis.
+- TCP is the configured grasp-center frame, not the raw source EE link: its +z axis points toward the fingertips and +y is the gripper opening axis. The host applies tcp_from_source_link in both observations and commands (X5: 145 mm along link6 +X; Franka: 102 mm along panda_hand +Z).
 - The host performs all world/base/TCP conversion, IK validation, interpolation, and gripper normalization. Do not emit simulator-world poses.
+- If previous_result.result.accepted is false with reason "unreachable", the requested motion was not executed; use the reported target, workspace or step-limit reason and the measured TCP state to choose a smaller reachable action.
+- If execution_feedback.execution_blocked is true, the host has stopped motion after repeated TCP tracking errors; do not issue another movement command and explain the failure from the reported measurements.
+- If execution_feedback.ik_feedback.status is "ik_failed", RoboDojo could not find a valid joint solution, so that arm's requested pose was not executed. Treat it as an unreachable pose, reduce the step or change the approach, and verify with the next image and measured TCP.
 Camera calibration and views:
 - Available simulated cameras: {", ".join(str(name) for name in cameras)}.
 - cam_head is fixed; wrist cameras move with their corresponding simulated arm.
-- RoboDojo intrinsics and camera-to-world extrinsics are captured from the simulator and converted by the host to base-from-camera rays.
+- Pixel coordinates refer to the original image: origin at top-left, u increases right, v increases down. K^-1 [u,v,1] uses optical axes (+X right, +Y down, +Z forward).
+- Raw camera-to-world extrinsics declare extrinsic_axes. USD axes are +X right, +Y up, -Z forward; the host applies diag(1,-1,-1,1) on the camera side before back-projection. base_from_optical_camera is already converted; do not flip its axes again.
+- locate_point uses each observation's own intrinsics and camera pose. For temporal triangulation, reference_pixel_xy must identify the same stationary physical point in the same named camera at reference_step, not coordinates copied from another camera or observation. A fixed cam_head pair has no motion baseline.
 - locate_point returns a calibrated ray in an arm base_link frame. A single RGB image still does not establish metric depth.
 - Camera matrices are retained in the host observation and run record; use the named camera/frame semantics rather than guessing pixel-to-metre scale.
 """
@@ -232,7 +237,7 @@ def _model_numbers(value: Any) -> Any:
 def _state_payload(state: dict[str, Any]) -> dict[str, Any]:
     if "arms" in state:
         payload: dict[str, Any] = {side: _single_state_payload(value) for side, value in state["arms"].items()}
-        for key in ("backend", "robot_model", "calibration", "simulator_raw"):
+        for key in ("backend", "robot_model", "calibration", "simulator_raw", "execution_feedback"):
             if key in state:
                 payload[key] = state[key]
         return payload
@@ -252,4 +257,5 @@ def _single_state_payload(state: dict[str, Any]) -> dict[str, Any]:
         "gripper_vel": state["gripper_velocity_m_s"],
         "gripper_torque": state["gripper_torque_nm"],
         "gravity_compensation": state.get("gravity_compensation"),
+        "execution_feedback": state.get("execution_feedback"),
     }
