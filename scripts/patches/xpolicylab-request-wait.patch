@@ -19,23 +19,30 @@ index 05dd997..8d07031 100644
              "connect_retry_delay_s": connect_retry_delay_s,
              "max_connect_seconds": max_connect_seconds,
 diff --git a/client_server/ws/protocol/client.py b/client_server/ws/protocol/client.py
-index c2bcc16..f6b7eef 100644
+index c2bcc16..b7d42bb 100644
 --- a/client_server/ws/protocol/client.py
 +++ b/client_server/ws/protocol/client.py
-@@ -88,7 +88,11 @@ class PolicyEvalClientConfig:
+@@ -88,12 +88,13 @@ class PolicyEvalClientConfig:
      url: str
      evaluation_id: str
      connect_timeout_s: float = 30.0
 -    request_timeout_s: float = 120.0
-+    # Model calls are unbounded by default.  A slow multimodal inference must
-+    # not be mistaken for a dead websocket; request_warning_s below reports
-+    # slow calls without cancelling them.  Callers can still opt into a hard
-+    # deadline by setting this to a non-negative number.
+-    # Handshake budget, separate from request_timeout_s: the server answers
+-    # HELLO without touching the model (it is constructed before the port
+-    # opens), so this is a plain round-trip and must not inherit the timeout
+-    # sized for slow inference — otherwise a hung server stalls every connect
+-    # attempt for minutes. Raise it for servers that do work on HELLO.
++    # Model calls are unbounded.  A slow multimodal inference must not be
++    # mistaken for a dead websocket; request_warning_s below reports slow
++    # calls without cancelling them.  This legacy field is retained for
++    # configuration compatibility and is used only as a warning fallback.
 +    request_timeout_s: float | None = None
-     # Handshake budget, separate from request_timeout_s: the server answers
-     # HELLO without touching the model (it is constructed before the port
-     # opens), so this is a plain round-trip and must not inherit the timeout
-@@ -112,6 +116,7 @@ class PolicyEvalClientConfig:
++    # Warning threshold for the HELLO handshake. It is not a hard deadline;
++    # once a socket is connected, a slow server is allowed to finish.
+     handshake_timeout_s: float = 60.0
+     # Cold-start budget: a policy server loading a large checkpoint has not
+     # opened its port yet, so the client sees connection refused and retries.
+@@ -112,6 +113,7 @@ class PolicyEvalClientConfig:
      ws_ping_interval_s: float | None = 20.0
      ws_ping_timeout_s: float | None = 20.0
      proxy: str | Literal[True] | None = None
@@ -43,7 +50,7 @@ index c2bcc16..f6b7eef 100644
  
      def __post_init__(self) -> None:
          self.ws_ping_interval_s = normalize_ws_ping(
-@@ -125,7 +130,6 @@ class PolicyEvalClientConfig:
+@@ -125,7 +127,6 @@ class PolicyEvalClientConfig:
          # documented "no wall-clock cap", so 0 stays allowed everywhere).
          for name in (
              "connect_timeout_s",
@@ -51,7 +58,7 @@ index c2bcc16..f6b7eef 100644
              "handshake_timeout_s",
              "connect_retry_delay_s",
              "max_connect_seconds",
-@@ -141,6 +145,17 @@ class PolicyEvalClientConfig:
+@@ -141,6 +142,17 @@ class PolicyEvalClientConfig:
                  raise ValueError(
                      f"{name} must be a non-negative finite number, got {value!r}"
                  )
@@ -69,47 +76,50 @@ index c2bcc16..f6b7eef 100644
          if self.max_connect_attempts < 1:
              raise ValueError(
                  f"max_connect_attempts must be >= 1, got {self.max_connect_attempts!r}"
-@@ -518,8 +533,39 @@ class PolicyEvalClient:
+@@ -518,16 +530,34 @@ class PolicyEvalClient:
                  )
              raise
          timeout = timeout_s if timeout_s is not None else self.config.request_timeout_s
 +        warning = self.config.request_warning_s
-+        started = asyncio.get_running_loop().time()
          try:
 -            response = await asyncio.wait_for(fut, timeout=timeout)
-+            if warning is None or (timeout is not None and warning > timeout):
-+                # No warning is requested, or an explicit hard deadline comes
-+                # first.  Preserve the old finite-timeout behavior for callers
-+                # that deliberately configured request_timeout_s.
-+                response = (
-+                    await fut
-+                    if timeout is None
-+                    else await asyncio.wait_for(fut, timeout=timeout)
-+                )
+-        except asyncio.TimeoutError as exc:
+-            self._pending.pop(request_id, None)
+-            # The server may STILL be executing this request. Dedup only
+-            # covers retries with the SAME request_id, so callers must treat
+-            # a timeout as fatal for the trial — re-issuing the logical call
+-            # under a fresh request_id would execute it a second time
+-            # (update_obs/get_action are not idempotent for stateful models).
+-            raise WsError(ErrorCode.TIMEOUT, f"timeout waiting for {expected}") from exc
++            # Every request, including HELLO, is unbounded after the socket
++            # connects. Use the request/handshake setting as a warning
++            # threshold only, then keep waiting for the protocol response.
++            warning_threshold = (
++                timeout
++                if msg_type == MessageType.HELLO
++                else (warning if warning is not None else timeout)
++            )
++            if warning_threshold is None:
++                response = await fut
 +            else:
 +                # Shield the protocol future: reaching the warning threshold
 +                # must not cancel the request that the policy server may still
 +                # be executing.
 +                try:
 +                    response = await asyncio.wait_for(
-+                        asyncio.shield(fut), timeout=warning
++                        asyncio.shield(fut), timeout=warning_threshold
 +                    )
 +                except asyncio.TimeoutError:
 +                    warning_message = (
 +                        f"{msg_type.value} request {request_id} has been waiting "
-+                        f"for at least {warning:g}s; continuing to wait"
++                        f"for at least {warning_threshold:g}s; continuing to wait"
 +                    )
 +                    logger.warning(warning_message)
 +                    _status("WARNING", _YELLOW, warning_message)
-+                    if timeout is None:
-+                        response = await fut
-+                    else:
-+                        elapsed = asyncio.get_running_loop().time() - started
-+                        remaining = max(0.0, timeout - elapsed)
-+                        response = await asyncio.wait_for(fut, timeout=remaining)
-         except asyncio.TimeoutError as exc:
-             self._pending.pop(request_id, None)
-             # The server may STILL be executing this request. Dedup only
++                    response = await fut
+         except asyncio.CancelledError:
+             # Outer cancellation (e.g. KeyboardInterrupt around
+             # run_until_complete): wait_for cancels fut, but the _pending
 diff --git a/utils/debug_env_client.py b/utils/debug_env_client.py
 index 7d7bc7d..89cec18 100644
 --- a/utils/debug_env_client.py

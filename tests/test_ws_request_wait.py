@@ -12,7 +12,6 @@ if str(XPOLICYLAB) not in sys.path:
 from client_server.ws.protocol.client import PolicyEvalClient, PolicyEvalClientConfig
 from client_server.ws.protocol.messages import MessageType
 from client_server.ws.protocol.schemas import Frame
-from client_server.ws.protocol.exceptions import WsError
 
 
 class _Socket:
@@ -53,7 +52,7 @@ def test_request_warns_but_waits_without_hard_deadline(capsys):
     assert "continuing to wait" in capsys.readouterr().out
 
 
-def test_explicit_request_deadline_remains_available():
+def test_legacy_request_deadline_is_only_a_warning_threshold(capsys):
     async def run():
         client = PolicyEvalClient(
             PolicyEvalClientConfig(
@@ -64,10 +63,49 @@ def test_explicit_request_deadline_remains_available():
             )
         )
         client._ws = _Socket()
-        await client.request(MessageType.HEARTBEAT, {})
 
-    with pytest.raises(WsError, match="timeout waiting"):
-        asyncio.run(run())
+        async def finish_request():
+            await asyncio.sleep(0.03)
+            request_id = next(iter(client._pending))
+            client._pending[request_id].set_result(_reply(request_id))
+
+        asyncio.create_task(finish_request())
+        return await client.request(MessageType.HEARTBEAT, {})
+
+    response = asyncio.run(run())
+    assert response.message_type is MessageType.HEARTBEAT_ACK
+    assert "continuing to wait" in capsys.readouterr().out
+
+
+def test_hello_handshake_timeout_is_also_only_a_warning(capsys):
+    async def run():
+        client = PolicyEvalClient(
+            PolicyEvalClientConfig(
+                url="ws://localhost:1",
+                evaluation_id="eval",
+                handshake_timeout_s=0.01,
+            )
+        )
+        client._ws = _Socket()
+
+        async def finish_request():
+            await asyncio.sleep(0.03)
+            request_id = next(iter(client._pending))
+            client._pending[request_id].set_result(
+                Frame(
+                    message_type=MessageType.HELLO_ACK,
+                    request_id=request_id,
+                    evaluation_id="eval",
+                    payload={"ok": True},
+                )
+            )
+
+        asyncio.create_task(finish_request())
+        return await client.hello()
+
+    response = asyncio.run(run())
+    assert response.message_type is MessageType.HELLO_ACK
+    assert "continuing to wait" in capsys.readouterr().out
 
 
 def test_request_timeout_can_be_unbounded():
