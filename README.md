@@ -173,6 +173,26 @@ historical keyframes and compressed state/action samples; `video` supplies
 only the historical keyframes; `none` disables historical examples and leaves
 the normal task prompt plus live observations:
 
+`smoke` is the quick sweep mode: it defaults to one episode per selected task
+and is intended for checking that the simulator, policy server, camera
+calibration, and context path are working. `benchmark` uses the task-defined
+episode counts and is intended for a full run. `--only`, `--dimension`,
+`--all`, and `--dry-run` are passed through to RoboDojo's sweep runner.
+
+The unified runner prepares the Python environment, pinned source checkouts,
+generated policy adapter, and (when explicitly requested) simulator
+dependencies before launching the sweep:
+
+```bash
+# Prepare lightweight dependencies automatically; default context is video + action.
+./scripts/run_robodojo_eval.sh smoke --icl-mode video+action --only push_T --eval-num 1
+
+# On a simulator host that still needs Isaac Sim/IsaacLab/CuRobo:
+./scripts/run_robodojo_eval.sh --install-sim-deps smoke --only push_T --eval-num 1
+```
+
+The lower-level runner remains available when the environment is already set up:
+
 ```bash
 # Default: video + action context.
 ./scripts/eval_robodojo_8gpu.sh smoke --icl-mode video+action --only push_T --eval-num 1
