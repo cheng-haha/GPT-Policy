@@ -61,7 +61,21 @@ class RoboDojoICL:
         try:
             import pyarrow.parquet as parquet
             episodes = parquet.read_table(task_root / "meta/episodes/chunk-000/file-000.parquet").to_pylist()
-            data = parquet.read_table(task_root / "data/chunk-000/file-000.parquet").to_pylist()
+            # The dataset also stores every camera calibration matrix and
+            # joint state in this table.  Loading all of those nested columns
+            # into Python made the first RoboDojo observation spend roughly
+            # two minutes in ICL preparation.  The trajectory summary only
+            # needs timestamps, indices, and the EEF state/action vectors.
+            data = parquet.read_table(
+                task_root / "data/chunk-000/file-000.parquet",
+                columns=[
+                    "timestamp",
+                    "index",
+                    "episode_index",
+                    "observation.states.eef",
+                    "actions.eef",
+                ],
+            ).to_pylist()
         except Exception:
             return None
         if not episodes or not data:
