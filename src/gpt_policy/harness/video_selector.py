@@ -98,7 +98,8 @@ class CodexVideoSelector:
         parts = []
         for i, (frame, choice) in enumerate(zip(frames, selection.selected)):
             parts.append(TextPart(json.dumps({"index": i, "t_s": frame.timestamp_s,
-                "stage": choice.stage, "left": choice.left, "right": choice.right,
+                "stage": choice.stage, "subtask": choice.subtask or choice.stage,
+                "left": choice.left, "right": choice.right,
                 "reason": choice.reason, "result": choice.result}, ensure_ascii=False)))
             parts.extend(_frame_images(frame))
         try:
@@ -123,14 +124,14 @@ _REVIEW_INSTRUCTIONS = """Review the full historical demonstration before robot 
 Inputs are preliminary images and annotations selected per window, not yet globally deduplicated. Verify the images; do not blindly trust local annotations.
 Each time may include top, left_wrist and right_wrist views. Use wrist close-ups to identify contact side, grasp direction, object-to-gripper orientation, gripper-to-table direction and recontact after release. Record these relationships in phase annotations; do not mislabel empty-gripper pressing as regrasping.
 Usually retain 12-16 frames, never exceeding the supplied limit. Merge redundant holds and window boundaries while preserving the initial state, preparation, contact, grasp verification, arm-role changes, release and final outcome. Select important before/after changes separately; the host will not add neighboring images automatically. Preserve the order of repeated twists and regrasps rather than describing them as no motion.
-summary briefly covers the full operation and uncertain phases; stage is short English; left/right describe roles; reason gives visual evidence; result states only visible outcomes. Explicitly report when success cannot be verified.
+summary briefly covers the full operation and uncertain phases; stage and subtask are the same short English subtask label; left/right describe roles; reason gives visual evidence; result states only visible outcomes. Explicitly report when success cannot be verified.
 Retain the full sequence's first and last frames and return chronological order. Historical actions are references, not pending commands. You have no robot or file tools."""
 
 
 _SELECTOR_INSTRUCTIONS = """Select demonstration keyframes from the supplied chronological video window and candidate images.
 Candidates may contain multiple camera views. Combine wrist close-ups with the top overview; do not rely on an occluded top view alone. Record contact side, object-to-gripper orientation, gripper-to-table direction and distinctions such as empty-gripper recontact after release.
 For the user's final task, select the smallest set that conveys the initial state, key actions, state changes and final outcome. Preserve before/after evidence for grasping, release and handoffs, and the order of repeated twists. Similar start/end poses do not imply no motion.
-Use short English stage names. left/right describe robot or human hand roles; stabilizing an object is an important action. result states only image-supported outcomes, including uncertainty or occlusion; gripper closure alone does not prove a grasp. reason explains the frame's evidence. Be concise and specific; do not invent unfamiliar objects or actions.
+Use short English stage names and repeat the same value in subtask (for example approach, grasp, push, release, verify). left/right describe robot or human hand roles; stabilizing an object is an important action. result states only image-supported outcomes, including uncertainty or occlusion; gripper closure alone does not prove a grasp. reason explains the frame's evidence. Be concise and specific; do not invent unfamiliar objects or actions.
 Cover the window's beginning and end with minimal redundant imagery. Select only supplied candidate indices and return chronological order.
 You have no shell, file or robot-control tools. Return only JSON matching the output schema."""
 
@@ -194,7 +195,7 @@ def _selection_schema(max_keyframes: int) -> dict[str, Any]:
                             "properties": {
                                 "index": {"type": "integer", "minimum": 0},
                                 "reason": {"type": "string", "minLength": 1},
-                                **{key: {"type": "string"} for key in ("stage", "left", "right", "result")},
+                                **{key: {"type": "string"} for key in ("stage", "subtask", "left", "right", "result")},
                             },
                         },
                     },
@@ -236,11 +237,14 @@ def _validate_selection(
             raise RuntimeError(f"Codex 关键帧 {index} 的 reason 不能为空")
         seen.add(index)
         details = {}
-        for key in ("stage", "left", "right", "result"):
+        for key in ("stage", "subtask", "left", "right", "result"):
             value = item.get(key, "")
             if not isinstance(value, str):
                 raise RuntimeError(f"Codex keyframe {key} must be text")
             details[key] = value.strip()
+        # ``stage`` was the original public field.  Keep old Codex responses
+        # valid while exposing an explicit subtask label downstream.
+        details["subtask"] = details["subtask"] or details["stage"]
         selected.append(SelectedFrame(index, reason.strip(), **details))
 
     selected.sort(key=lambda item: item.index)

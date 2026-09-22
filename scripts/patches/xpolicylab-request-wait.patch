@@ -1,0 +1,124 @@
+diff --git a/client_server/ws/model_client.py b/client_server/ws/model_client.py
+index 05dd997..8d07031 100644
+--- a/client_server/ws/model_client.py
++++ b/client_server/ws/model_client.py
+@@ -40,6 +40,7 @@ class WsModelClient:
+         connect_timeout_s: float | None = None,
+         handshake_timeout_s: float | None = None,
+         request_timeout_s: float | None = None,
++        request_warning_s: float | None = None,
+         max_connect_attempts: int | None = None,
+         connect_retry_delay_s: float | None = None,
+         max_connect_seconds: float | None = None,
+@@ -56,6 +57,7 @@ class WsModelClient:
+             "connect_timeout_s": connect_timeout_s,
+             "handshake_timeout_s": handshake_timeout_s,
+             "request_timeout_s": request_timeout_s,
++            "request_warning_s": request_warning_s,
+             "max_connect_attempts": max_connect_attempts,
+             "connect_retry_delay_s": connect_retry_delay_s,
+             "max_connect_seconds": max_connect_seconds,
+diff --git a/client_server/ws/protocol/client.py b/client_server/ws/protocol/client.py
+index c2bcc16..f6b7eef 100644
+--- a/client_server/ws/protocol/client.py
++++ b/client_server/ws/protocol/client.py
+@@ -88,7 +88,11 @@ class PolicyEvalClientConfig:
+     url: str
+     evaluation_id: str
+     connect_timeout_s: float = 30.0
+-    request_timeout_s: float = 120.0
++    # Model calls are unbounded by default.  A slow multimodal inference must
++    # not be mistaken for a dead websocket; request_warning_s below reports
++    # slow calls without cancelling them.  Callers can still opt into a hard
++    # deadline by setting this to a non-negative number.
++    request_timeout_s: float | None = None
+     # Handshake budget, separate from request_timeout_s: the server answers
+     # HELLO without touching the model (it is constructed before the port
+     # opens), so this is a plain round-trip and must not inherit the timeout
+@@ -112,6 +116,7 @@ class PolicyEvalClientConfig:
+     ws_ping_interval_s: float | None = 20.0
+     ws_ping_timeout_s: float | None = 20.0
+     proxy: str | Literal[True] | None = None
++    request_warning_s: float | None = 120.0
+ 
+     def __post_init__(self) -> None:
+         self.ws_ping_interval_s = normalize_ws_ping(
+@@ -125,7 +130,6 @@ class PolicyEvalClientConfig:
+         # documented "no wall-clock cap", so 0 stays allowed everywhere).
+         for name in (
+             "connect_timeout_s",
+-            "request_timeout_s",
+             "handshake_timeout_s",
+             "connect_retry_delay_s",
+             "max_connect_seconds",
+@@ -141,6 +145,17 @@ class PolicyEvalClientConfig:
+                 raise ValueError(
+                     f"{name} must be a non-negative finite number, got {value!r}"
+                 )
++        for name in ("request_timeout_s", "request_warning_s"):
++            value = getattr(self, name)
++            if value is not None and (
++                isinstance(value, bool)
++                or not isinstance(value, (int, float))
++                or not math.isfinite(value)
++                or value < 0
++            ):
++                raise ValueError(
++                    f"{name} must be None or a non-negative finite number, got {value!r}"
++                )
+         if self.max_connect_attempts < 1:
+             raise ValueError(
+                 f"max_connect_attempts must be >= 1, got {self.max_connect_attempts!r}"
+@@ -518,8 +533,39 @@ class PolicyEvalClient:
+                 )
+             raise
+         timeout = timeout_s if timeout_s is not None else self.config.request_timeout_s
++        warning = self.config.request_warning_s
++        started = asyncio.get_running_loop().time()
+         try:
+-            response = await asyncio.wait_for(fut, timeout=timeout)
++            if warning is None or (timeout is not None and warning > timeout):
++                # No warning is requested, or an explicit hard deadline comes
++                # first.  Preserve the old finite-timeout behavior for callers
++                # that deliberately configured request_timeout_s.
++                response = (
++                    await fut
++                    if timeout is None
++                    else await asyncio.wait_for(fut, timeout=timeout)
++                )
++            else:
++                # Shield the protocol future: reaching the warning threshold
++                # must not cancel the request that the policy server may still
++                # be executing.
++                try:
++                    response = await asyncio.wait_for(
++                        asyncio.shield(fut), timeout=warning
++                    )
++                except asyncio.TimeoutError:
++                    warning_message = (
++                        f"{msg_type.value} request {request_id} has been waiting "
++                        f"for at least {warning:g}s; continuing to wait"
++                    )
++                    logger.warning(warning_message)
++                    _status("WARNING", _YELLOW, warning_message)
++                    if timeout is None:
++                        response = await fut
++                    else:
++                        elapsed = asyncio.get_running_loop().time() - started
++                        remaining = max(0.0, timeout - elapsed)
++                        response = await asyncio.wait_for(fut, timeout=remaining)
+         except asyncio.TimeoutError as exc:
+             self._pending.pop(request_id, None)
+             # The server may STILL be executing this request. Dedup only
+diff --git a/utils/debug_env_client.py b/utils/debug_env_client.py
+index 7d7bc7d..89cec18 100644
+--- a/utils/debug_env_client.py
++++ b/utils/debug_env_client.py
+@@ -45,6 +45,7 @@ class TestEnv:
+                 connect_timeout_s=deploy_cfg.get("connect_timeout_s"),
+                 handshake_timeout_s=deploy_cfg.get("handshake_timeout_s"),
+                 request_timeout_s=deploy_cfg.get("request_timeout_s"),
++                request_warning_s=deploy_cfg.get("request_warning_s"),
+                 max_connect_attempts=deploy_cfg.get("max_connect_attempts"),
+                 connect_retry_delay_s=deploy_cfg.get("connect_retry_delay_s"),
+                 max_connect_seconds=deploy_cfg.get("max_connect_seconds"),

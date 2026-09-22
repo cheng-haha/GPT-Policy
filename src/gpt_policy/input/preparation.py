@@ -42,6 +42,7 @@ class VideoPreparationResult:
                     "frame_index": self.extraction.candidates[choice.index].frame_index,
                     "reason": reasons[choice.index],
                     "path": local_path(image.path),
+                    "subtask": choice.subtask or choice.stage,
                 }
             )
         return {
@@ -137,6 +138,7 @@ def prepare_input_videos(
                 (
                     f"Video '{label}' keyframe, timestamp_s={frame.timestamp_s:.3f}; "
                     f"selection reason: {choice.reason}; stage={choice.stage}; "
+                    f"subtask={choice.subtask or choice.stage}; "
                     f"left={choice.left}; right={choice.right}; result={choice.result}"
                 ),
                 part.detail,

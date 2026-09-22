@@ -89,6 +89,10 @@ class SelectedFrame:
     left: str = ""
     right: str = ""
     result: str = ""
+    # ``stage`` is the historical wire name.  Keep it for cache and bundle
+    # compatibility while exposing the same annotation as an explicit
+    # subtask to callers that build multi-view context.
+    subtask: str = ""
 
 
 @dataclass(frozen=True)

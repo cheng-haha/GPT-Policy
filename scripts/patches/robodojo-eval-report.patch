@@ -1,0 +1,60 @@
+diff --git a/scripts/internal/smoke_all_tasks.sh b/scripts/internal/smoke_all_tasks.sh
+index 139892d..1d609c0 100755
+--- a/scripts/internal/smoke_all_tasks.sh
++++ b/scripts/internal/smoke_all_tasks.sh
+@@ -740,6 +740,21 @@ print(int(payload.get("eval_time", 0)))
+ PY
+ }
+ 
++extract_eval_success() {
++  local result_path="$1"
++  python3 - "${result_path}" <<'PY'
++import json
++from pathlib import Path
++import sys
++
++payload = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
++details = payload.get("details") or {}
++success = bool(details) and all(bool(item.get("success")) for item in details.values() if isinstance(item, dict))
++success = success and float(payload.get("success_rate", 0.0)) >= 1.0
++print("1" if success else "0")
++PY
++}
++
+ run_eval_for_task() {
+   local task="$1"
+   local task_policy_gpu="$2"
+@@ -750,7 +765,7 @@ run_eval_for_task() {
+   local task_run_id="${run_id}_${task}"
+   local result_path="${ROOT_DIR}/eval_result/RoboDojo/${task}/${policy_name}/${env_cfg}/${seed}_ckpt_name=${ckpt},action_type=${action_type}/${task_run_id}/_result.json"
+   local log_path="${log_dir}/${task}.log"
+-  local rc elapsed eval_time message start_sec end_sec
++  local rc elapsed eval_time eval_success message start_sec end_sec
+ 
+   if [[ "${execution_mode}" == "eval" ]]; then
+     echo "[smoke_all_tasks] RUN ${task} (policy_gpu=${task_policy_gpu}, env_gpu=${task_env_gpu})"
+@@ -812,20 +827,22 @@ run_eval_for_task() {
+   fi
+ 
+   eval_time="-"
++  eval_success="0"
+   message=""
+   if [[ -f "${result_path}" ]]; then
+     eval_time="$(extract_eval_time "${result_path}")"
++    eval_success="$(extract_eval_success "${result_path}")"
+   else
+     message="missing _result.json"
+   fi
+ 
+-  if [[ "${rc}" -eq 0 && "${eval_time}" =~ ^[0-9]+$ && "${eval_time}" -ge 1 ]]; then
++  if [[ "${rc}" -eq 0 && "${eval_time}" =~ ^[0-9]+$ && "${eval_time}" -ge 1 && "${eval_success}" == "1" ]]; then
+     record_result_row "${target_tsv}" "PASS" "${task}" "${rc}" "${eval_time}" "${elapsed}" "${result_path}" "${log_path}" "ok"
+     return 0
+   fi
+ 
+   if [[ -z "${message}" ]]; then
+-    message="exit=${rc}, eval_time=${eval_time}"
++    message="exit=${rc}, eval_time=${eval_time}, success=${eval_success}"
+   fi
+   record_result_row "${target_tsv}" "FAIL" "${task}" "${rc}" "${eval_time}" "${elapsed}" "${result_path}" "${log_path}" "${message}"
+   return 1

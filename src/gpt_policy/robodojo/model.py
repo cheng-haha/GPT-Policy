@@ -112,7 +112,18 @@ class GPTPolicyModel:
         if icl_mode not in {"video+action", "video", "none"}:
             raise ValueError("ROBODOJO_ICL_MODE must be video+action, video, or none")
         self.icl_mode = icl_mode
-        self.icl = RoboDojoICL(dataset_root, cache_root, keyframes=int(model_cfg.get("icl_keyframes", 6))) if model_cfg.get("icl_enabled", True) and icl_mode != "none" else None
+        icl_selector = None
+        if model_cfg.get("icl_enabled", True) and icl_mode != "none" and self.agent_cfg.type == "codex":
+            # Reuse the real-robot Codex vision compiler: it returns semantic
+            # keyframes and per-frame subtask labels over synchronized views.
+            from ..harness.video_selector import CodexVideoSelector
+            from ..input.video import VideoProcessingConfig
+            icl_selector = CodexVideoSelector(
+                self.agent_cfg,
+                VideoProcessingConfig(max_candidates=24, max_keyframes=max(3, min(int(model_cfg.get("icl_keyframes", 6)), 8))),
+            )
+        self.icl = RoboDojoICL(dataset_root, cache_root, keyframes=int(model_cfg.get("icl_keyframes", 6)),
+                                selector=icl_selector) if model_cfg.get("icl_enabled", True) and icl_mode != "none" else None
         self._icl_summary: str | None = None
         self._icl_images: dict[str, _Image] = {}
         self._icl_loaded = False
@@ -246,13 +257,18 @@ class GPTPolicyModel:
         if not self._icl_loaded and self.icl is not None:
             self._icl_loaded = True
             try:
-                prepared = self.icl.prepare(str(obs.get("instruction") or self.model_cfg.get("task_name") or ""))
+                prepared = self.icl.prepare(
+                    str(obs.get("instruction") or self.model_cfg.get("task_name") or ""),
+                    include_actions=self.icl_mode == "video+action",
+                )
             except Exception as exc:
                 self._trace_event("icl_unavailable", {"error": repr(exc)})
                 prepared = None
             if prepared is not None:
                 summary, paths = prepared
-                self._icl_summary = summary if self.icl_mode == "video+action" else None
+                # The summary contains Codex's subtask labels in both modes;
+                # only video+action additionally contains numeric trajectories.
+                self._icl_summary = summary
                 self._icl_images = {name: _image_file(name, path) for name, path in paths.items()}
                 try:
                     matched_task = json.loads(summary).get("task")
@@ -262,7 +278,7 @@ class GPTPolicyModel:
                     "mode": self.icl_mode,
                     "task": matched_task,
                     "image_count": len(self._icl_images),
-                    "action_summary": self._icl_summary is not None,
+                    "action_summary": self.icl_mode == "video+action",
                 })
             else:
                 self._trace_event("icl_unavailable", {

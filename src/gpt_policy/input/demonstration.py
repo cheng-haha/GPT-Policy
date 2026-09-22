@@ -239,7 +239,7 @@ def prepare_demonstration(run_input, source, mode, destination, selector=None, e
                             raise ValueError("Demonstration requires at most 48 unique images")
                         hashes[str(target.relative_to(temp))] = digest
                         image_t = frame.get("image_times", {}).get(camera, t)
-                        image_parts.append(ImagePart(target, f"{image_id}: Historical {camera}, t={image_t:.3f}s; {frame.get('stage', '')}", "high"))
+                        image_parts.append(ImagePart(target, f"{image_id}: Historical {camera}, t={image_t:.3f}s; subtask={frame.get('subtask') or frame.get('stage', '')}", "high"))
                     relative = str(target.relative_to(temp))
                     copied[camera] = relative
                     image_ids[camera] = image_id
@@ -296,7 +296,8 @@ def _extract_demo(source, mode, destination, instruction, selector, extractor, c
         camera = "top" if recording else "video"
         views = {camera: frame, **frame.views}
         frames.append({"t_s": frame.timestamp_s, "video_frame_index": frame.frame_index,
-                       "stage": choice.stage, "observation": choice.reason,
+                       "stage": choice.stage, "subtask": choice.subtask or choice.stage,
+                       "observation": choice.reason,
                        "roles": {"left": choice.left, "right": choice.right}, "result": choice.result,
                        "images": {name: str(f.path) for name, f in views.items()},
                        "image_times": {name: f.timestamp_s for name, f in views.items()},
