@@ -38,6 +38,24 @@ def _finish_policy_exit(env, force_failure: bool = False):
 
 def eval_one_episode(TASK_ENV, model_client):
     model_client.call(func_name="reset")
+    unconfirmed_done = 0
+
+    def handle_policy_exit():
+        nonlocal unconfirmed_done
+        give_up = model_client.call(func_name="is_terminal_give_up")
+        blocked = model_client.call(func_name="is_execution_blocked")
+        confirmed = _finish_policy_exit(TASK_ENV, force_failure=give_up or blocked)
+        if confirmed or give_up or blocked:
+            return True
+        unconfirmed_done += 1
+        if unconfirmed_done >= 3:
+            # Repeating an unconfirmed done decision without advancing the
+            # environment otherwise creates an unbounded policy-only loop.
+            _finish_policy_exit(TASK_ENV, force_failure=True)
+            return True
+        model_client.call(func_name="clear_terminal_decision", obs=_completion_feedback(TASK_ENV))
+        return False
+
     while not TASK_ENV.is_episode_end():
         # Keep the two counters explicit: GPT-Policy counts model decisions,
         # while RoboDojo counts submitted environment actions.  A chunked
@@ -53,24 +71,17 @@ def eval_one_episode(TASK_ENV, model_client):
             # ``done`` is only a request from the policy.  RoboDojo remains
             # authoritative: keep the episode alive when its reward checker
             # has not confirmed success yet.
-            give_up = model_client.call(func_name="is_terminal_give_up")
-            blocked = model_client.call(func_name="is_execution_blocked")
-            confirmed = _finish_policy_exit(TASK_ENV, force_failure=give_up or blocked)
-            if not confirmed and not give_up and not blocked:
-                model_client.call(func_name="clear_terminal_decision", obs=_completion_feedback(TASK_ENV))
+            if not handle_policy_exit():
                 continue
             break
         actions = model_client.call(func_name="get_action")
         if model_client.call(func_name="is_episode_done"):
-            give_up = model_client.call(func_name="is_terminal_give_up")
-            blocked = model_client.call(func_name="is_execution_blocked")
-            confirmed = _finish_policy_exit(TASK_ENV, force_failure=give_up or blocked)
-            if not confirmed and not give_up and not blocked:
-                model_client.call(func_name="clear_terminal_decision", obs=_completion_feedback(TASK_ENV))
+            if not handle_policy_exit():
                 continue
             break
         for action in actions:
             TASK_ENV.take_action(action)
+            unconfirmed_done = 0
             if TASK_ENV.is_episode_end():
                 break
 

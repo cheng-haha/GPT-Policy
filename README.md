@@ -236,22 +236,29 @@ For the ten-task subset used by GPT-as-Policy, use the frozen 50-case panel in
 `configs/robodojo_panel50.json`. The panel contains five published layout IDs
 per task: two standard and three `_random` for number arrangement, packing,
 and clothes folding; five standard for the other seven tasks. The runner
-checks all 50 layout hashes against the published panel before launching any
-model or simulator process. It runs 13 native RoboDojo `benchmark` invocations
-and checks each `_result.json` for the exact expected layout IDs. A failed task
+checks all 50 layout hashes, ten support trajectories, and 169 native source
+files against the published panel or reviewed integration hashes before
+launching a model or simulator process. It runs each case in a fresh native
+RoboDojo `benchmark` process, matching the reset pattern of the published
+one-rollout-per-container protocol. GPT-Policy's Codex policy does not use the
+published OpenPI JAX policy RNG seed.
+Set `--gpus` to run one case process at a time on each listed GPU. Each GPU
+finishes a task's five cases before taking the next waiting task. The runner
+checks each `_result.json` for the exact expected layout ID. A failed task
 is a completed case; a missing native result stops the panel without counting
-that case as a failure.
+that case as a failure. The default 3600-second wall timeout also marks a case
+incomplete; adjust it with `--case-timeout-s` if needed.
 
 ```bash
 # Verify layout identity and inspect the commands without starting a simulator.
-python3 scripts/run_robodojo_panel50.py --dry-run --gpu 0 --icl-mode none
+python3 scripts/run_robodojo_panel50.py --dry-run --gpus 0,1 --icl-mode none
 
 # Run the no-demonstration comparison condition; choose a stable run ID for resume.
-python3 scripts/run_robodojo_panel50.py --gpu 0 --icl-mode none \
+python3 scripts/run_robodojo_panel50.py --gpus 0,1,2,3,4,5,6,7 --icl-mode none \
   --run-id xingwu_panel50_01
 
-# Resume after an interrupted group. Completed groups are not repeated.
-python3 scripts/run_robodojo_panel50.py --gpu 0 --icl-mode none \
+# Resume after an interrupted case. Completed cases are not repeated.
+python3 scripts/run_robodojo_panel50.py --gpus 0,1,2,3,4,5,6,7 --icl-mode none \
   --run-id xingwu_panel50_01 --resume
 ```
 
@@ -259,7 +266,11 @@ python3 scripts/run_robodojo_panel50.py --gpu 0 --icl-mode none \
 local dataset has no demonstration for `classify_objects_by_language`; the
 runner reports that gap. Add `--require-icl` to refuse a mixed ICL condition.
 The panel aligns task layouts and native scoring with the published case set;
-the policy and its EEF controller remain GPT-Policy's own method. The active
+five source files carry reviewed GPT-Policy observation and evaluation patches.
+The policy and its EEF controller remain GPT-Policy's own method. EEF targets
+are limited to 0.05 m and 0.35 rad per action, matching the published action
+bounds; native control applies each accepted target over a 25 Hz interval.
+Incomplete but progressing moves are reported to the policy as such. The active
 ARX X5 config uses RoboDojo's upstream action interpolation and physics.
 
 The policy has no default TCP minimum height (`z: [null, 0.45]` in arm-base

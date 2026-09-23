@@ -123,6 +123,10 @@ class RoboDojoAdapterTest(unittest.TestCase):
         model = GPTPolicyModel.__new__(GPTPolicyModel)
         model.adapter = self.adapter
         model.arms = ("left", "right")
+        model.step = 0
+        model._observation_history = {}
+        model._max_tracking_error_m = 0.03
+        model._max_tracking_error_rad = 0.20
         model._last_commanded_world = {
             "left": [0.10, 0.20, 0.11, 1.0, 0.0, 0.0, 0.0],
             "right": [0.30, 0.20, 0.11, 1.0, 0.0, 0.0, 0.0],
@@ -139,6 +143,10 @@ class RoboDojoAdapterTest(unittest.TestCase):
         model = GPTPolicyModel.__new__(GPTPolicyModel)
         model.adapter = self.adapter
         model.arms = ("left", "right")
+        model.step = 0
+        model._observation_history = {}
+        model._max_tracking_error_m = 0.03
+        model._max_tracking_error_rad = 0.20
         model._last_commanded_world = {
             "left": [0.10, 0.20, 0.11, 1.0, 0.0, 0.0, 0.0],
             "right": [0.30, 0.20, 0.11, 1.0, 0.0, 0.0, 0.0],
@@ -157,12 +165,53 @@ class RoboDojoAdapterTest(unittest.TestCase):
         self.assertFalse(feedback["arms"]["right"]["tracking_checked"])
         self.assertTrue(feedback["all_within_tolerance"])
 
+    def test_incomplete_native_move_is_not_reported_as_unexecuted_or_stalled(self):
+        model = GPTPolicyModel.__new__(GPTPolicyModel)
+        model.adapter = self.adapter
+        model.arms = ("left", "right")
+        model.step = 1
+        model._max_tracking_error_m = 0.03
+        model._max_tracking_error_rad = 0.20
+        model._observation_history = {0: {"state": {
+            "left_ee_pose": [0.0, 0.0, 0.10, 1.0, 0.0, 0.0, 0.0],
+        }}}
+        model._last_commanded_world = {
+            "left": [0.05, 0.0, 0.10, 1.0, 0.0, 0.0, 0.0],
+        }
+        feedback = model._execution_feedback(
+            {"state": {"left_ee_pose": [0.015, 0.0, 0.10, 1.0, 0.0, 0.0, 0.0]}},
+            {"status": "incomplete", "arms": {"left": {"status": "Success", "tracking_status": "incomplete"}}},
+        )
+        self.assertEqual(feedback["not_executed_arms"], [])
+        self.assertEqual(feedback["arms"]["left"]["status"], "incomplete")
+        self.assertFalse(feedback["arms"]["left"]["stalled"])
+        self.assertAlmostEqual(feedback["arms"]["left"]["translation_progress_m"], 0.015)
+
+    def test_nonmoving_arm_is_reported_as_stalled(self):
+        model = GPTPolicyModel.__new__(GPTPolicyModel)
+        model.adapter = self.adapter
+        model.arms = ("left", "right")
+        model.step = 1
+        model._max_tracking_error_m = 0.03
+        model._max_tracking_error_rad = 0.20
+        model._observation_history = {0: {"state": {
+            "left_ee_pose": [0.0, 0.0, 0.10, 1.0, 0.0, 0.0, 0.0],
+        }}}
+        model._last_commanded_world = {
+            "left": [0.05, 0.0, 0.10, 1.0, 0.0, 0.0, 0.0],
+        }
+        feedback = model._execution_feedback({"state": {
+            "left_ee_pose": [0.0, 0.0, 0.10, 1.0, 0.0, 0.0, 0.0],
+        }})
+        self.assertTrue(feedback["arms"]["left"]["stalled"])
+
     def test_reachability_rejects_out_of_workspace_target(self):
         model = GPTPolicyModel.__new__(GPTPolicyModel)
         model.arms = ("left", "right")
         model.adapter = self.adapter
         model._reachability_bounds = {"x": [-0.05, 0.65], "y": [-0.55, 0.55], "z": [0.04, 0.45]}
         model._max_reachability_step_m = 0.30
+        model._max_reachability_rotation_rad = 0.35
         model.latest_frame = {"state": {
             "left_ee_pose": [0.10, 0.0, 0.16, 1.0, 0.0, 0.0, 0.0],
         }}
@@ -179,6 +228,7 @@ class RoboDojoAdapterTest(unittest.TestCase):
         model.adapter = self.adapter
         model._reachability_bounds = {"x": [-0.05, 0.65], "y": [-0.55, 0.55], "z": [0.04, 0.45]}
         model._max_reachability_step_m = 0.30
+        model._max_reachability_rotation_rad = 0.35
         model.latest_frame = {"state": {
             "left_ee_pose": [0.10, 0.0, 0.16, 1.0, 0.0, 0.0, 0.0],
         }}
@@ -188,6 +238,28 @@ class RoboDojoAdapterTest(unittest.TestCase):
         self.assertEqual(result["reason"], "unreachable")
         self.assertFalse(result["executed"])
         self.assertIn("jump", result["error"])
+
+    def test_reachability_enforces_published_eef_action_bounds(self):
+        model = GPTPolicyModel.__new__(GPTPolicyModel)
+        model.arms = ("left", "right")
+        model.adapter = self.adapter
+        model._reachability_bounds = {"x": [-0.05, 0.65], "y": [-0.55, 0.55], "z": [None, 0.45]}
+        model._max_reachability_step_m = 0.05
+        model._max_reachability_rotation_rad = 0.35
+        model.latest_frame = {"state": {
+            "left_ee_pose": [0.10, 0.0, 0.11, 1.0, 0.0, 0.0, 0.0],
+        }}
+        far = model._validate_reachability([{
+            "left_ee_pose": [0.16, 0.0, 0.11, 1.0, 0.0, 0.0, 0.0],
+        }])
+        self.assertEqual(far["reason"], "unreachable")
+        self.assertAlmostEqual(far["max_step_m"], 0.05)
+        angle = 0.4
+        rotated = model._validate_reachability([{
+            "left_ee_pose": [0.10, 0.0, 0.11, np.cos(angle / 2), 0.0, 0.0, np.sin(angle / 2)],
+        }])
+        self.assertEqual(rotated["reason"], "unreachable")
+        self.assertAlmostEqual(rotated["max_rotation_step_rad"], 0.35)
 
     def test_locate_point_requires_valid_triangulation_quality(self):
         model = GPTPolicyModel.__new__(GPTPolicyModel)

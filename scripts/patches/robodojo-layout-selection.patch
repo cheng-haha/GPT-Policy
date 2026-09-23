@@ -1,0 +1,14 @@
+diff --git a/env/seed_manager/seed_manager.py b/env/seed_manager/seed_manager.py
+index 3c8c74f..99d854e 100644
+--- a/env/seed_manager/seed_manager.py
++++ b/env/seed_manager/seed_manager.py
+@@ -45,0 +46,9 @@ class SeedManager:
++        selected_layout = os.environ.get("ROBODOJO_LAYOUT_ID")
++        if selected_layout is not None:
++            try:
++                layout_id = int(selected_layout)
++            except ValueError as error:
++                raise ValueError(f"Invalid ROBODOJO_LAYOUT_ID: {selected_layout}") from error
++            if layout_id not in self.seed_info:
++                raise ValueError(f"ROBODOJO_LAYOUT_ID {layout_id} is unavailable for {self.task_name}")
++            all_layout_ids = [layout_id]

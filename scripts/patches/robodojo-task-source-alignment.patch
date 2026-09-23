@@ -1,0 +1,14 @@
+diff --git a/task/RoboDojo/tasks/organize_table.py b/task/RoboDojo/tasks/organize_table.py
+index c9abf80..f9534b9 100644
+--- a/task/RoboDojo/tasks/organize_table.py
++++ b/task/RoboDojo/tasks/organize_table.py
+@@ -102 +102 @@ class OrganizeTableCommon:
+-            "Place the alarm clock on the drawer, put the figurine on the stand, place the mouse on the mouse pad, and push the keyboard into the frame."
++            "Place the mouse on the mouse pad, push the keyboard into the frame, put the figurine on the stand, place the alarm clock on the drawer, then open the drawer and put all remaining miscellaneous items inside."
+diff --git a/task/RoboDojo/tasks/stack_blocks_by_language.py b/task/RoboDojo/tasks/stack_blocks_by_language.py
+index fe4146a..7bd0937 100644
+--- a/task/RoboDojo/tasks/stack_blocks_by_language.py
++++ b/task/RoboDojo/tasks/stack_blocks_by_language.py
+@@ -54 +54 @@ class StackBlocksByLanguageCommon:
+-            f"stack the blocks from bottom to top in the order of {color[str(cat_index[0])]}, {color[str(cat_index[1])]}, and {color[str(cat_index[2])]}, then reset the robot arm."
++            f"stack the blocks from bottom to top in the order of{color[str(cat_index[0])]}, {color[str(cat_index[1])]}, and {color[str(cat_index[2])]}, then reset the robot arm."

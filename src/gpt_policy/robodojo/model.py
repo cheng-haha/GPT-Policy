@@ -135,6 +135,7 @@ class GPTPolicyModel:
         self._last_commanded_world: dict[str, list[float]] = {}
         self._last_execution_feedback: dict[str, Any] | None = None
         self._tracking_failure_count = 0
+        self._arm_stall_counts = {arm: 0 for arm in self.arms}
         self._max_tracking_error_m = float(model_cfg.get("robodojo_max_tracking_error_m", 0.03))
         self._max_tracking_error_rad = float(model_cfg.get("robodojo_max_tracking_error_rad", 0.20))
         self._max_consecutive_tracking_failures = int(model_cfg.get("robodojo_max_consecutive_tracking_failures", 2))
@@ -144,7 +145,8 @@ class GPTPolicyModel:
         self._reachability_bounds = model_cfg.get("robodojo_reachability_bounds", {
             "x": [-0.05, 0.65], "y": [-0.55, 0.55], "z": [None, 0.45],
         })
-        self._max_reachability_step_m = float(model_cfg.get("robodojo_max_step_m", 0.30))
+        self._max_reachability_step_m = float(model_cfg.get("robodojo_max_step_m", 0.05))
+        self._max_reachability_rotation_rad = float(model_cfg.get("robodojo_max_rotation_step_rad", 0.35))
         self._terminal_reason: str | None = None
         self._terminal_kind: str | None = None
         self._home_tcp_targets: dict[str, list[float]] | None = None
@@ -227,6 +229,7 @@ class GPTPolicyModel:
         self._last_commanded_world = {}
         self._last_execution_feedback = None
         self._tracking_failure_count = 0
+        self._arm_stall_counts = {arm: 0 for arm in self.arms}
         self._terminal_reason = None
         self._terminal_kind = None
         self._home_tcp_targets = None
@@ -323,21 +326,21 @@ class GPTPolicyModel:
                     },
                 }, ensure_ascii=False)
         if self._last_execution_feedback is not None:
-            checked_arms = [
-                item for item in self._last_execution_feedback["arms"].values()
-                if item.get("tracking_checked", True)
-            ]
-            bad_tracking = bool(ik_feedback and ik_feedback.get("status") == "tracking_failed") or any(
-                item["translation_error_m"] > self._max_tracking_error_m
-                or item["rotation_error_rad"] > self._max_tracking_error_rad
-                for item in checked_arms
-            )
-            self._tracking_failure_count = self._tracking_failure_count + 1 if bad_tracking else 0
+            # Native control advances for one 25 Hz action interval. A pose
+            # error after that interval is expected when the arm made useful
+            # progress; only repeated lack of progress by the same arm blocks.
+            for arm, item in self._last_execution_feedback["arms"].items():
+                self._arm_stall_counts[arm] = (
+                    self._arm_stall_counts.get(arm, 0) + 1
+                    if item.get("tracking_checked", True) and item.get("stalled", False) else 0
+                )
+            self._tracking_failure_count = max(self._arm_stall_counts.values(), default=0)
             self._last_execution_feedback["tracking_failure_count"] = self._tracking_failure_count
+            self._last_execution_feedback["arm_stall_counts"] = dict(self._arm_stall_counts)
             if self._tracking_failure_count >= self._max_consecutive_tracking_failures:
                 self._last_execution_feedback["execution_blocked"] = True
                 self._last_execution_feedback["blocked_reason"] = (
-                    "连续动作的 TCP 实测误差超过安全阈值；已停止继续运动，避免继续尝试造成碰撞。"
+                    "连续动作没有朝目标产生明显位姿进展；已停止继续运动，避免重复无效指令。"
                 )
                 self._terminal_reason = "execution_tracking_failed"
                 self._terminal_kind = "execution_blocked"
@@ -530,6 +533,7 @@ class GPTPolicyModel:
     def _workspace_context(self):
         return {"frame": "each arm base", "tcp_bounds_m": deepcopy(self._reachability_bounds),
                 "max_step_m": self._max_reachability_step_m,
+                "max_rotation_step_rad": self._max_reachability_rotation_rad,
                 "bound_semantics": "null means no policy bound on that side; no default TCP minimum height",
                 "collision_check": "policy bounds do not certify collision-free motion; simulator IK and physics still apply"}
 
@@ -593,6 +597,16 @@ class GPTPolicyModel:
                         "target_base_xyz": target_base.tolist(),
                         "distance_from_previous_m": distance,
                         "max_step_m": self._max_reachability_step_m,
+                    }
+                rotation_step = self._quat_angle_wxyz(start_world[3:], target[3:])
+                if rotation_step > self._max_reachability_rotation_rad:
+                    return {
+                        "accepted": False, "executed": False,
+                        "reason": "unreachable",
+                        "error": f"{arm} target requires a {rotation_step:.3f} rad rotation, above the {self._max_reachability_rotation_rad:.3f} rad action limit",
+                        "arm": arm, "waypoint_index": action_index,
+                        "rotation_from_previous_rad": rotation_step,
+                        "max_rotation_step_rad": self._max_reachability_rotation_rad,
                     }
                 previous_targets[arm] = target
         return None
@@ -720,6 +734,22 @@ class GPTPolicyModel:
             measured_tcp = self.adapter.calibration.world_from_tcp(arm, measured)
             translation_error = float(np.linalg.norm(target_tcp[:3, 3] - measured_tcp[:3, 3]))
             rotation_error = self._quat_angle_wxyz(target[3:], measured[3:])
+            previous_frame = self._observation_history.get(self.step - 1, {})
+            previous_pose = (previous_frame.get("state") or {}).get(
+                f"{arm}_ee_pose" if len(self.arms) > 1 else "ee_pose"
+            )
+            if previous_pose is not None:
+                previous = np.asarray(previous_pose, dtype=np.float64).reshape(7)
+                previous_tcp = self.adapter.calibration.world_from_tcp(arm, previous)
+                prior_translation_error = float(np.linalg.norm(target_tcp[:3, 3] - previous_tcp[:3, 3]))
+                prior_rotation_error = self._quat_angle_wxyz(target[3:], previous[3:])
+                translation_progress = prior_translation_error - translation_error
+                rotation_progress = prior_rotation_error - rotation_error
+                stalled = ((translation_error > self._max_tracking_error_m and translation_progress < 0.001)
+                           or (rotation_error > self._max_tracking_error_rad and rotation_progress < 0.005))
+            else:
+                translation_progress = rotation_progress = None
+                stalled = False
             arms[arm] = {
                 "commanded_world_xyz_wxyz": target.tolist(),
                 "measured_world_xyz_wxyz": measured.tolist(),
@@ -728,9 +758,12 @@ class GPTPolicyModel:
                 "source_pose_frame": "RoboDojo environment-relative source EE link, wxyz",
                 "translation_error_m": translation_error,
                 "rotation_error_rad": rotation_error,
+                "translation_progress_m": translation_progress,
+                "rotation_progress_rad": rotation_progress,
+                "stalled": stalled,
                 "within_tolerance": translation_error <= 0.015 and rotation_error <= 0.20,
                 "tracking_checked": True,
-                "status": "tracked",
+                "status": "stalled" if stalled else "tracked" if translation_error <= 0.015 and rotation_error <= 0.20 else "incomplete",
             }
         if not arms:
             return None

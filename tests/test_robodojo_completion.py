@@ -116,6 +116,43 @@ class RoboDojoCompletionTest(unittest.TestCase):
         self.assertTrue(feedback["checks"]["t_xy_distance_under_0_007_m"])
         self.assertEqual(next(obs for name, obs in calls if name == "update_obs")["task_name"], "push_T")
 
+    def test_repeated_unconfirmed_done_cannot_loop_forever(self):
+        class Env:
+            task_name = "organize_table"
+            success = [True]
+            end_flag = [False]
+            take_action_cnt = [0]
+
+            def is_episode_end(self):
+                return self.end_flag[0]
+
+            def get_running_env_idx_list(self):
+                return [] if self.end_flag[0] else [0]
+
+            def get_obs(self):
+                return {}
+
+            def get_obs_batch(self, **kwargs):
+                return []
+
+        class Client:
+            def __init__(self):
+                self.cleared = 0
+
+            def call(self, func_name, **kwargs):
+                if func_name == "is_episode_done":
+                    return True
+                if func_name in {"is_terminal_give_up", "is_execution_blocked"}:
+                    return False
+                if func_name == "clear_terminal_decision":
+                    self.cleared += 1
+
+        env, client = Env(), Client()
+        eval_one_episode(env, client)
+        self.assertFalse(env.success[0])
+        self.assertTrue(env.end_flag[0])
+        self.assertEqual(client.cleared, 2)
+
 
 if __name__ == "__main__":
     unittest.main()

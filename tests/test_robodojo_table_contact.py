@@ -16,6 +16,7 @@ class TableContactTest(unittest.TestCase):
         model.arms = ("left", "right")
         model._reachability_bounds = {"x": [-0.05, 0.65], "y": [-0.55, 0.55], "z": [None, 0.45]}
         model._max_reachability_step_m = 0.30
+        model._max_reachability_rotation_rad = 0.35
         manifest = json.loads((ROOT / "configs/examples/robodojo_calibration.json").read_text())
         model.adapter = RoboDojoAdapter(RoboDojoCalibration.from_manifest(manifest))
         initial = model.adapter.action({"target": {"left": {"pose_xyzquat": [0.14, -0.052, 0.09, 0, 1, 0, 0]}}})

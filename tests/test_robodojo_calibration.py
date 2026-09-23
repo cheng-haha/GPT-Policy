@@ -119,6 +119,10 @@ class RoboDojoCalibrationTest(unittest.TestCase):
         model.arms = ("left",)
         calibration = RoboDojoCalibration.from_manifest(self.manifest | {"tcp_from_link6": {"left": [[0, 0, -1, 0], [0, 1, 0, 0], [1, 0, 0, -0.145], [0, 0, 0, 1]]}})
         model.adapter = RoboDojoAdapter(calibration, model.arms)
+        model.step = 0
+        model._observation_history = {}
+        model._max_tracking_error_m = 0.03
+        model._max_tracking_error_rad = 0.20
         model._last_commanded_world = {"left": [0, 0, 0.3, 1, 0, 0, 0]}
         result = model._execution_feedback({"state": {"ee_pose": [0, 0, 0.3, np.sqrt(0.5), 0, 0, np.sqrt(0.5)]}})
         self.assertAlmostEqual(result["arms"]["left"]["translation_error_m"], 0.145 * np.sqrt(2))

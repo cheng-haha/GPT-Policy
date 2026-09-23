@@ -70,6 +70,12 @@ def main():
         model.task_name = "fold_clothes"
         model._reachability_bounds = {"x": [-0.05, 0.65], "y": [-0.55, 0.55], "z": [None, 0.45]}
         model._max_reachability_step_m = 0.30
+        # This legacy contact probe intentionally uses larger diagnostic
+        # rotations than the 0.35 rad policy action contract.
+        model._max_reachability_rotation_rad = np.pi
+        model._max_tracking_error_m = 0.03
+        model._max_tracking_error_rad = 0.20
+        model._observation_history = {}
         layout = environment.reward_manager.func_parser.layout_manager
         garment = layout.get_scene_object(0, layout.get_instance_name(label="target", env_idx=0))
         initial_points = garment.sample_mesh_vertices()[0].copy()
@@ -84,6 +90,8 @@ def main():
         ]
         frame = environment.get_obs()
         for index, (pose, grip) in enumerate(targets):
+            model.step = index + 1
+            model._observation_history[index] = {"state": frame["state"]}
             model.adapter = RoboDojoAdapter(RoboDojoCalibration.from_observation(manifest, frame))
             model.latest_frame = frame | {"task_name": "fold_clothes"}
             action = model.adapter.action({"target": {"left": {"pose_xyzquat": pose}}})

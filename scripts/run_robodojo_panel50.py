@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """Run the 50 published GPT-as-Policy RoboDojo layouts with GPT-Policy.
 
-This reproduces the *case selection*, not the other project's policy. Each
-native RoboDojo invocation evaluates consecutive layout IDs for one task
-variant. Task failure is a valid completed outcome; missing native results are
-not counted as failures or silently replaced.
+This reproduces the published case selection and one-process-per-case reset
+protocol, not the other project's policy. Task failure is a valid completed
+outcome; missing native results are not counted as failures or silently replaced.
 """
 
 from __future__ import annotations
 
 import argparse
-from collections import Counter, OrderedDict
+from collections import Counter, OrderedDict, deque
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 import hashlib
 import json
@@ -20,6 +20,7 @@ import re
 import shlex
 import subprocess
 import sys
+import threading
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -57,6 +58,23 @@ def layout_files(runtime_task: str, eval_seed: int) -> list[Path]:
 def validate_panel() -> tuple[dict, OrderedDict[str, list[dict]]]:
     panel = json.loads(MANIFEST.read_text(encoding="utf-8"))
     require(panel.get("schema") == "gpt_policy.robodojo.panel50.v1", "Unknown panel schema")
+    source_files = panel.get("native_source_files")
+    overrides = panel.get("native_overrides")
+    require(isinstance(source_files, list) and len(source_files) == 169,
+            "Expected the 169 published native source fingerprints")
+    require(isinstance(overrides, dict) and len(overrides) == 5,
+            "Expected exactly five reviewed native integration changes")
+    source_paths = [item["path"] for item in source_files]
+    require(len(set(source_paths)) == len(source_paths) and set(overrides) <= set(source_paths),
+            "Duplicate native source path or unknown integration change")
+    for item in source_files:
+        relative = Path(item["path"])
+        require(not relative.is_absolute() and ".." not in relative.parts,
+                f"Invalid native source path: {relative}")
+        source = ROBODOJO / relative
+        require(source.is_file(), f"Missing native source file: {source}")
+        require(digest(source) == overrides.get(item["path"], item["sha256"]),
+                f"Native source differs from frozen panel/integration: {relative}")
     support_files = panel.get("support_files")
     require(isinstance(support_files, list) and len(support_files) == 10,
             "Expected the ten published support trajectories")
@@ -117,6 +135,7 @@ def source_fingerprints() -> dict[str, str]:
         "scripts/eval_robodojo_8gpu.sh",
         "third_party/RoboDojo/scripts/internal/smoke_all_tasks.sh",
         "third_party/RoboDojo/src/eval_client/main.py",
+        "third_party/RoboDojo/env/seed_manager/seed_manager.py",
         "src/gpt_policy/robodojo/model.py",
         "src/gpt_policy/robodojo/deploy.py",
         "src/gpt_policy/robodojo/adapter.py",
@@ -170,16 +189,24 @@ def read_completed_group(summary_path: Path, runtime_task: str, cases: list[dict
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--gpu", type=int, default=0)
+    parser.add_argument("--gpu", type=int, default=None, help="One GPU ID (default: 0)")
+    parser.add_argument("--gpus", default=None, help="Comma-separated GPU IDs; one case process per GPU")
     parser.add_argument("--icl-mode", choices=("video+action", "video", "none"), default="video+action")
     parser.add_argument("--require-icl", action="store_true", help="Fail if any task lacks a demonstration")
     parser.add_argument("--run-id", default=None, help="Stable ID for reporting and resume")
     parser.add_argument("--resume", action="store_true", help="Resume a prior --run-id")
-    parser.add_argument("--dry-run", action="store_true", help="Verify all layouts and print the 13 commands")
+    parser.add_argument("--case-timeout-s", type=int, default=3600,
+                        help="Maximum wall time for one case; timeout is incomplete, not failure")
+    parser.add_argument("--dry-run", action="store_true", help="Verify layouts and print 50 case commands")
     args = parser.parse_args()
-    require(args.gpu >= 0, "GPU ID must be nonnegative")
+    require(args.gpu is None or args.gpus is None, "Use --gpu or --gpus, not both")
+    gpu_text = args.gpus if args.gpus is not None else str(args.gpu if args.gpu is not None else 0)
+    require(re.fullmatch(r"[0-9]+(,[0-9]+)*", gpu_text) is not None, "Invalid GPU list")
+    gpus = [int(value) for value in gpu_text.split(",")]
+    require(len(set(gpus)) == len(gpus), "Duplicate GPU ID")
+    require(args.case_timeout_s > 0, "Case timeout must be positive")
     require(not args.resume or args.run_id, "--resume requires --run-id")
-    panel, groups = validate_panel()
+    panel, _groups = validate_panel()
     missing_demos = sorted(task for task in TASKS if not (DATASET_ROOT / task / "meta/tasks.parquet").is_file())
     if args.icl_mode != "none" and missing_demos:
         print("ICL demonstration missing for: " + ", ".join(missing_demos), file=sys.stderr)
@@ -189,67 +216,122 @@ def main() -> int:
     report_path = ROOT / "var/runs/robodojo/panel50" / f"{run_id}.json"
     fingerprints = source_fingerprints()
     manifest_hash = digest(MANIFEST)
-    commands = {}
-    for runtime_task, cases in groups.items():
-        group_id = f"{run_id}_{runtime_task}"
-        commands[runtime_task] = [str(ROOT / "scripts/run_robodojo_eval.sh"), "--skip-setup",
-                                  "benchmark", "--icl-mode", args.icl_mode, "--only", runtime_task,
-                                  "--eval-num", str(len(cases)), "--seed", "0", "--run-id", group_id]
-    print(f"Verified {len(panel['cases'])} published cases, {len(TASKS)} tasks, {len(groups)} native runs")
+    assignments: dict[int, list[dict]] = {gpu: [] for gpu in gpus}
+    cases_by_task = {task: [case for case in panel["cases"] if case["task"] == task] for task in TASKS}
+    for task_index, task in enumerate(TASKS):
+        gpu = gpus[task_index % len(gpus)]
+        assignments[gpu].extend(cases_by_task[task])
+
+    def command_for(case: dict) -> list[str]:
+        return ["timeout", "--signal=TERM", "--kill-after=20s", f"{args.case_timeout_s}s",
+                str(ROOT / "scripts/run_robodojo_eval.sh"), "--skip-setup",
+                "benchmark", "--icl-mode", args.icl_mode, "--only", case["runtime_task"],
+                "--eval-num", "1", "--seed", "0", "--run-id", f"{run_id}_{case['case_id']}"]
+
+    def summary_for(case: dict) -> Path:
+        return ROBODOJO / "smoke_results" / f"{run_id}_{case['case_id']}.json"
+
+    print(f"Verified {len(panel['cases'])} published cases, "
+          f"{len(panel['native_source_files']) - len(panel['native_overrides'])} matching native files and "
+          f"{len(panel['native_overrides'])} reviewed overrides, "
+          f"{len(TASKS)} tasks, 50 isolated native runs on {len(gpus)} GPU(s)")
     if args.dry_run:
-        for runtime_task, cmd in commands.items():
-            print(f"ROBODOJO_GPU_IDS={args.gpu} " + shlex.join(cmd))
+        print("GPU assignment below is a preview; live workers take the next task as they become free")
+        for gpu, cases in assignments.items():
+            for case in cases:
+                print(f"ROBODOJO_GPU_IDS={gpu} ROBODOJO_LAYOUT_ID={case['layout_id']} " +
+                      shlex.join(command_for(case)))
         return 0
 
     if args.resume:
         require(report_path.is_file(), f"No report to resume: {report_path}")
         report = json.loads(report_path.read_text(encoding="utf-8"))
+        require(report.get("schema") == "gpt_policy.robodojo.panel50_result.v2", "Incompatible report schema")
         require(report.get("manifest_sha256") == manifest_hash and report.get("source_fingerprints") == fingerprints,
                 "Source or panel changed since this run started")
-        require(report.get("gpu") == args.gpu and report.get("icl_mode") == args.icl_mode,
-                "GPU or ICL mode changed since this run started")
+        require(report.get("gpus") == gpus and report.get("icl_mode") == args.icl_mode
+                and report.get("case_timeout_s") == args.case_timeout_s,
+                "GPU assignment, ICL mode, or timeout changed since this run started")
+        for case in panel["cases"]:
+            completed = report["cases"].get(case["case_id"])
+            if completed and completed.get("status") == "complete":
+                verified = read_completed_group(Path(completed["summary_path"]), case["runtime_task"], [case])
+                require(completed["result"] == verified["cases"][0],
+                        f"Previously completed result changed: {case['case_id']}")
     else:
         require(not report_path.exists(), f"Run ID already exists: {run_id}; use --resume or another ID")
-        report = dict(schema="gpt_policy.robodojo.panel50_result.v1", run_id=run_id,
+        report = dict(schema="gpt_policy.robodojo.panel50_result.v2", run_id=run_id,
                       source_panel=panel["source_repository"] + "/blob/" + panel["source_commit"] + "/" + panel["source_path"],
                       manifest_sha256=manifest_hash, source_fingerprints=fingerprints,
-                      gpu=args.gpu, icl_mode=args.icl_mode, missing_icl_demonstrations=missing_demos,
-                      status="running", groups={})
+                      gpus=gpus, icl_mode=args.icl_mode, missing_icl_demonstrations=missing_demos,
+                      case_timeout_s=args.case_timeout_s,
+                      published_policy_rng_seed_note="OpenPI JAX seed from source panel; not applied to GPT-Policy Codex",
+                      status="running", cases={})
         write_report(report_path, report)
 
-    env = os.environ.copy()
-    env["ROBODOJO_GPU_IDS"] = str(args.gpu)
-    for runtime_task, cases in groups.items():
-        if report["groups"].get(runtime_task, {}).get("status") == "complete":
-            completed = report["groups"][runtime_task]
-            verified = read_completed_group(Path(completed["summary_path"]), runtime_task, cases)
-            require(completed["cases"] == verified["cases"],
-                    f"Previously completed result changed: {runtime_task}")
-            print(f"Skipping completed {runtime_task}")
-            continue
-        command = commands[runtime_task]
-        print(f"Running {runtime_task}: {len(cases)} layouts", flush=True)
-        rc = subprocess.run(command, cwd=ROOT, env=env, check=False).returncode
-        summary_path = ROBODOJO / "smoke_results" / f"{run_id}_{runtime_task}.json"
+    lock = threading.Lock()
+    task_lock = threading.Lock()
+    stop = threading.Event()
+    pending_tasks = deque(TASKS)
+
+    def run_gpu_queue(gpu: int) -> None:
+        while not stop.is_set():
+            with task_lock:
+                if not pending_tasks:
+                    return
+                task = pending_tasks.popleft()
+            print(f"GPU {gpu}: assigned task {task}", flush=True)
+            for case in cases_by_task[task]:
+                if not run_case(gpu, case):
+                    return
+
+    def run_case(gpu: int, case: dict) -> bool:
+        case_id = case["case_id"]
+        if stop.is_set():
+            return False
+        if report["cases"].get(case_id, {}).get("status") == "complete":
+            print(f"Skipping completed {case_id}", flush=True)
+            return True
+        env = os.environ.copy()
+        env["ROBODOJO_GPU_IDS"] = str(gpu)
+        env["ROBODOJO_LAYOUT_ID"] = str(case["layout_id"])
+        print(f"GPU {gpu}: running {case_id}", flush=True)
+        summary_path = summary_for(case)
         try:
-            require(rc == 0, f"RoboDojo exited {rc} for {runtime_task}")
-            report["groups"][runtime_task] = read_completed_group(summary_path, runtime_task, cases)
+            rc = subprocess.run(command_for(case), cwd=ROOT, env=env, check=False).returncode
+            require(rc == 0, f"RoboDojo exited {rc} for {case_id}")
+            native = read_completed_group(summary_path, case["runtime_task"], [case])
+            entry = dict(status="complete", gpu=gpu, summary_path=str(summary_path),
+                         result_path=native["result_path"], result=native["cases"][0])
         except (OSError, ValueError, KeyError, TypeError) as error:
-            report["groups"][runtime_task] = dict(status="incomplete", error=str(error),
-                                                   summary_path=str(summary_path))
-            report["status"] = "incomplete"
+            entry = dict(status="incomplete", gpu=gpu, summary_path=str(summary_path), error=str(error))
+            stop.set()
+            print(f"Stopped {case_id}: {error}", file=sys.stderr, flush=True)
+        with lock:
+            report["cases"][case_id] = entry
+            if entry["status"] != "complete":
+                report["status"] = "incomplete"
             write_report(report_path, report)
-            print(f"Stopped: {error}; partial report: {report_path}", file=sys.stderr)
-            return 1
-        write_report(report_path, report)
+        if entry["status"] != "complete":
+            return False
+        return True
 
-    results = [case for group in report["groups"].values() for case in group["cases"]]
-    require(len(results) == 50 and len({x["case_id"] for x in results}) == 50,
-            "Panel is incomplete despite all native runs returning")
+    with ThreadPoolExecutor(max_workers=len(gpus)) as executor:
+        futures = [executor.submit(run_gpu_queue, gpu) for gpu in gpus]
+        for future in futures:
+            future.result()
+
+    results = [report["cases"].get(case["case_id"]) for case in panel["cases"]]
+    if any(item is None or item.get("status") != "complete" for item in results):
+        report["status"] = "incomplete"
+        write_report(report_path, report)
+        print(f"Incomplete panel; partial report: {report_path}", file=sys.stderr)
+        return 1
+    case_results = [item["result"] for item in results]
     report["status"] = "complete"
-    report["successes"] = sum(x["success"] for x in results)
+    report["successes"] = sum(x["success"] for x in case_results)
     report["success_rate"] = report["successes"] / 50
-    report["mean_score"] = 100 * sum(x["score"] for x in results) / 50
+    report["mean_score"] = 100 * sum(x["score"] for x in case_results) / 50
     write_report(report_path, report)
     print(f"Complete: {report['successes']}/50 success, Score {report['mean_score']:.2f}; {report_path}")
     return 0

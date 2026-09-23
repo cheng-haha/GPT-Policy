@@ -20,6 +20,8 @@ CALIBRATION="$(realpath "$CALIBRATION")"
 ROBODOJO_DIR="${XPOLICYLAB_DIR}/../RoboDojo"
 CAMERA_PATCH="${ROOT_DIR}/scripts/patches/robodojo-camera-calibration.patch"
 ACTION_PATCH="${ROOT_DIR}/scripts/patches/robodojo-action-execution.patch"
+LAYOUT_PATCH="${ROOT_DIR}/scripts/patches/robodojo-layout-selection.patch"
+TASK_PATCH="${ROOT_DIR}/scripts/patches/robodojo-task-source-alignment.patch"
 REQUEST_PATCH="${ROOT_DIR}/scripts/patches/xpolicylab-request-wait.patch"
 if git -C "$ROBODOJO_DIR" apply --reverse --check "$CAMERA_PATCH" 2>/dev/null; then
   printf '%s\n' 'RoboDojo camera calibration patch is already applied.'
@@ -35,6 +37,22 @@ elif git -C "$ROBODOJO_DIR" apply --check --unidiff-zero "$ACTION_PATCH"; then
   git -C "$ROBODOJO_DIR" apply --unidiff-zero "$ACTION_PATCH"
 else
   echo 'RoboDojo evaluator source differs from the pinned version; review the action execution patch before installing.' >&2
+  exit 1
+fi
+if git -C "$ROBODOJO_DIR" apply --reverse --check --unidiff-zero "$LAYOUT_PATCH" 2>/dev/null; then
+  printf '%s\n' 'RoboDojo single-layout selection patch is already applied.'
+elif git -C "$ROBODOJO_DIR" apply --check --unidiff-zero "$LAYOUT_PATCH"; then
+  git -C "$ROBODOJO_DIR" apply --unidiff-zero "$LAYOUT_PATCH"
+else
+  echo 'RoboDojo seed manager differs from the pinned version; review the layout patch before installing.' >&2
+  exit 1
+fi
+if git -C "$ROBODOJO_DIR" apply --reverse --check --unidiff-zero "$TASK_PATCH" 2>/dev/null; then
+  printf '%s\n' 'RoboDojo task instructions match the published panel source.'
+elif git -C "$ROBODOJO_DIR" apply --check --unidiff-zero "$TASK_PATCH"; then
+  git -C "$ROBODOJO_DIR" apply --unidiff-zero "$TASK_PATCH"
+else
+  echo 'RoboDojo task instructions differ from the pinned version; review the task source patch before installing.' >&2
   exit 1
 fi
 if git -C "$XPOLICYLAB_DIR" apply --reverse --check "$REQUEST_PATCH" 2>/dev/null; then

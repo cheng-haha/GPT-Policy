@@ -1,5 +1,5 @@
 diff --git a/src/eval_client/eval_env.py b/src/eval_client/eval_env.py
-index d2af1c0..7cfe63d 100644
+index d2af1c0..49fad7e 100644
 --- a/src/eval_client/eval_env.py
 +++ b/src/eval_client/eval_env.py
 @@ -116,0 +117,4 @@ def create_eval_env(config, app, resume_state=None, **kwargs):
@@ -54,7 +54,7 @@ index d2af1c0..7cfe63d 100644
 +                self.robot_manager.control_manager.push(active_env_indices, control_info_list)
 +                while not self.have_empty(active_env_indices):
 +                    self.step(env_idx_list=active_env_indices)
-@@ -455 +490,36 @@ def create_eval_env(config, app, resume_state=None, **kwargs):
+@@ -455 +490,40 @@ def create_eval_env(config, app, resume_state=None, **kwargs):
 -                        self._check_endpose_finite(env_idx_list)
 +                        self._check_endpose_finite(active_env_indices)
 +                if self.eval_cfg.get("action_execution", {}).get("wait_until_settled", False):
@@ -87,12 +87,16 @@ index d2af1c0..7cfe63d 100644
 +                        feedback["measured_pose"] = measured.tolist()
 +                        feedback["translation_error_m"] = translation_error
 +                        if translation_error > 0.03:
-+                            self._last_ik_feedback[ee_env_idx]["status"] = "tracking_failed"
-+                            feedback["status"] = "tracking_failed"
++                            # Native 25 Hz control can make progress without
++                            # reaching a pose in one interval. The IK target
++                            # was executed; preserve its Success status so a
++                            # partial move is not reported as never executed.
++                            self._last_ik_feedback[ee_env_idx]["status"] = "incomplete"
++                            feedback["tracking_status"] = "incomplete"
 +                            feedback["reason"] = (
-+                                "IK returned Success, but the simulated TCP did not reach the requested pose"
++                                "Native control moved toward the pose but did not reach it in this action interval"
 +                            )
-@@ -499,0 +570,3 @@ def create_eval_env(config, app, resume_state=None, **kwargs):
+@@ -499,0 +574,3 @@ def create_eval_env(config, app, resume_state=None, **kwargs):
 +            if self.eval_cfg.get("action_execution", {}).get("wait_until_settled", False):
 +                from gpt_policy.robodojo.execution import interpolate_control
 +                return interpolate_control(self, control_info, env_idx)
