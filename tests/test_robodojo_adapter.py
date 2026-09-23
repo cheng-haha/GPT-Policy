@@ -210,7 +210,6 @@ class RoboDojoAdapterTest(unittest.TestCase):
         model.arms = ("left", "right")
         model.adapter = self.adapter
         model._reachability_bounds = {"x": [-0.05, 0.65], "y": [-0.55, 0.55], "z": [0.04, 0.45]}
-        model._max_reachability_step_m = 0.30
         model._max_reachability_rotation_rad = 0.35
         model.latest_frame = {"state": {
             "left_ee_pose": [0.10, 0.0, 0.16, 1.0, 0.0, 0.0, 0.0],
@@ -222,12 +221,11 @@ class RoboDojoAdapterTest(unittest.TestCase):
         self.assertFalse(result["executed"])
         self.assertIn("workspace", result["error"])
 
-    def test_reachability_rejects_large_single_step(self):
+    def test_reachability_allows_large_single_translation_within_workspace(self):
         model = GPTPolicyModel.__new__(GPTPolicyModel)
         model.arms = ("left", "right")
         model.adapter = self.adapter
         model._reachability_bounds = {"x": [-0.05, 0.65], "y": [-0.55, 0.55], "z": [0.04, 0.45]}
-        model._max_reachability_step_m = 0.30
         model._max_reachability_rotation_rad = 0.35
         model.latest_frame = {"state": {
             "left_ee_pose": [0.10, 0.0, 0.16, 1.0, 0.0, 0.0, 0.0],
@@ -235,16 +233,13 @@ class RoboDojoAdapterTest(unittest.TestCase):
         result = model._validate_reachability([{
             "left_ee_pose": [0.45, 0.0, 0.16, 1.0, 0.0, 0.0, 0.0],
         }])
-        self.assertEqual(result["reason"], "unreachable")
-        self.assertFalse(result["executed"])
-        self.assertIn("jump", result["error"])
+        self.assertIsNone(result)
 
     def test_reachability_enforces_published_eef_action_bounds(self):
         model = GPTPolicyModel.__new__(GPTPolicyModel)
         model.arms = ("left", "right")
         model.adapter = self.adapter
         model._reachability_bounds = {"x": [-0.05, 0.65], "y": [-0.55, 0.55], "z": [None, 0.45]}
-        model._max_reachability_step_m = 0.05
         model._max_reachability_rotation_rad = 0.35
         model.latest_frame = {"state": {
             "left_ee_pose": [0.10, 0.0, 0.11, 1.0, 0.0, 0.0, 0.0],
@@ -252,8 +247,7 @@ class RoboDojoAdapterTest(unittest.TestCase):
         far = model._validate_reachability([{
             "left_ee_pose": [0.16, 0.0, 0.11, 1.0, 0.0, 0.0, 0.0],
         }])
-        self.assertEqual(far["reason"], "unreachable")
-        self.assertAlmostEqual(far["max_step_m"], 0.05)
+        self.assertIsNone(far)
         angle = 0.4
         rotated = model._validate_reachability([{
             "left_ee_pose": [0.10, 0.0, 0.11, np.cos(angle / 2), 0.0, 0.0, np.sin(angle / 2)],

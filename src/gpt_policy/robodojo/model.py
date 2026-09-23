@@ -145,7 +145,6 @@ class GPTPolicyModel:
         self._reachability_bounds = model_cfg.get("robodojo_reachability_bounds", {
             "x": [-0.05, 0.65], "y": [-0.55, 0.55], "z": [None, 0.45],
         })
-        self._max_reachability_step_m = float(model_cfg.get("robodojo_max_step_m", 0.05))
         self._control_mode = os.environ.get("ROBODOJO_CONTROL_MODE", "native-ee")
         if self._control_mode not in {"native-ee", "dls"}:
             raise ValueError(f"Unsupported RoboDojo control mode: {self._control_mode}")
@@ -537,7 +536,6 @@ class GPTPolicyModel:
 
     def _workspace_context(self):
         context = {"frame": "each arm base", "tcp_bounds_m": deepcopy(self._reachability_bounds),
-                "max_step_m": self._max_reachability_step_m,
                 "max_rotation_step_rad": self._max_reachability_rotation_rad,
                 "bound_semantics": "null means no policy bound on that side; no default TCP minimum height",
                 "collision_check": "policy bounds do not certify collision-free motion; simulator IK and physics still apply"}
@@ -549,10 +547,8 @@ class GPTPolicyModel:
     def _validate_reachability(self, actions: list[Mapping[str, Any]]) -> dict[str, Any] | None:
         """Reject obviously unreachable EEF targets before simulator IK.
 
-        This is a safety pre-check, not a proof that IK will succeed. The
-        simulator remains the final authority, but it must never be asked to
-        solve a target outside the configured per-arm workspace or a single
-        jump larger than the safe step limit.
+        This is a pre-check, not a proof that IK will succeed. The simulator
+        remains the final authority for IK and physics feasibility.
         """
         if not self.latest_frame:
             return None
@@ -595,18 +591,6 @@ class GPTPolicyModel:
                     if actual is None:
                         continue
                     start_world = np.asarray(actual, dtype=np.float64).reshape(7)
-                start_tcp = self.adapter.calibration.world_from_tcp(arm, start_world)
-                distance = float(np.linalg.norm(target_h[:3, 3] - start_tcp[:3, 3]))
-                if distance > self._max_reachability_step_m:
-                    return {
-                        "accepted": False, "executed": False,
-                        "reason": "unreachable",
-                        "error": f"{arm} target requires a {distance:.3f} m TCP jump, above the {self._max_reachability_step_m:.3f} m safety limit",
-                        "arm": arm, "waypoint_index": action_index,
-                        "target_base_xyz": target_base.tolist(),
-                        "distance_from_previous_m": distance,
-                        "max_step_m": self._max_reachability_step_m,
-                    }
                 if getattr(self, "_control_mode", "native-ee") == "dls":
                     start_tcp = self.adapter.calibration.world_from_tcp(arm, start_world)
                     distance = float(np.linalg.norm(target_h[:3, 3] - start_tcp[:3, 3]))
