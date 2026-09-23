@@ -1,63 +1,32 @@
 diff --git a/src/eval_client/eval_env.py b/src/eval_client/eval_env.py
-index d2af1c0..6379956 100644
+index d2af1c0..7cfe63d 100644
 --- a/src/eval_client/eval_env.py
 +++ b/src/eval_client/eval_env.py
-@@ -114,6 +114,10 @@ def create_eval_env(config, app, resume_state=None, **kwargs):
-             self.success = [True] * self.num_envs
-             self.end_flag = [False] * self.num_envs
-             self.take_action_cnt = [0] * self.num_envs
+@@ -116,0 +117,4 @@ def create_eval_env(config, app, resume_state=None, **kwargs):
 +            # Result of the most recent EE->joint IK conversion.  RoboDojo
 +            # used to silently omit an arm when IK failed, which made an
 +            # unexecuted pose look like a tracking/calibration error.
 +            self._last_ik_feedback = [None] * self.num_envs
-             # Per-env streaming video writers: {env_idx: {camera_key: writer}}.
-             # Replaces the old full-episode frame cache; only vision frames are
-             # streamed to disk as they arrive instead of buffered in RAM.
-@@ -218,6 +222,7 @@ def create_eval_env(config, app, resume_state=None, **kwargs):
-             self.success = [True] * self.num_envs
-             self.end_flag = [False] * self.num_envs
-             self.take_action_cnt = [0] * self.num_envs
+@@ -195,0 +200,2 @@ def create_eval_env(config, app, resume_state=None, **kwargs):
++                request_timeout_s=self.deploy_cfg.get("request_timeout_s"),
++                request_warning_s=self.deploy_cfg.get("request_warning_s"),
+@@ -220,0 +227 @@ def create_eval_env(config, app, resume_state=None, **kwargs):
 +            self._last_ik_feedback = [None] * self.num_envs
-             # Discard any writers left open by a previous (e.g. crashed or
-             # unstable) batch before starting a fresh one.
-             self._abort_video_writers()
-@@ -281,6 +286,8 @@ def create_eval_env(config, app, resume_state=None, **kwargs):
-                     self._stream_vision(env_idx, data[env_idx])
-                 env_data = deepcopy(data[env_idx])
-                 env_data["env_idx"] = env_idx
+@@ -283,0 +291,2 @@ def create_eval_env(config, app, resume_state=None, **kwargs):
 +                if self._last_ik_feedback[env_idx] is not None:
 +                    env_data["ik_feedback"] = deepcopy(self._last_ik_feedback[env_idx])
-                 data_list.append(env_data)
-             return data_list
- 
-@@ -359,6 +366,7 @@ def create_eval_env(config, app, resume_state=None, **kwargs):
-             if self.physx_monitor_enabled:
-                 self._check_physx_broken_envs()
-             control_info_list = []
+@@ -361,0 +371,3 @@ def create_eval_env(config, app, resume_state=None, **kwargs):
 +            execution_targets = {}
-             if env_idx_list is None:
-                 env_idx_list = list(range(self.num_envs))
-             for idx, env_idx in enumerate(env_idx_list):
-@@ -405,6 +413,7 @@ def create_eval_env(config, app, resume_state=None, **kwargs):
-                         else:
-                             pass
-                 elif action_type == "ee":
++            active_env_indices = []
++            ee_env_indices = []
+@@ -407,0 +420 @@ def create_eval_env(config, app, resume_state=None, **kwargs):
 +                    ik_feedback = {"status": "ok", "arms": {}}
-                     for robot in self.robot_manager.robot_list:
-                         if robot.type != "target":
-                             continue
-@@ -417,10 +426,25 @@ def create_eval_env(config, app, resume_state=None, **kwargs):
-                             env_idx=env_idx,
-                             robot=robot,
-                         )
+@@ -419,0 +433,4 @@ def create_eval_env(config, app, resume_state=None, **kwargs):
 +                        arm_feedback = {
 +                            "requested_pose": np.asarray(target_pose, dtype=float).tolist(),
 +                            "status": str(ik_result.get("status", "Fail")),
 +                        }
-                         if ik_result["status"] == "Success":
-                             control_info[obs_name] = {
-                                 "position": ik_result["joint_value"],
-                             }
+@@ -423,0 +441,11 @@ def create_eval_env(config, app, resume_state=None, **kwargs):
 +                        else:
 +                            # Keep this arm at its current state and report the
 +                            # rejection in the next observation.  Gripper
@@ -69,27 +38,30 @@ index d2af1c0..6379956 100644
 +                                "a valid joint solution for the requested pose"
 +                            )
 +                        ik_feedback["arms"][name] = arm_feedback
- 
-                         key_name = self.robot_manager.process_name(robot.gripper_name)
-                         if robot.ee_type == "gripper":
-@@ -443,8 +467,11 @@ def create_eval_env(config, app, resume_state=None, **kwargs):
-                             }
-                         else:
-                             pass
+@@ -445,0 +474 @@ def create_eval_env(config, app, resume_state=None, **kwargs):
 +                execution_targets[env_idx] = deepcopy(control_info)
-                 control_seq = self.process_control_info(control_info, env_idx)
-                 control_info_list.append(control_seq)
+@@ -447,0 +477,6 @@ def create_eval_env(config, app, resume_state=None, **kwargs):
++                active_env_indices.append(env_idx)
 +                if action_type == "ee":
 +                    self._last_ik_feedback[env_idx] = ik_feedback
- 
-             if len(control_info_list) > 0:
-                 self.robot_manager.control_manager.push(env_idx_list, control_info_list)
-@@ -453,6 +480,38 @@ def create_eval_env(config, app, resume_state=None, **kwargs):
-                     if self.physx_monitor_enabled:
-                         self._check_physx_broken_envs()
-                         self._check_endpose_finite(env_idx_list)
++                    ee_env_indices.append(env_idx)
++                else:
++                    self._last_ik_feedback[env_idx] = None
+@@ -450,3 +485,3 @@ def create_eval_env(config, app, resume_state=None, **kwargs):
+-                self.robot_manager.control_manager.push(env_idx_list, control_info_list)
+-                while not self.have_empty(env_idx_list):
+-                    self.step(env_idx_list=env_idx_list)
++                self.robot_manager.control_manager.push(active_env_indices, control_info_list)
++                while not self.have_empty(active_env_indices):
++                    self.step(env_idx_list=active_env_indices)
+@@ -455 +490,36 @@ def create_eval_env(config, app, resume_state=None, **kwargs):
+-                        self._check_endpose_finite(env_idx_list)
++                        self._check_endpose_finite(active_env_indices)
 +                if self.eval_cfg.get("action_execution", {}).get("wait_until_settled", False):
 +                    from gpt_policy.robodojo.execution import settle_control
++                    # A settling failure must return control to the policy.
++                    # Retrying here indefinitely can hang an entire evaluation
++                    # while simulation time advances outside its action budget.
 +                    completion = settle_control(self, execution_targets)
 +                    for completed_idx, details in completion.items():
 +                        if self._last_ik_feedback[completed_idx] is not None:
@@ -98,38 +70,29 @@ index d2af1c0..6379956 100644
 +                # the simulated TCP settles far from the requested pose. Do
 +                # an explicit post-execution check so the next observation
 +                # distinguishes "IK returned Success" from "TCP arrived".
-+                if action_type == "ee":
++                for ee_env_idx in ee_env_indices:
 +                    for robot in self.robot_manager.robot_list:
 +                        if robot.type != "target":
 +                            continue
 +                        arm = robot.arm_name.split("_")[0]
-+                        feedback = self._last_ik_feedback[env_idx]["arms"].get(arm)
++                        feedback = self._last_ik_feedback[ee_env_idx]["arms"].get(arm)
 +                        if not feedback or feedback.get("status") != "Success":
 +                            continue
 +                        measured = self.robot_manager.get_real_endpose(
-+                            robot=robot, env_idx_list=[env_idx]
-+                        )[env_idx]
++                            robot=robot, env_idx_list=[ee_env_idx]
++                        )[ee_env_idx]
 +                        measured = np.asarray(measured, dtype=float).reshape(7)
 +                        requested = np.asarray(feedback["requested_pose"], dtype=float).reshape(7)
 +                        translation_error = float(np.linalg.norm(requested[:3] - measured[:3]))
 +                        feedback["measured_pose"] = measured.tolist()
 +                        feedback["translation_error_m"] = translation_error
 +                        if translation_error > 0.03:
-+                            self._last_ik_feedback[env_idx]["status"] = "tracking_failed"
++                            self._last_ik_feedback[ee_env_idx]["status"] = "tracking_failed"
 +                            feedback["status"] = "tracking_failed"
 +                            feedback["reason"] = (
 +                                "IK returned Success, but the simulated TCP did not reach the requested pose"
 +                            )
- 
-             self.reward_manager.step(env_idx_list=env_idx_list)
-             if getattr(self, "interact", False):
-@@ -497,6 +556,9 @@ def create_eval_env(config, app, resume_state=None, **kwargs):
-             Returns:
-                     List[dict]: A control sequence of length `interpolation_nums`.
-             """
+@@ -499,0 +570,3 @@ def create_eval_env(config, app, resume_state=None, **kwargs):
 +            if self.eval_cfg.get("action_execution", {}).get("wait_until_settled", False):
 +                from gpt_policy.robodojo.execution import interpolate_control
 +                return interpolate_control(self, control_info, env_idx)
-             interpolation_nums = int(self.obs_manager.collect_interval)
-             if interpolation_nums <= 0:
-                 return [deepcopy(control_info)]

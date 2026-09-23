@@ -50,7 +50,10 @@ def settle_control(env, targets):
     cfg = env.eval_cfg["action_execution"]
     tolerance = float(cfg.get("joint_tolerance_rad", 0.001))
     velocity_tolerance = float(cfg.get("joint_velocity_tolerance_rad_s", 0.01))
-    steps = int(np.ceil(float(cfg.get("settle_timeout_s", 2.0)) / env.dt))
+    timeout_s = float(cfg.get("settle_timeout_s", 2.0))
+    if timeout_s <= 0:
+        raise ValueError("settle_timeout_s must be positive")
+    steps = max(1, int(np.ceil(timeout_s / env.dt)))
     stable = {idx: 0 for idx in targets}
     result = {}
     for step in range(steps + 1):

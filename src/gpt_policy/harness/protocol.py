@@ -39,9 +39,9 @@ def _robot_calibration_notes(arms: tuple[str, ...], settings: dict[str, Any] | N
 - GPT-Policy quaternion order is [qx,qy,qz,qw]. RoboDojo's source ee_pose is [x,y,z,qw,qx,qy,qz]; the host performs this conversion.
 - TCP is the configured grasp-center frame, not the raw source EE link: its +z axis points toward the fingertips and +y is the gripper opening axis. The host applies tcp_from_source_link in both observations and commands (X5: 145 mm along link6 +X; Franka: 102 mm along panda_hand +Z).
 - The host performs all world/base/TCP conversion, IK validation, interpolation, and gripper normalization. Do not emit simulator-world poses.
-- If previous_result.result.accepted is false with reason "unreachable", the requested motion was not executed; use the reported target, workspace or step-limit reason and the measured TCP state to choose a smaller reachable action.
+- If previous_result.result.accepted is false with reason "unreachable" or "workspace_limit", the requested motion was not executed; use the reported target, workspace or step-limit reason and the measured TCP state to choose another action. A policy workspace rejection is not a failed IK solve. The current motion_limits specify any active height bound; null means no bound on that side.
 - If execution_feedback.execution_blocked is true, the host has stopped motion after repeated TCP tracking errors; do not issue another movement command and explain the failure from the reported measurements.
-- If execution_feedback.ik_feedback.status is "ik_failed", RoboDojo could not find a valid joint solution, so that arm's requested pose was not executed. Treat it as an unreachable pose, reduce the step or change the approach, and verify with the next image and measured TCP.
+- If execution_feedback.ik_feedback.status is "ik_failed", RoboDojo could not find a valid joint solution, so that arm's requested pose was not executed and its unchanged TCP must not be judged against the rejected target. Treat it as an unreachable pose, reduce the step or change the approach, and verify with the next image and measured TCP.
 Camera calibration and views:
 - Available simulated cameras: {", ".join(str(name) for name in cameras)}.
 - cam_head is fixed; wrist cameras move with their corresponding simulated arm.

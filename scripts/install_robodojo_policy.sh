@@ -20,7 +20,6 @@ CALIBRATION="$(realpath "$CALIBRATION")"
 ROBODOJO_DIR="${XPOLICYLAB_DIR}/../RoboDojo"
 CAMERA_PATCH="${ROOT_DIR}/scripts/patches/robodojo-camera-calibration.patch"
 ACTION_PATCH="${ROOT_DIR}/scripts/patches/robodojo-action-execution.patch"
-REPORT_PATCH="${ROOT_DIR}/scripts/patches/robodojo-eval-report.patch"
 REQUEST_PATCH="${ROOT_DIR}/scripts/patches/xpolicylab-request-wait.patch"
 if git -C "$ROBODOJO_DIR" apply --reverse --check "$CAMERA_PATCH" 2>/dev/null; then
   printf '%s\n' 'RoboDojo camera calibration patch is already applied.'
@@ -30,20 +29,12 @@ else
   echo 'RoboDojo camera source differs from the pinned version; review the calibration patch before installing.' >&2
   exit 1
 fi
-if git -C "$ROBODOJO_DIR" apply --reverse --check "$ACTION_PATCH" 2>/dev/null; then
+if git -C "$ROBODOJO_DIR" apply --reverse --check --unidiff-zero "$ACTION_PATCH" 2>/dev/null; then
   printf '%s\n' 'RoboDojo action execution patch is already applied.'
-elif git -C "$ROBODOJO_DIR" apply --check "$ACTION_PATCH"; then
-  git -C "$ROBODOJO_DIR" apply "$ACTION_PATCH"
+elif git -C "$ROBODOJO_DIR" apply --check --unidiff-zero "$ACTION_PATCH"; then
+  git -C "$ROBODOJO_DIR" apply --unidiff-zero "$ACTION_PATCH"
 else
   echo 'RoboDojo evaluator source differs from the pinned version; review the action execution patch before installing.' >&2
-  exit 1
-fi
-if git -C "$ROBODOJO_DIR" apply --reverse --check "$REPORT_PATCH" 2>/dev/null; then
-  printf '%s\n' 'RoboDojo evaluation reporting patch is already applied.'
-elif git -C "$ROBODOJO_DIR" apply --check "$REPORT_PATCH"; then
-  git -C "$ROBODOJO_DIR" apply "$REPORT_PATCH"
-else
-  echo 'RoboDojo smoke evaluator source differs from the pinned version; review the reporting patch before installing.' >&2
   exit 1
 fi
 if git -C "$XPOLICYLAB_DIR" apply --reverse --check "$REQUEST_PATCH" 2>/dev/null; then
@@ -101,18 +92,6 @@ robots:
     grasp_perfect_direction: "back"
   }
 EOF
-for profile in "$OVERLAY_ENV_CFG" "$FRANKA_ENV_CFG"; do
-  cat >>"$profile" <<'EOF'
-action_execution:
-  wait_until_settled: true
-  joint_speed_rad_s: 1.0
-  joint_acceleration_rad_s2: 4.0
-  min_duration_s: 0.2
-  settle_timeout_s: 2.0
-  joint_tolerance_rad: 0.001
-  joint_velocity_tolerance_rad_s: 0.01
-EOF
-done
 POLICY_DIR="${XPOLICYLAB_DIR}/policy/${POLICY_NAME}"
 mkdir -p "$POLICY_DIR"
 printf '%s\n' '"""GPT-Policy adapter for RoboDojo/XPolicyLab."""' >"${POLICY_DIR}/__init__.py"
@@ -131,6 +110,12 @@ class Model(ModelTemplate):
         self.impl.update_obs_batch(obs_list)
     def is_episode_done(self):
         return self.impl.is_episode_done()
+    def clear_terminal_decision(self, feedback=None):
+        self.impl.clear_terminal_decision(feedback)
+    def is_terminal_give_up(self):
+        return self.impl.is_terminal_give_up()
+    def is_execution_blocked(self):
+        return self.impl.is_execution_blocked()
     def get_action(self):
         return self.impl.get_action()
     def get_action_batch(self, env_idx_list=None):
@@ -164,6 +149,7 @@ cat >"${POLICY_DIR}/setup_eval_policy_server.sh" <<EOF
 set -euo pipefail
 PORT="\${9:-19000}"
 HOST="\${10:-0.0.0.0}"
+export ROBODOJO_TASK_NAME="\${2:-}"
 cd "$(realpath "$XPOLICYLAB_DIR")"
 export PYTHONPATH="$(realpath "$ROOT_DIR/src"):\$PWD\${PYTHONPATH:+:\$PYTHONPATH}"
 if ! command -v codex >/dev/null 2>&1; then

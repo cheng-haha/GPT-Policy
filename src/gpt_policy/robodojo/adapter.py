@@ -125,7 +125,11 @@ class RoboDojoAdapter:
     def observation_metadata(self, frame: Mapping[str, Any], env_step: int) -> dict[str, Any]:
         return {
             "backend": "robodojo",
-            "env_step": int(env_step),
+            # ``env_step`` supplied by the deployment bridge is the simulator
+            # action count.  Fall back to the caller value for compatibility
+            # with direct/unit-test use of the adapter.
+            "env_step": int(frame.get("env_step", env_step)),
+            "policy_step": int(env_step),
             "task_instruction": frame.get("instruction"),
             "success": frame.get("success"),
             "end_flag": frame.get("end_flag"),

@@ -1,4 +1,6 @@
 import unittest
+from types import SimpleNamespace
+from unittest.mock import patch
 
 import numpy as np
 
@@ -81,6 +83,42 @@ class RoboDojoAdapterTest(unittest.TestCase):
         self.assertEqual(_canonical_tool_name("give_up"), "terminal.give_up")
         self.assertEqual(_canonical_tool_name("terminal.done"), "terminal.done")
 
+    def test_bimanual_gripper_close_reaches_submitted_action(self):
+        model = GPTPolicyModel.__new__(GPTPolicyModel)
+        model.arms = ("left", "right")
+        model.adapter = self.adapter
+        model.latest_frame = {"state": {
+            "left_ee_pose": [0, 0, 0, 1, 0, 0, 0],
+            "right_ee_pose": [0, 0, 0, 1, 0, 0, 0],
+            "left_ee_joint_state": [1.0],
+            "right_ee_joint_state": [1.0],
+        }}
+        model.latest_state = {}
+        model.latest_images = {}
+        model._icl_images = {}
+        model._terminal_reason = None
+        model._started = True
+        model.step = 0
+        model.model_cfg = {}
+        model.previous = None
+        events = []
+        model._trace_event = lambda event, payload: events.append((event, payload))
+
+        for positions, expected in [
+            ({"left": 0, "right": None}, (0.0, 1.0)),
+            ({"left": None, "right": 0.05}, (1.0, 0.05)),
+            ({"left": None, "right": None}, (1.0, 1.0)),
+        ]:
+            with self.subTest(positions=positions):
+                model.agent = SimpleNamespace(decide=lambda _turn: {
+                    "name": "set_gripper", "arguments": {"positions": positions, "note": "test"},
+                })
+                with patch("gpt_policy.robodojo.model.observation", return_value="test"):
+                    action = model.get_action()[0]
+                self.assertEqual(action["left_ee_joint_state"], [expected[0]])
+                self.assertEqual(action["right_ee_joint_state"], [expected[1]])
+                self.assertEqual(events[-1][1]["actions"][0], action)
+
     def test_execution_feedback_reports_world_tcp_error(self):
         model = GPTPolicyModel.__new__(GPTPolicyModel)
         model.adapter = self.adapter
@@ -97,6 +135,28 @@ class RoboDojoAdapterTest(unittest.TestCase):
         self.assertTrue(feedback["arms"]["left"]["within_tolerance"])
         self.assertAlmostEqual(feedback["arms"]["right"]["translation_error_m"], 0.06)
 
+    def test_ik_rejected_arm_is_not_counted_as_tracking_failure(self):
+        model = GPTPolicyModel.__new__(GPTPolicyModel)
+        model.adapter = self.adapter
+        model.arms = ("left", "right")
+        model._last_commanded_world = {
+            "left": [0.10, 0.20, 0.11, 1.0, 0.0, 0.0, 0.0],
+            "right": [0.30, 0.20, 0.11, 1.0, 0.0, 0.0, 0.0],
+        }
+        feedback = model._execution_feedback(
+            {"state": {
+                "left_ee_pose": [0.10, 0.20, 0.11, 1.0, 0.0, 0.0, 0.0],
+                "right_ee_pose": [0.30, 0.20, 0.11, 1.0, 0.0, 0.0, 0.0],
+            }},
+            {"status": "ik_failed", "arms": {
+                "left": {"status": "Success"},
+                "right": {"status": "ik_failed", "reason": "no solution"},
+            }},
+        )
+        self.assertEqual(feedback["not_executed_arms"], ["right"])
+        self.assertFalse(feedback["arms"]["right"]["tracking_checked"])
+        self.assertTrue(feedback["all_within_tolerance"])
+
     def test_reachability_rejects_out_of_workspace_target(self):
         model = GPTPolicyModel.__new__(GPTPolicyModel)
         model.arms = ("left", "right")
@@ -109,7 +169,7 @@ class RoboDojoAdapterTest(unittest.TestCase):
         result = model._validate_reachability([{
             "left_ee_pose": [-0.30, 0.0, 0.16, 1.0, 0.0, 0.0, 0.0],
         }])
-        self.assertEqual(result["reason"], "unreachable")
+        self.assertEqual(result["reason"], "workspace_limit")
         self.assertFalse(result["executed"])
         self.assertIn("workspace", result["error"])
 

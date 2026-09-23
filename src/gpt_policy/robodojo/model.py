@@ -11,6 +11,7 @@ from __future__ import annotations
 import io
 import json
 import os
+import re
 import time
 from copy import deepcopy
 from dataclasses import dataclass
@@ -90,6 +91,9 @@ class GPTPolicyModel:
         settings["backend"] = "robodojo"
         self.settings = settings
         self.model_cfg = dict(model_cfg)
+        # The policy server starts before the first observation. Its launcher
+        # supplies the task name so the trace directory is accurate at startup.
+        self.task_name = str(os.environ.get("ROBODOJO_TASK_NAME") or model_cfg.get("task_name") or "unknown_task")
         self.robot_model = str(model_cfg.get("robot_model", "X5"))
         self.arms = tuple(model_cfg.get("arms", ("left", "right")))
         calibration_path = Path(str(model_cfg["calibration_manifest"])).expanduser().resolve()
@@ -138,10 +142,12 @@ class GPTPolicyModel:
         # a guessed EEF pose from reaching RoboDojo's IK solver, which may
         # otherwise return a large, misleading joint-space deviation.
         self._reachability_bounds = model_cfg.get("robodojo_reachability_bounds", {
-            "x": [-0.05, 0.65], "y": [-0.55, 0.55], "z": [0.04, 0.45],
+            "x": [-0.05, 0.65], "y": [-0.55, 0.55], "z": [None, 0.45],
         })
         self._max_reachability_step_m = float(model_cfg.get("robodojo_max_step_m", 0.30))
         self._terminal_reason: str | None = None
+        self._terminal_kind: str | None = None
+        self._home_tcp_targets: dict[str, list[float]] | None = None
         self.step = 0
         self._started = False
         # RoboDojo runs this wrapper in a long-lived policy server, outside
@@ -151,19 +157,55 @@ class GPTPolicyModel:
         default_trace_root = Path(__file__).resolve().parents[3] / "var/runs/gpt/robodojo"
         trace_root = Path(str(model_cfg.get("trace_dir") or default_trace_root)).expanduser()
         trace_root.mkdir(parents=True, exist_ok=True)
-        run_name = f"{time.strftime('%Y%m%d-%H%M%S')}-{time.time_ns() % 1_000_000:06d}-push_T-pid{os.getpid()}"
+        trace_task = re.sub(r"[^A-Za-z0-9_.-]+", "_", self.task_name).strip("._-") or "unknown_task"
+        run_name = f"{time.strftime('%Y%m%d-%H%M%S')}-{time.time_ns() % 1_000_000:06d}-{trace_task}-pid{os.getpid()}"
         self.trace_dir = trace_root / run_name
         self.trace_dir.mkdir(parents=True, exist_ok=False)
         self.trace_frames = self.trace_dir / "frames"
         self.trace_frames.mkdir()
         self.trace_events = (self.trace_dir / "events.jsonl").open("a", encoding="utf-8")
-        self._trace_event("run_started", {"model": self._agent_model, "robot_model": self.robot_model, "arms": self.arms})
+        self._trace_event("run_started", {"model": self._agent_model, "robot_model": self.robot_model, "arms": self.arms, "task_name": self.task_name})
 
     def _start(self, instruction: str) -> None:
         dof = int(self.model_cfg.get("dof", 6))
         schema = output_schema(dof, self.arms, self.catalog)
         tools = tool_schemas(dof, self.arms, self.catalog)
         prompt = instructions(self.robot_model, "robodojo", dof, self.arms, self.settings, self.catalog, task_instruction=instruction)
+        task_name = (
+            (self.latest_frame or {}).get("task_name")
+            or getattr(self, "task_name", None)
+            or self.model_cfg.get("task_name")
+            or self.settings.get("runtime", {}).get("task_name")
+        )
+        if task_name == "push_T":
+            prompt += (
+                "\nRoboDojo push_T completion: The T block must match the gray target "
+                "within 7 degrees orientation and 0.007 m XY center distance, "
+                "must never be lifted over 0.01 m, and BOTH arms must return "
+                "near their initial EE poses (each position axis within 0.15 m "
+                "and orientation within 20 degrees). Visual overlap alone is "
+                "insufficient. Once the T appears aligned, safely move both "
+                "arms back toward the initial TCP poses below, then inspect "
+                "fresh feedback. Plan collision-free intermediate waypoints "
+                "when needed. A running success=true is not task completion; "
+                "RoboDojo confirms completion with end_flag=true. If done is "
+                "rejected, use previous_result.completion_feedback.checks to "
+                "target only the failed conditions. Initial TCP poses in each "
+                "arm's base frame: "
+                + json.dumps(self._home_tcp_targets or {}, ensure_ascii=False)
+            )
+        if hasattr(self, "_reachability_bounds"):
+            prompt += "\nRoboDojo motion limits: " + json.dumps(self._workspace_context())
+            prompt += (" These are policy pre-checks, not IK feasibility results. "
+                       "For cloth, approach a freshly localized point in small steps; "
+                       "verify cloth moves with the gripper after closing and lifting. "
+                       "An accepted gripper command alone does not prove a grasp.")
+        if task_name == "fold_clothes":
+            prompt += ("\nFold-clothes completion is checked when both grippers are open "
+                       "(openness > 0.7) and both arms return to their initial poses. "
+                       "Fold the sleeves toward the chest and the hem toward the shoulders "
+                       "before releasing and returning home. Wait for RoboDojo confirmation. "
+                       "Initial base-frame TCP poses: " + json.dumps(self._home_tcp_targets or {}))
         self.agent.start(AgentContext(prompt, tools, schema))
         self._started = True
 
@@ -186,6 +228,8 @@ class GPTPolicyModel:
         self._last_execution_feedback = None
         self._tracking_failure_count = 0
         self._terminal_reason = None
+        self._terminal_kind = None
+        self._home_tcp_targets = None
         self.step = 0
         self._started = False
         self._trace_event("reset", {})
@@ -193,6 +237,37 @@ class GPTPolicyModel:
     def is_episode_done(self) -> bool:
         """Tell the environment loop to stop after a terminal model decision."""
         return self._terminal_reason is not None
+
+    def clear_terminal_decision(self, feedback: Mapping[str, Any] | None = None) -> None:
+        """Resume after ``done`` was not confirmed by RoboDojo's evaluator."""
+        self._terminal_reason = None
+        self._terminal_kind = None
+        checks = feedback.get("checks") if isinstance(feedback, Mapping) else None
+        failed = [name for name, passed in checks.items() if not passed] if isinstance(checks, Mapping) else []
+        reason = (
+            "RoboDojo 未确认任务成功；未通过的条件: " + ", ".join(failed) + "。请先处理这些条件，避免反复盲调其他条件。"
+            if failed else "RoboDojo 尚未确认任务成功；请检查奖励条件和历史失败状态。"
+        )
+        self.previous = json.dumps({
+            "tool": "terminal.done",
+            "result": {
+                "accepted": False,
+                "reason": reason,
+                "completion_feedback": _jsonable(feedback),
+                "home_tcp_targets": self._home_tcp_targets,
+            },
+        }, ensure_ascii=False)
+        self._trace_event("terminal_rejected", {
+            "policy_step": self.step,
+            "env_step": self.latest_frame.get("env_step") if self.latest_frame else None,
+            "completion_feedback": _jsonable(feedback),
+        })
+
+    def is_terminal_give_up(self) -> bool:
+        return self._terminal_kind == "terminal.give_up"
+
+    def is_execution_blocked(self) -> bool:
+        return self._terminal_kind == "execution_blocked"
 
     def update_obs(self, obs: Mapping[str, Any]):
         self.latest_frame = obs
@@ -210,11 +285,20 @@ class GPTPolicyModel:
             self._calibration_manifest, obs
         )
         self.latest_state = self.adapter.state(obs)
+        self.latest_state["motion_limits"] = self._workspace_context()
+        if self._home_tcp_targets is None:
+            self._home_tcp_targets = {
+                arm: _jsonable(self.latest_state["arms"][arm]["tcp_xyzquat"])
+                for arm in self.arms
+            }
         # The deploy loop executes the complete action list before asking for
         # the next observation. Therefore feedback must be compared with the
         # final waypoint of the previous chunk, not with its first waypoint.
-        self._last_execution_feedback = self._execution_feedback(obs)
         ik_feedback = obs.get("ik_feedback")
+        # RoboDojo reports an IK rejection while leaving that arm at its
+        # previous pose. Do not compare that unchanged pose with the rejected
+        # target from the preceding command: it was never an executed target.
+        self._last_execution_feedback = self._execution_feedback(obs, ik_feedback)
         if ik_feedback is not None:
             if self._last_execution_feedback is None:
                 self._last_execution_feedback = {
@@ -227,11 +311,26 @@ class GPTPolicyModel:
                 self._last_execution_feedback["warning"] = (
                     "RoboDojo 的逆运动学未能为部分目标位姿找到关节解；该机械臂目标没有执行。"
                 )
+                # IK rejection happens before arm control is queued. Preserve
+                # it as the structured result for the next Codex turn rather
+                # than treating it as a tracking failure or terminal error.
+                self.previous = json.dumps({
+                    "tool": "robot.move_to",
+                    "result": {
+                        "accepted": False,
+                        "reason": "ik_unreachable",
+                        "ik_feedback": _jsonable(ik_feedback),
+                    },
+                }, ensure_ascii=False)
         if self._last_execution_feedback is not None:
-            bad_tracking = bool(ik_feedback and ik_feedback.get("status") in {"ik_failed", "tracking_failed"}) or any(
+            checked_arms = [
+                item for item in self._last_execution_feedback["arms"].values()
+                if item.get("tracking_checked", True)
+            ]
+            bad_tracking = bool(ik_feedback and ik_feedback.get("status") == "tracking_failed") or any(
                 item["translation_error_m"] > self._max_tracking_error_m
                 or item["rotation_error_rad"] > self._max_tracking_error_rad
-                for item in self._last_execution_feedback["arms"].values()
+                for item in checked_arms
             )
             self._tracking_failure_count = self._tracking_failure_count + 1 if bad_tracking else 0
             self._last_execution_feedback["tracking_failure_count"] = self._tracking_failure_count
@@ -241,6 +340,7 @@ class GPTPolicyModel:
                     "连续动作的 TCP 实测误差超过安全阈值；已停止继续运动，避免继续尝试造成碰撞。"
                 )
                 self._terminal_reason = "execution_tracking_failed"
+                self._terminal_kind = "execution_blocked"
                 self._trace_event("execution_blocked", {
                     "step": self.step,
                     "reason": self._terminal_reason,
@@ -337,11 +437,19 @@ class GPTPolicyModel:
         canonical_name = _canonical_tool_name(name)
         self._trace_event("model_decision", {
             "step": self.step, "name": name, "canonical_name": canonical_name,
+            "env_step": self.latest_frame.get("env_step") if self.latest_frame else None,
             "arguments": _jsonable(arguments), "state": _jsonable(self.latest_state),
         })
         if canonical_name in {"terminal.done", "terminal.give_up"}:
+            self._terminal_kind = canonical_name
             self._terminal_reason = str(arguments.get("reason") or canonical_name)
-            self._trace_event("action", {"step": self.step, "name": canonical_name, "actions": self._hold_action()})
+            self._trace_event("action", {
+                "step": self.step,
+                "policy_step": self.step,
+                "env_step": self.latest_frame.get("env_step") if self.latest_frame else None,
+                "name": canonical_name,
+                "actions": self._hold_action(),
+            })
             return [self._hold_action()]
         result: dict[str, Any] = {"accepted": True}
         if canonical_name == "locate_point":
@@ -361,7 +469,11 @@ class GPTPolicyModel:
             # selected side is null, emit a complete measured-state hold
             # action instead of asking the adapter to build an empty dict.
             positions = arguments.get("positions") if canonical_name == "set_gripper" else None
-            single_hold = canonical_name == "set_gripper" and arguments.get("gripper") is None
+            single_hold = (
+                canonical_name == "set_gripper"
+                and "positions" not in arguments
+                and arguments.get("gripper") is None
+            )
             all_hold = isinstance(positions, Mapping) and all(
                 positions.get(arm) is None for arm in self.arms
             )
@@ -405,13 +517,21 @@ class GPTPolicyModel:
         self._last_commanded_world = commanded_trajectory[-1] if commanded_trajectory else {}
         self.previous = json.dumps({"tool": canonical_name, "result": result}, ensure_ascii=False)
         self._trace_event("action", {
-            "step": self.step, "name": canonical_name,
+            "step": self.step, "policy_step": self.step,
+            "env_step": self.latest_frame.get("env_step") if self.latest_frame else None,
+            "name": canonical_name,
             "result": _jsonable(result),
             "actions": _jsonable(actions),
             "commanded_trajectory_world": commanded_trajectory,
             "commanded_targets_world": self._last_commanded_world,
         })
         return actions
+
+    def _workspace_context(self):
+        return {"frame": "each arm base", "tcp_bounds_m": deepcopy(self._reachability_bounds),
+                "max_step_m": self._max_reachability_step_m,
+                "bound_semantics": "null means no policy bound on that side; no default TCP minimum height",
+                "collision_check": "policy bounds do not certify collision-free motion; simulator IK and physics still apply"}
 
     def _validate_reachability(self, actions: list[Mapping[str, Any]]) -> dict[str, Any] | None:
         """Reject obviously unreachable EEF targets before simulator IK.
@@ -442,17 +562,17 @@ class GPTPolicyModel:
                 base_from_world = self.adapter.calibration.base_from_world(arm)
                 target_h = self.adapter.calibration.world_from_tcp(arm, target)
                 target_base = (base_from_world @ target_h)[:3, 3]
-                limits = self._reachability_bounds
+                limits = self._workspace_context()["tcp_bounds_m"]
                 for axis, value in zip(("x", "y", "z"), target_base):
-                    low, high = map(float, limits[axis])
-                    if value < low or value > high:
+                    low, high = limits[axis]
+                    if (low is not None and value < float(low)) or (high is not None and value > float(high)):
                         return {
                             "accepted": False, "executed": False,
-                            "reason": "unreachable",
+                            "reason": "workspace_limit", "ik_checked": False,
                             "error": f"{arm} target is outside the configured RoboDojo workspace",
                             "arm": arm, "waypoint_index": action_index,
                             "target_base_xyz": target_base.tolist(),
-                            "workspace_bounds": {name: list(map(float, limits[name])) for name in ("x", "y", "z")},
+                            "workspace_bounds": deepcopy(limits),
                             "axis": axis, "value": float(value),
                         }
                 if arm in previous_targets:
@@ -568,17 +688,34 @@ class GPTPolicyModel:
         b /= max(np.linalg.norm(b), 1e-12)
         return float(2.0 * np.arccos(np.clip(abs(float(np.dot(a, b))), -1.0, 1.0)))
 
-    def _execution_feedback(self, frame: Mapping[str, Any]) -> dict[str, Any] | None:
+    def _execution_feedback(
+        self,
+        frame: Mapping[str, Any],
+        ik_feedback: Mapping[str, Any] | None = None,
+    ) -> dict[str, Any] | None:
         if not self._last_commanded_world:
             return None
         state = frame.get("state") or {}
         arms: dict[str, Any] = {}
+        ik_arms = (ik_feedback or {}).get("arms", {})
         for arm, commanded in self._last_commanded_world.items():
             actual = state.get(f"{arm}_ee_pose" if len(self.arms) > 1 else "ee_pose")
             if actual is None:
                 continue
             target = np.asarray(commanded, dtype=np.float64).reshape(7)
             measured = np.asarray(actual, dtype=np.float64).reshape(7)
+            arm_ik = ik_arms.get(arm, {})
+            ik_status = arm_ik.get("status")
+            if ik_status and ik_status != "Success":
+                arms[arm] = {
+                    "status": "not_executed",
+                    "tracking_checked": False,
+                    "ik_status": ik_status,
+                    "requested_world_xyz_wxyz": arm_ik.get("requested_pose", target.tolist()),
+                    "measured_world_xyz_wxyz": measured.tolist(),
+                    "reason": arm_ik.get("reason", "IK rejected the requested pose; arm held its previous state"),
+                }
+                continue
             target_tcp = self.adapter.calibration.world_from_tcp(arm, target)
             measured_tcp = self.adapter.calibration.world_from_tcp(arm, measured)
             translation_error = float(np.linalg.norm(target_tcp[:3, 3] - measured_tcp[:3, 3]))
@@ -592,13 +729,25 @@ class GPTPolicyModel:
                 "translation_error_m": translation_error,
                 "rotation_error_rad": rotation_error,
                 "within_tolerance": translation_error <= 0.015 and rotation_error <= 0.20,
+                "tracking_checked": True,
+                "status": "tracked",
             }
         if not arms:
             return None
         return {
             "measured_after_previous_action": True,
             "arms": arms,
-            "all_within_tolerance": all(item["within_tolerance"] for item in arms.values()),
+            "all_within_tolerance": all(
+                item.get("within_tolerance", True)
+                for item in arms.values()
+                if item.get("tracking_checked", True)
+            ),
+            "tracking_checked_arms": [
+                arm for arm, item in arms.items() if item.get("tracking_checked", True)
+            ],
+            "not_executed_arms": [
+                arm for arm, item in arms.items() if not item.get("tracking_checked", True)
+            ],
             "warning": "命令被接受不等于 TCP 已到位；后续动作必须依据此实测误差和新图像调整。",
         }
 
@@ -642,7 +791,9 @@ class GPTPolicyModel:
                            "mime_type": image.mime_type})
         camera_metadata = self.adapter.cameras(frame)
         self._trace_event("observation", {
-            "step": self.step, "instruction": frame.get("instruction"),
+            "step": self.step, "policy_step": self.step,
+            "task_name": frame.get("task_name") or getattr(self, "task_name", None),
+            "env_step": frame.get("env_step"), "instruction": frame.get("instruction"),
             "state": _jsonable(self.latest_state), "images": images,
             "camera_metadata": camera_metadata,
             "success": frame.get("success"), "end_flag": frame.get("end_flag"),
