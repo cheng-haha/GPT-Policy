@@ -1,5 +1,7 @@
 """RoboDojo deployment loop with explicit environment termination."""
 
+import os
+
 
 def _completion_feedback(env):
     """Read push_T's current reward predicates without changing reward state."""
@@ -37,6 +39,11 @@ def _finish_policy_exit(env, force_failure: bool = False):
 
 
 def eval_one_episode(TASK_ENV, model_client):
+    control_mode = os.environ.get("ROBODOJO_CONTROL_MODE", "native-ee")
+    if control_mode not in {"native-ee", "dls"}:
+        raise ValueError(f"Unsupported RoboDojo control mode: {control_mode}")
+    controller = None
+    TASK_ENV._gpt_policy_control_feedback = None
     model_client.call(func_name="reset")
     unconfirmed_done = 0
 
@@ -66,6 +73,8 @@ def eval_one_episode(TASK_ENV, model_client):
         obs["env_step"] = int(TASK_ENV.take_action_cnt[0])
         obs["success"] = bool(TASK_ENV.success[0])
         obs["end_flag"] = bool(TASK_ENV.end_flag[0])
+        if TASK_ENV._gpt_policy_control_feedback is not None:
+            obs["control_feedback"] = TASK_ENV._gpt_policy_control_feedback
         model_client.call(func_name="update_obs", obs=obs)
         if model_client.call(func_name="is_episode_done"):
             # ``done`` is only a request from the policy.  RoboDojo remains
@@ -80,7 +89,13 @@ def eval_one_episode(TASK_ENV, model_client):
                 continue
             break
         for action in actions:
-            TASK_ENV.take_action(action)
+            if control_mode == "dls":
+                if controller is None:
+                    from .dls import DualX5DLS
+                    controller = DualX5DLS(TASK_ENV)
+                TASK_ENV._gpt_policy_control_feedback = controller.execute(TASK_ENV, action)
+            else:
+                TASK_ENV.take_action(action)
             unconfirmed_done = 0
             if TASK_ENV.is_episode_end():
                 break

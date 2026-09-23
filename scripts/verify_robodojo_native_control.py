@@ -15,6 +15,9 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--gpu", type=int, default=0)
     parser.add_argument("--layout-id", type=int, default=0)
+    parser.add_argument("--control-mode", choices=("native-ee", "dls"), default="native-ee")
+    parser.add_argument("--delta-x", type=float, default=0.02,
+                        help="Requested left link6 translation in metres")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1]
@@ -29,7 +32,9 @@ def main() -> int:
     app = AppLauncher(headless=True, enable_cameras=True, device=f"cuda:{args.gpu}",
                       kit_args=zero_delay_kit_args()).app
     environment = None
-    report = {"task": "organize_table", "layout_id": args.layout_id, "gpu": args.gpu}
+    report = {"task": "organize_table", "layout_id": args.layout_id, "gpu": args.gpu,
+              "requested_delta_x_m": args.delta_x,
+              "control_mode": args.control_mode}
     try:
         from omegaconf import OmegaConf
         from utils.load_file import load_yaml
@@ -81,14 +86,20 @@ def main() -> int:
         for arm in model.arms:
             pose = list(before["state"][f"{arm}_ee_pose"])
             if arm == "left":
-                pose[0] += 0.02
+                pose[0] += args.delta_x
             action[f"{arm}_ee_pose"] = pose
             action[f"{arm}_ee_joint_state"] = list(before["state"][f"{arm}_ee_joint_state"])
         report["reachability_rejection"] = model._validate_reachability([action])
         if report["reachability_rejection"] is not None:
             raise RuntimeError("Bounded diagnostic action was rejected")
         model._last_commanded_world = {arm: action[f"{arm}_ee_pose"] for arm in model.arms}
-        environment.take_action(action)
+        if args.control_mode == "dls":
+            from gpt_policy.robodojo.dls import DualX5DLS
+            controller = DualX5DLS(environment)
+            report["fk_validation"] = controller.verify_fk()
+            report["control_feedback"] = controller.execute(environment, action)
+        else:
+            environment.take_action(action)
         after = environment.get_obs()
         report["ik_feedback"] = _jsonable(after.get("ik_feedback"))
         report["execution_feedback"] = _jsonable(model._execution_feedback(after, after.get("ik_feedback")))
@@ -96,13 +107,15 @@ def main() -> int:
         after_pose = np.asarray(after["state"]["left_ee_pose"], dtype=float)
         report["measured_translation_m"] = float(np.linalg.norm(after_pose[:3] - before_pose[:3]))
         left = report["execution_feedback"]["arms"]["left"]
-        report["passed"] = (report["ik_feedback"]["arms"]["left"]["status"] == "Success"
-                            and report["measured_translation_m"] > 0.002
+        executed = (report["control_feedback"]["native_control_steps"] > 0
+                    if args.control_mode == "dls" else
+                    report["ik_feedback"]["arms"]["left"]["status"] == "Success")
+        report["passed"] = (executed and report["measured_translation_m"] > 0.002
                             and left["tracking_checked"] and not left["stalled"])
         output.write_text(json.dumps(_jsonable(report), indent=2) + "\n")
         print(json.dumps({"passed": report["passed"],
                           "measured_translation_m": report["measured_translation_m"],
-                          "ik_status": report["ik_feedback"]["status"],
+                          "ik_status": (report["ik_feedback"] or {}).get("status"),
                           "tracking_status": left["status"]}), flush=True)
         return 0 if report["passed"] else 1
     except Exception as error:

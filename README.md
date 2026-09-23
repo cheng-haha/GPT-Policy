@@ -260,6 +260,11 @@ python3 scripts/run_robodojo_panel50.py --gpus 0,1,2,3,4,5,6,7 --icl-mode none \
 # Resume after an interrupted case. Completed cases are not repeated.
 python3 scripts/run_robodojo_panel50.py --gpus 0,1,2,3,4,5,6,7 --icl-mode none \
   --run-id xingwu_panel50_01 --resume
+
+# Run the same frozen cases with GPT-as-Policy-style bounded DLS control.
+# Use a separate run ID; resume requires the same --control-mode.
+python3 scripts/run_robodojo_panel50.py --gpus 0,1 --icl-mode none \
+  --control-mode dls --run-id xingwu_panel50_dls_01
 ```
 
 `--icl-mode video+action` preserves GPT-Policy's current ICL setting, but the
@@ -267,15 +272,24 @@ local dataset has no demonstration for `classify_objects_by_language`; the
 runner reports that gap. Add `--require-icl` to refuse a mixed ICL condition.
 The panel aligns task layouts and native scoring with the published case set;
 five source files carry reviewed GPT-Policy observation and evaluation patches.
-The policy and its EEF controller remain GPT-Policy's own method. EEF targets
-are limited to 0.05 m and 0.35 rad per action, matching the published action
-bounds; native control applies each accepted target over a 25 Hz interval.
-Incomplete but progressing moves are reported to the policy as such. The active
-ARX X5 config uses RoboDojo's upstream action interpolation and physics.
+The default `native-ee` mode uses RoboDojo/cuRobo EE IK and native joint
+interpolation. `--control-mode dls` keeps GPT-Policy's EEF output but converts
+each target into measured-state, robot-only numerical-Jacobian DLS joint
+actions. DLS validates both arms' URDF FK against measured link6 (<2 mm and
+<0.01 rad), limits the requested target to 0.05 m/0.35 rad, each task-space
+update to 0.02 m/0.1 rad, and each joint update to 0.05 rad. It uses up to
+five real RoboDojo action steps per moving target (one for a gripper-only
+action), each of which counts toward the native episode limit and reward
+check. GPT-as-Policy's Direct controller lets its model choose 1-5 steps;
+GPT-Policy currently uses five for a moving target, so this is a matched
+controller method but not an identical policy action schedule. The DLS mode
+still initializes RoboDojo's unused cuRobo planner. Both modes report
+incomplete but progressing moves to the policy from measured observations.
 
 The policy has no default TCP minimum height (`z: [null, 0.45]` in arm-base
 coordinates), allowing cloth contact approaches below 40 mm. Other workspace
-bounds and the maximum step distance remain in force. Effective bounds are
+bounds remain in force; the 5 cm action bound is enforced in DLS mode.
+Effective bounds are
 included in GPT observations; passing these checks does not guarantee a grasp
 or collision-free motion.
 `scripts/verify_robodojo_cloth_contact.py --output PATH --height 0.025` runs

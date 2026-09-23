@@ -133,11 +133,13 @@ def source_fingerprints() -> dict[str, str]:
         "scripts/run_robodojo_panel50.py",
         "scripts/run_robodojo_eval.sh",
         "scripts/eval_robodojo_8gpu.sh",
+        "scripts/install_robodojo_policy.sh",
         "third_party/RoboDojo/scripts/internal/smoke_all_tasks.sh",
         "third_party/RoboDojo/src/eval_client/main.py",
         "third_party/RoboDojo/env/seed_manager/seed_manager.py",
         "src/gpt_policy/robodojo/model.py",
         "src/gpt_policy/robodojo/deploy.py",
+        "src/gpt_policy/robodojo/dls.py",
         "src/gpt_policy/robodojo/adapter.py",
         "src/gpt_policy/robodojo/execution.py",
         "third_party/RoboDojo/env_cfg/gpt_policy_x5.yml",
@@ -192,6 +194,8 @@ def main() -> int:
     parser.add_argument("--gpu", type=int, default=None, help="One GPU ID (default: 0)")
     parser.add_argument("--gpus", default=None, help="Comma-separated GPU IDs; one case process per GPU")
     parser.add_argument("--icl-mode", choices=("video+action", "video", "none"), default="video+action")
+    parser.add_argument("--control-mode", choices=("native-ee", "dls"), default="native-ee",
+                        help="Native cuRobo EE IK or bounded measured-state DLS joint control")
     parser.add_argument("--require-icl", action="store_true", help="Fail if any task lacks a demonstration")
     parser.add_argument("--run-id", default=None, help="Stable ID for reporting and resume")
     parser.add_argument("--resume", action="store_true", help="Resume a prior --run-id")
@@ -239,7 +243,8 @@ def main() -> int:
         print("GPU assignment below is a preview; live workers take the next task as they become free")
         for gpu, cases in assignments.items():
             for case in cases:
-                print(f"ROBODOJO_GPU_IDS={gpu} ROBODOJO_LAYOUT_ID={case['layout_id']} " +
+                print(f"ROBODOJO_GPU_IDS={gpu} ROBODOJO_LAYOUT_ID={case['layout_id']} "
+                      f"ROBODOJO_CONTROL_MODE={args.control_mode} " +
                       shlex.join(command_for(case)))
         return 0
 
@@ -250,6 +255,7 @@ def main() -> int:
         require(report.get("manifest_sha256") == manifest_hash and report.get("source_fingerprints") == fingerprints,
                 "Source or panel changed since this run started")
         require(report.get("gpus") == gpus and report.get("icl_mode") == args.icl_mode
+                and report.get("control_mode") == args.control_mode
                 and report.get("case_timeout_s") == args.case_timeout_s,
                 "GPU assignment, ICL mode, or timeout changed since this run started")
         for case in panel["cases"]:
@@ -263,7 +269,8 @@ def main() -> int:
         report = dict(schema="gpt_policy.robodojo.panel50_result.v2", run_id=run_id,
                       source_panel=panel["source_repository"] + "/blob/" + panel["source_commit"] + "/" + panel["source_path"],
                       manifest_sha256=manifest_hash, source_fingerprints=fingerprints,
-                      gpus=gpus, icl_mode=args.icl_mode, missing_icl_demonstrations=missing_demos,
+                      gpus=gpus, icl_mode=args.icl_mode, control_mode=args.control_mode,
+                      missing_icl_demonstrations=missing_demos,
                       case_timeout_s=args.case_timeout_s,
                       published_policy_rng_seed_note="OpenPI JAX seed from source panel; not applied to GPT-Policy Codex",
                       status="running", cases={})
@@ -295,6 +302,7 @@ def main() -> int:
         env = os.environ.copy()
         env["ROBODOJO_GPU_IDS"] = str(gpu)
         env["ROBODOJO_LAYOUT_ID"] = str(case["layout_id"])
+        env["ROBODOJO_CONTROL_MODE"] = args.control_mode
         print(f"GPU {gpu}: running {case_id}", flush=True)
         summary_path = summary_for(case)
         try:

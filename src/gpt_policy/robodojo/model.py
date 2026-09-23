@@ -146,6 +146,9 @@ class GPTPolicyModel:
             "x": [-0.05, 0.65], "y": [-0.55, 0.55], "z": [None, 0.45],
         })
         self._max_reachability_step_m = float(model_cfg.get("robodojo_max_step_m", 0.05))
+        self._control_mode = os.environ.get("ROBODOJO_CONTROL_MODE", "native-ee")
+        if self._control_mode not in {"native-ee", "dls"}:
+            raise ValueError(f"Unsupported RoboDojo control mode: {self._control_mode}")
         self._max_reachability_rotation_rad = float(model_cfg.get("robodojo_max_rotation_step_rad", 0.35))
         self._terminal_reason: str | None = None
         self._terminal_kind: str | None = None
@@ -302,6 +305,8 @@ class GPTPolicyModel:
         # previous pose. Do not compare that unchanged pose with the rejected
         # target from the preceding command: it was never an executed target.
         self._last_execution_feedback = self._execution_feedback(obs, ik_feedback)
+        if obs.get("control_feedback") is not None and self._last_execution_feedback is not None:
+            self._last_execution_feedback["controller_feedback"] = _jsonable(obs["control_feedback"])
         if ik_feedback is not None:
             if self._last_execution_feedback is None:
                 self._last_execution_feedback = {
@@ -531,11 +536,15 @@ class GPTPolicyModel:
         return actions
 
     def _workspace_context(self):
-        return {"frame": "each arm base", "tcp_bounds_m": deepcopy(self._reachability_bounds),
+        context = {"frame": "each arm base", "tcp_bounds_m": deepcopy(self._reachability_bounds),
                 "max_step_m": self._max_reachability_step_m,
                 "max_rotation_step_rad": self._max_reachability_rotation_rad,
                 "bound_semantics": "null means no policy bound on that side; no default TCP minimum height",
                 "collision_check": "policy bounds do not certify collision-free motion; simulator IK and physics still apply"}
+        if getattr(self, "_control_mode", "native-ee") == "dls":
+            context["max_step_m"] = 0.05
+            context["controller"] = "bounded robot-only DLS; 1-5 native joint actions per target"
+        return context
 
     def _validate_reachability(self, actions: list[Mapping[str, Any]]) -> dict[str, Any] | None:
         """Reject obviously unreachable EEF targets before simulator IK.
@@ -598,6 +607,18 @@ class GPTPolicyModel:
                         "distance_from_previous_m": distance,
                         "max_step_m": self._max_reachability_step_m,
                     }
+                if getattr(self, "_control_mode", "native-ee") == "dls":
+                    start_tcp = self.adapter.calibration.world_from_tcp(arm, start_world)
+                    distance = float(np.linalg.norm(target_h[:3, 3] - start_tcp[:3, 3]))
+                    if distance > 0.050001:
+                        return {
+                            "accepted": False, "executed": False,
+                            "reason": "unreachable", "arm": arm,
+                            "waypoint_index": action_index,
+                            "error": f"{arm} DLS target requires {distance:.3f} m, above the 0.05 m limit",
+                            "distance_from_previous_m": distance,
+                            "max_step_m": 0.05,
+                        }
                 rotation_step = self._quat_angle_wxyz(start_world[3:], target[3:])
                 if rotation_step > self._max_reachability_rotation_rad:
                     return {
