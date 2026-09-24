@@ -129,6 +129,11 @@ class RoboDojoAdapter:
             "task_instruction": frame.get("instruction"),
             "success": frame.get("success"),
             "end_flag": frame.get("end_flag"),
+            "completion_rule": (
+                "RoboDojo success may require the visible task goal plus released/stable objects "
+                "and robot-back-to-origin; for bimanual X5 tasks, assume both arms must return "
+                "to their initial/origin poses before terminal.done unless the task says otherwise."
+            ),
             "calibration": self.calibration.context_manifest(),
             "raw_observation_fields": sorted(frame.keys()),
         }

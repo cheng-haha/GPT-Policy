@@ -16,6 +16,8 @@ from pathlib import Path
 import sys
 import time
 
+from ..paths import generated_var_path
+
 
 PRICES = json.loads(Path(__file__).with_name("prices.json").read_text())
 _ledger = ContextVar("model_usage_ledger", default=None)
@@ -117,7 +119,7 @@ class UsageLedger:
     def __init__(self):
         self.calls = []
         self.root = None
-        self.run_root = Path("var/runs/gpt")
+        self.run_root = generated_var_path("runs", "gpt")
         self._written = 0
         self.write_error = None
 

@@ -5,6 +5,7 @@ XPOLICYLAB_DIR="${ROOT_DIR}/third_party/XPolicyLab"
 GPT_CONFIG="${ROOT_DIR}/configs/examples/robodojo.json"
 CALIBRATION="${ROOT_DIR}/configs/examples/robodojo_calibration.json"
 POLICY_NAME="GPT_Policy"
+GENERATED_ROOT="${GPT_POLICY_GENERATED_ROOT:-/mnt/data/cpfs/b5big/Research/zgx/GPT-Policy-generated}"
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --xpolicylab-dir) XPOLICYLAB_DIR="$2"; shift 2 ;;
@@ -21,6 +22,7 @@ ROBODOJO_DIR="${XPOLICYLAB_DIR}/../RoboDojo"
 CAMERA_PATCH="${ROOT_DIR}/scripts/patches/robodojo-camera-calibration.patch"
 ACTION_PATCH="${ROOT_DIR}/scripts/patches/robodojo-action-execution.patch"
 REPORT_PATCH="${ROOT_DIR}/scripts/patches/robodojo-eval-report.patch"
+GENERATED_ROOT_PATCH="${ROOT_DIR}/scripts/patches/robodojo-generated-root.patch"
 REQUEST_PATCH="${ROOT_DIR}/scripts/patches/xpolicylab-request-wait.patch"
 if git -C "$ROBODOJO_DIR" apply --reverse --check "$CAMERA_PATCH" 2>/dev/null; then
   printf '%s\n' 'RoboDojo camera calibration patch is already applied.'
@@ -46,6 +48,14 @@ else
   echo 'RoboDojo smoke evaluator source differs from the pinned version; review the reporting patch before installing.' >&2
   exit 1
 fi
+if git -C "$ROBODOJO_DIR" apply --reverse --check "$GENERATED_ROOT_PATCH" 2>/dev/null; then
+  printf '%s\n' 'RoboDojo generated-root patch is already applied.'
+elif git -C "$ROBODOJO_DIR" apply --check "$GENERATED_ROOT_PATCH"; then
+  git -C "$ROBODOJO_DIR" apply "$GENERATED_ROOT_PATCH"
+else
+  echo 'RoboDojo eval client source differs from the pinned version; review the generated-root patch before installing.' >&2
+  exit 1
+fi
 if git -C "$XPOLICYLAB_DIR" apply --reverse --check "$REQUEST_PATCH" 2>/dev/null; then
   printf '%s\n' 'XPolicyLab unbounded request wait patch is already applied.'
 elif git -C "$XPOLICYLAB_DIR" apply --check "$REQUEST_PATCH"; then
@@ -60,6 +70,17 @@ if [[ -f "$BASE_ENV_CFG" ]]; then
   sed -e 's/intrinsic_matrix: false/intrinsic_matrix: true/' \
       -e 's/extrinsic_matrix: false/extrinsic_matrix: true/' \
       "$BASE_ENV_CFG" >"$OVERLAY_ENV_CFG"
+  cat >>"$OVERLAY_ENV_CFG" <<'EOF'
+
+action_execution:
+  wait_until_settled: true
+  settle_after_trajectory: true
+  joint_speed_rad_s: 1.5
+  joint_acceleration_rad_s2: 6.0
+  joint_tolerance_rad: 0.003
+  joint_velocity_tolerance_rad_s: 0.02
+  settle_timeout_s: 6.0
+EOF
 fi
 FRANKA_ENV_CFG="${XPOLICYLAB_DIR}/../RoboDojo/env_cfg/gpt_policy_franka.yml"
 cat >"${FRANKA_ENV_CFG}" <<'EOF'
@@ -80,6 +101,14 @@ observation:
     intrinsic_matrix: true
     extrinsic_matrix: true
     shape: true
+action_execution:
+  wait_until_settled: true
+  settle_after_trajectory: true
+  joint_speed_rad_s: 1.5
+  joint_acceleration_rad_s2: 6.0
+  joint_tolerance_rad: 0.003
+  joint_velocity_tolerance_rad_s: 0.02
+  settle_timeout_s: 6.0
 robots:
   - {
     robot_type: arm,
@@ -156,14 +185,17 @@ arms: [left, right]
 icl_enabled: true
 icl_mode: video+action
 icl_dataset_root: /mnt/data/cpfs/b5/post_train_data/robodojo_sim
-icl_cache_dir: ${ROOT_DIR}/var/cache/robodojo_icl
+icl_cache_dir: ${GENERATED_ROOT}/var/cache/robodojo_icl
+trace_dir: ${GENERATED_ROOT}/var/runs/gpt/robodojo
 icl_keyframes: 6
+robodojo_disable_step_limits: true
 EOF
 cat >"${POLICY_DIR}/setup_eval_policy_server.sh" <<EOF
 #!/usr/bin/env bash
 set -euo pipefail
 PORT="\${9:-19000}"
 HOST="\${10:-0.0.0.0}"
+export ROBODOJO_TASK_NAME="\${2:-}"
 cd "$(realpath "$XPOLICYLAB_DIR")"
 export PYTHONPATH="$(realpath "$ROOT_DIR/src"):\$PWD\${PYTHONPATH:+:\$PYTHONPATH}"
 if ! command -v codex >/dev/null 2>&1; then
@@ -266,6 +298,8 @@ calibration_manifest: $(realpath "${ROOT_DIR}/configs/examples/robodojo_franka_c
 robot_model: Franka
 dof: 7
 arms: [franka]
+icl_cache_dir: ${GENERATED_ROOT}/var/cache/robodojo_icl
+trace_dir: ${GENERATED_ROOT}/var/runs/gpt/robodojo
 EOF
 sed -i 's/GPT_Policy/GPT_Policy_Franka/g; s/gpt_policy_x5/gpt_policy_franka/g' "${FRANKA_POLICY_DIR}/eval.sh"
 sed -i 's/GPT_Policy/GPT_Policy_Franka/g; s/gpt_policy_x5/gpt_policy_franka/g' "${FRANKA_POLICY_DIR}/setup_eval_env_client.sh"

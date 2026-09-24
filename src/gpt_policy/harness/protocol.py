@@ -42,6 +42,10 @@ def _robot_calibration_notes(arms: tuple[str, ...], settings: dict[str, Any] | N
 - If previous_result.result.accepted is false with reason "unreachable", the requested motion was not executed; use the reported target, workspace or step-limit reason and the measured TCP state to choose a smaller reachable action.
 - If execution_feedback.execution_blocked is true, the host has stopped motion after repeated TCP tracking errors; do not issue another movement command and explain the failure from the reported measurements.
 - If execution_feedback.ik_feedback.status is "ik_failed", RoboDojo could not find a valid joint solution, so that arm's requested pose was not executed. Treat it as an unreachable pose, reduce the step or change the approach, and verify with the next image and measured TCP.
+RoboDojo completion rule:
+- RoboDojo's reward is the final authority; many tasks require all_robot_back_to_origin() or per-arm is_robot_back_to_origin() in addition to the visible object goal.
+- Do not call done immediately after placing, pushing, inserting, pouring, folding, or sorting. First release or relax the object as appropriate, verify the object is stable and supported, then return the controlled arm(s) to their initial/origin pose. For bimanual tasks, return both arms unless the task explicitly says only one arm must return.
+- Treat "reset/back to origin/return the robot arm" in task language as part of the goal. If the object goal is complete but an arm is still near the object, continue with a safe withdrawal/home motion instead of done.
 Camera calibration and views:
 - Available simulated cameras: {", ".join(str(name) for name in cameras)}.
 - cam_head is fixed; wrist cameras move with their corresponding simulated arm.
@@ -142,6 +146,9 @@ State joint_pos/tcp_pose are live joint and calibrated TCP feedback; joint_vel i
 """
     if plug_profile:
         return common + PLUG_CONTROL
+    robodojo_completion = """
+RoboDojo completion: Visible object success is usually not enough. Many RoboDojo task rewards also require the controlled arm(s), often both arms, to be back at the initial/origin pose. Before done, verify the object goal, release/stability, and robot-back-to-origin condition from fresh observation; otherwise continue with safe withdrawal/home motions.
+""" if (settings or {}).get("backend") == "robodojo" else ""
     return common + """Orientation retention and reachability: For position-only adjustments, keep the last acknowledged target quaternion in the complete pose_xyzquat. Never replace a held orientation with load-induced measured drift; investigate drift first. After IK rejection, preserve required tool-axis directions and compare approach positions, heights and permitted axial rotations. Use check_path for uncertain alternatives; do not tilt the gripper merely to make IK pass. The configured workspace is not a measured reachability boundary; an in-range point may be unreachable at the required orientation. IK acceptance does not certify clearance between camera housings, arms or objects.
 
 Every motion tool requires a note: 1-2 short Chinese sentences, usually 20-60 characters, stating current evidence and the next purpose. Keep failure causes when relevant; do not repeat coordinate arrays, history, tool mechanics or general rules. Use only the selected tool's arguments. Follow its schema for omitted and nullable fields. Camera images are supplied through observation.images and actual image inputs.
@@ -153,7 +160,7 @@ Check fingertips, wrists, camera housings, forearms and table clearance in fresh
 previous_result.trajectory.planned_tcp_points_xyzrpy is the planned path including its start, not a measured trajectory. Judge execution from execution_feedback and fresh state.
 
 Release verification: Before releasing or regrasping, verify that the intended surface or another hand reliably supports the entire object. Observe after release and before withdrawing. A fully-open command does not prove that a wide object detached. If the object stays fixed relative to the fingers or the destination still appears empty, keep it reliably supported by the intended surface or container while disengaging the fingers. Do not lift a still-trapped object away and report completion.
-
+""" + robodojo_completion + """
 Persistence: One failed action, tool rejection, missed grasp, occluded target or uncertain result does not establish impossibility. Diagnose from fresh images, measured state and previous_result, then try safe alternatives in viewpoint, approach, grasp, orientation, path or step size and verify each result. Call done only when the physical goal is established. Do not call give_up while reasonable safe strategies remain. Consider meaningfully different recoveries; give_up requires evidence that the task cannot be completed or further attempts would violate safety constraints. In reason, list attempted strategies and the evidence preventing further progress.
 """
 

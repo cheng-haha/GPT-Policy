@@ -1,0 +1,63 @@
+diff --git a/src/eval_client/eval_env.py b/src/eval_client/eval_env.py
+index 49fad7e..37f7d8a 100644
+--- a/src/eval_client/eval_env.py
++++ b/src/eval_client/eval_env.py
+@@ -19,6 +19,13 @@ from utils.pipeline_utils import get_robot_action_dim_info
+ from utils.save_file import VideoStreamWriter, format_video_saved_message, save_json
+ 
+ 
++def _eval_result_root():
++    generated_root = os.environ.get("GPT_POLICY_GENERATED_ROOT")
++    if generated_root:
++        return os.path.join(generated_root, "robodojo", "eval_result")
++    return "eval_result"
++
++
+ def _patch_websockets_proxy_compat():
+     # Isaac Sim may load an older bundled websockets package that does not
+     # accept the proxy kwarg used by XPolicyLab's websocket client.
+@@ -78,7 +85,7 @@ def create_eval_env(config, app, resume_state=None, **kwargs):
+                 os.environ["ROBODOJO_RUN_ID"] = run_id
+             self.run_id = run_id
+             self.save_dir = os.path.join(
+-                "eval_result",
++                _eval_result_root(),
+                 f"{BENCHMARK}",
+                 self.task_name,
+                 self.policy_name,
+@@ -736,7 +743,7 @@ def create_eval_env(config, app, resume_state=None, **kwargs):
+             locate by humans.
+             """
+             return os.path.join(
+-                "eval_result",
++                _eval_result_root(),
+                 f"{BENCHMARK}",
+                 self.task_name,
+                 self.policy_name,
+diff --git a/src/eval_client/main.py b/src/eval_client/main.py
+index d0c2c90..5c2b14c 100644
+--- a/src/eval_client/main.py
++++ b/src/eval_client/main.py
+@@ -140,6 +140,13 @@ from utils.pipeline_utils import *
+ BENCHMARK_PATH = os.path.join(ROOT_DIR, "task", BENCHMARK)
+ 
+ 
++def _eval_result_root():
++    generated_root = os.environ.get("GPT_POLICY_GENERATED_ROOT")
++    if generated_root:
++        return os.path.join(generated_root, "robodojo", "eval_result")
++    return "eval_result"
++
++
+ def _eval_batch_from_deploy(policy_name):
+     deploy_yml_path = os.path.join(ROOT_DIR, "XPolicyLab", "policy", policy_name, "deploy.yml")
+     deploy_yml = load_yaml(deploy_yml_path) if os.path.isfile(deploy_yml_path) else {}
+@@ -152,7 +159,7 @@ def _resume_manifest_path(eval_cfg, run_id):
+     the writer and reader paths.
+     """
+     return os.path.join(
+-        "eval_result",
++        _eval_result_root(),
+         BENCHMARK,
+         eval_cfg["task_name"],
+         eval_cfg["policy_name"],

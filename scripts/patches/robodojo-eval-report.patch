@@ -2,6 +2,31 @@ diff --git a/scripts/internal/smoke_all_tasks.sh b/scripts/internal/smoke_all_ta
 index 139892d..1d609c0 100755
 --- a/scripts/internal/smoke_all_tasks.sh
 +++ b/scripts/internal/smoke_all_tasks.sh
+@@ -3,6 +3,11 @@
+ set -euo pipefail
+ 
+ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
++if [[ -n "${GPT_POLICY_GENERATED_ROOT:-}" ]]; then
++  ROBODOJO_GENERATED_ROOT="${GPT_POLICY_GENERATED_ROOT}/robodojo"
++else
++  ROBODOJO_GENERATED_ROOT="${ROOT_DIR}"
++fi
+ 
+ dataset="RoboDojo"
+ execution_mode="eval"
+@@ -203,9 +208,9 @@ else
+   policy_name="$(basename "$(cd "${policy_dir}" && pwd)")"
+ fi
+ 
+-summary_path="${summary_path:-${ROOT_DIR}/smoke_results/${run_id}.json}"
+-markdown_path="${markdown_path:-${ROOT_DIR}/smoke_results/${run_id}.md}"
+-log_dir="${ROOT_DIR}/smoke_results/${run_id}/logs"
++summary_path="${summary_path:-${ROBODOJO_GENERATED_ROOT}/smoke_results/${run_id}.json}"
++markdown_path="${markdown_path:-${ROBODOJO_GENERATED_ROOT}/smoke_results/${run_id}.md}"
++log_dir="${ROBODOJO_GENERATED_ROOT}/smoke_results/${run_id}/logs"
+ mkdir -p "$(dirname "${summary_path}")" "$(dirname "${markdown_path}")" "${log_dir}"
+ 
+ RESULTS_TSV="$(mktemp)"
 @@ -740,6 +740,21 @@ print(int(payload.get("eval_time", 0)))
  PY
  }
@@ -26,7 +51,8 @@ index 139892d..1d609c0 100755
    local task_policy_gpu="$2"
 @@ -750,7 +765,7 @@ run_eval_for_task() {
    local task_run_id="${run_id}_${task}"
-   local result_path="${ROOT_DIR}/eval_result/RoboDojo/${task}/${policy_name}/${env_cfg}/${seed}_ckpt_name=${ckpt},action_type=${action_type}/${task_run_id}/_result.json"
+-  local result_path="${ROOT_DIR}/eval_result/RoboDojo/${task}/${policy_name}/${env_cfg}/${seed}_ckpt_name=${ckpt},action_type=${action_type}/${task_run_id}/_result.json"
++  local result_path="${ROBODOJO_GENERATED_ROOT}/eval_result/RoboDojo/${task}/${policy_name}/${env_cfg}/${seed}_ckpt_name=${ckpt},action_type=${action_type}/${task_run_id}/_result.json"
    local log_path="${log_dir}/${task}.log"
 -  local rc elapsed eval_time message start_sec end_sec
 +  local rc elapsed eval_time eval_success message start_sec end_sec

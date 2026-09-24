@@ -40,6 +40,51 @@ class RoboDojoAdapterTest(unittest.TestCase):
         action = self.adapter.action({"target": {"left": [0.1, 0.2, 0.3, 0, 0, 0, 1], "right": None}})
         self.assertEqual(action["left_ee_pose"], [0.1, 0.2, 0.3, 1, 0, 0, 0])
 
+    def test_bimanual_set_gripper_sends_selected_side_instead_of_hold(self):
+        model = GPTPolicyModel.__new__(GPTPolicyModel)
+        model.latest_frame = {"state": {
+            "left_ee_pose": [0.1, 0.0, 0.2, 1.0, 0.0, 0.0, 0.0],
+            "left_ee_joint_state": [0.8],
+            "right_ee_pose": [0.2, 0.0, 0.2, 1.0, 0.0, 0.0, 0.0],
+            "right_ee_joint_state": [0.7],
+        }}
+        arm_state = {
+            "joint_positions_rad": [0.0] * 6,
+            "joint_velocities_rad_s": [0.0] * 6,
+            "joint_torques_nm": [0.0] * 6,
+            "tcp_xyzrpy": [0.0] * 6,
+            "tcp_xyzquat": [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0],
+            "gripper_position_m": 0.0,
+            "gripper_normalized": 1.0,
+            "gripper_command_normalized": [1.0],
+            "gripper_velocity_m_s": 0.0,
+            "gripper_torque_nm": 0.0,
+        }
+        model.latest_state = {"arms": {"left": arm_state, "right": arm_state}}
+        model.latest_images = {}
+        model._icl_images = {}
+        model._icl_summary = None
+        model.model_cfg = {}
+        model.previous = None
+        model._started = True
+        model.adapter = self.adapter
+        model.arms = ("left", "right")
+        model.step = 0
+        model._terminal_reason = None
+        model.agent = type("Agent", (), {
+            "decide": lambda self, turn: {
+                "name": "set_gripper",
+                "arguments": {"positions": {"left": 0.0, "right": None}, "note": "close left"},
+            }
+        })()
+        model._trace_event = lambda *_args, **_kwargs: None
+        model._validate_reachability = lambda actions: None
+
+        action = model.get_action()[0]
+
+        self.assertEqual(action["left_ee_joint_state"], [0.0])
+        self.assertEqual(action["right_ee_joint_state"], [0.7])
+
     def test_fixed_low_side_push_path_round_trips_through_world_tcp(self):
         angle = np.deg2rad(90.0)
         world_from_base = np.array([
@@ -102,7 +147,6 @@ class RoboDojoAdapterTest(unittest.TestCase):
         model.arms = ("left", "right")
         model.adapter = self.adapter
         model._reachability_bounds = {"x": [-0.05, 0.65], "y": [-0.55, 0.55], "z": [0.04, 0.45]}
-        model._max_reachability_step_m = 0.30
         model.latest_frame = {"state": {
             "left_ee_pose": [0.10, 0.0, 0.16, 1.0, 0.0, 0.0, 0.0],
         }}
@@ -113,21 +157,31 @@ class RoboDojoAdapterTest(unittest.TestCase):
         self.assertFalse(result["executed"])
         self.assertIn("workspace", result["error"])
 
-    def test_reachability_rejects_large_single_step(self):
+    def test_reachability_allows_large_single_step_inside_workspace(self):
         model = GPTPolicyModel.__new__(GPTPolicyModel)
         model.arms = ("left", "right")
         model.adapter = self.adapter
         model._reachability_bounds = {"x": [-0.05, 0.65], "y": [-0.55, 0.55], "z": [0.04, 0.45]}
-        model._max_reachability_step_m = 0.30
         model.latest_frame = {"state": {
             "left_ee_pose": [0.10, 0.0, 0.16, 1.0, 0.0, 0.0, 0.0],
         }}
         result = model._validate_reachability([{
             "left_ee_pose": [0.45, 0.0, 0.16, 1.0, 0.0, 0.0, 0.0],
         }])
-        self.assertEqual(result["reason"], "unreachable")
-        self.assertFalse(result["executed"])
-        self.assertIn("jump", result["error"])
+        self.assertIsNone(result)
+
+    def test_reachability_allows_low_table_clearance_when_z_lower_bound_is_disabled(self):
+        model = GPTPolicyModel.__new__(GPTPolicyModel)
+        model.arms = ("left", "right")
+        model.adapter = self.adapter
+        model._reachability_bounds = {"x": [-0.05, 0.65], "y": [-0.55, 0.55], "z": [None, 0.45]}
+        model.latest_frame = {"state": {
+            "right_ee_pose": [0.30, 0.10, 0.16, 1.0, 0.0, 0.0, 0.0],
+        }}
+        result = model._validate_reachability([{
+            "right_ee_pose": [0.397, 0.1006, 0.027, 1.0, 0.0, 0.0, 0.0],
+        }])
+        self.assertIsNone(result)
 
     def test_locate_point_requires_valid_triangulation_quality(self):
         model = GPTPolicyModel.__new__(GPTPolicyModel)

@@ -10,6 +10,7 @@ EVAL_SCRIPT="${ROOT_DIR}/scripts/eval_robodojo_8gpu.sh"
 VENV_DIR="${GPT_POLICY_VENV:-${ROOT_DIR}/.venv}"
 INSTALL_SIM_DEPS=0
 SKIP_SETUP=0
+export GPT_POLICY_GENERATED_ROOT="${GPT_POLICY_GENERATED_ROOT:-/mnt/data/cpfs/b5big/Research/zgx/GPT-Policy-generated}"
 
 usage() {
   cat <<'EOF'

@@ -103,7 +103,14 @@ def result_status(results_root: Path, run_id: str) -> tuple[str, str]:
         return "DONE", "-"
 
 
-def discover(root: Path) -> list[Worker]:
+def default_results_root(root: Path) -> Path:
+    generated_root = os.environ.get("GPT_POLICY_GENERATED_ROOT")
+    if generated_root:
+        return Path(generated_root).expanduser() / "robodojo" / "smoke_results"
+    return root / "smoke_results"
+
+
+def discover(root: Path, results_root: Path) -> list[Worker]:
     procs = processes()
     workers: list[Worker] = []
     marker = "src/eval_client/main.py --task_name"
@@ -119,15 +126,15 @@ def discover(root: Path) -> list[Worker]:
             run_id=match(ARG_RE["run_id"], context),
         )
         if worker.run_id != "?":
-            log_path = root / "smoke_results" / worker.run_id / "logs" / f"{worker.task}.log"
+            log_path = results_root / worker.run_id / "logs" / f"{worker.task}.log"
             worker.log = str(log_path)
             worker.step, _ = latest_step(log_path)
-            worker.status, worker.elapsed = result_status(root / "smoke_results", worker.run_id)
+            worker.status, worker.elapsed = result_status(results_root, worker.run_id)
         workers.append(worker)
 
     # Include recently completed summaries when no live process is found for them.
     known = {worker.run_id for worker in workers}
-    for summary in sorted((root / "smoke_results").glob("*.json"), key=lambda p: p.stat().st_mtime, reverse=True):
+    for summary in sorted(results_root.glob("*.json"), key=lambda p: p.stat().st_mtime, reverse=True):
         if summary.stem in known or summary.stem.startswith("20"):
             continue
         try:
@@ -154,9 +161,9 @@ def discover(root: Path) -> list[Worker]:
     return sorted(workers, key=lambda item: (item.gpu == "?", item.gpu, item.pid))
 
 
-def render(workers: list[Worker], root: Path) -> str:
+def render(workers: list[Worker], root: Path, results_root: Path) -> str:
     now = time.strftime("%Y-%m-%d %H:%M:%S")
-    lines = [f"RoboDojo monitor  {now}  root={root}"]
+    lines = [f"RoboDojo monitor  {now}  root={root}  results={results_root}"]
     headers = ["GPU", "PID", "Task", "Seed", "Step", "Status", "Elapsed", "Run ID"]
     rows = [[w.gpu, str(w.pid), w.task, w.seed, w.step, w.status, w.elapsed, w.run_id] for w in workers]
     if not rows:
@@ -172,19 +179,21 @@ def render(workers: list[Worker], root: Path) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path("third_party/RoboDojo"), help="RoboDojo checkout")
+    parser.add_argument("--results-root", type=Path, help="smoke_results directory")
     parser.add_argument("--watch", action="store_true", help="refresh until interrupted")
     parser.add_argument("--interval", type=float, default=5.0, help="refresh interval in seconds")
     parser.add_argument("--running-only", action="store_true", help="hide completed result summaries")
     args = parser.parse_args()
     root = args.root.resolve()
+    results_root = (args.results_root.expanduser() if args.results_root else default_results_root(root)).resolve()
     try:
         while True:
             if args.watch:
                 print("\033[2J\033[H", end="")
-            workers = discover(root)
+            workers = discover(root, results_root)
             if args.running_only:
                 workers = [worker for worker in workers if worker.pid]
-            print(render(workers, root), flush=True)
+            print(render(workers, root, results_root), flush=True)
             if not args.watch:
                 return 0
             time.sleep(max(0.5, args.interval))

@@ -28,6 +28,7 @@ from .harness.video_selector import CodexVideoSelector
 from .harness.task_name import DEFAULT_TASK_NAME_MODEL, select_task_request
 from .harness.usage import attach_usage, collect_usage, set_usage_run_root, usage_phase, usage_summary
 from .harness.waiting import monitor_health
+from .paths import generated_var_path
 from .input import ImagePart, resolve_run_input
 from .input.references import image_path, instruction_media, instruction_mode
 from .input.request import normalize_request, save_request, save_task_request
@@ -125,7 +126,7 @@ def _run(args, interrupts) -> None:
         print(json.dumps(check_configuration(settings, config_path), ensure_ascii=False, indent=2))
         return
     agent_settings = agent_config(settings, config_path.parent)
-    runs_root = Path("var/runs") / {"codex": "gpt", "claude": "claude", "kimi": "kimi"}[settings.get("agent", "codex")]
+    runs_root = generated_var_path("runs") / {"codex": "gpt", "claude": "claude", "kimi": "kimi"}[settings.get("agent", "codex")]
     set_usage_run_root(runs_root)
     display = RunConsole()
     instruction = getattr(args, "instruction", None)

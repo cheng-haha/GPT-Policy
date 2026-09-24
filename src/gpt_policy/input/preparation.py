@@ -14,6 +14,7 @@ from .demonstration import prepare_demonstration
 from .request import RunInput
 from .video import FfmpegVideoExtractor, FrameSelection, VideoExtraction
 from .video_cache import CacheableFrameSelector, VideoProcessingCache
+from ..paths import generated_var_path
 
 
 @dataclass(frozen=True)
@@ -89,9 +90,7 @@ def prepare_input_videos(
     if not has_video_input(run_input):
         return run_input, ()
     active_extractor = extractor or FfmpegVideoExtractor()
-    active_cache = cache or VideoProcessingCache(
-        Path(__file__).resolve().parents[3] / "var" / "cache" / "video-input"
-    )
+    active_cache = cache or VideoProcessingCache(generated_var_path("cache", "video-input"))
     destination.mkdir(parents=True, exist_ok=True)
     prepared = []
     results = []

@@ -8,6 +8,7 @@ GPU_IDS="${ROBODOJO_GPU_IDS:-0,1,2,3,4,5,6,7}"
 SIM_ENV="${ROBODOJO_SIM_ENV:-RoboDojo}"
 MODE="${1:-smoke}"
 ICL_MODE="${ROBODOJO_ICL_MODE:-video+action}"
+export GPT_POLICY_GENERATED_ROOT="${GPT_POLICY_GENERATED_ROOT:-/mnt/data/cpfs/b5big/Research/zgx/GPT-Policy-generated}"
 
 if [[ "${MODE}" == "smoke" || "${MODE}" == "benchmark" ]]; then
   if [[ $# -gt 0 ]]; then

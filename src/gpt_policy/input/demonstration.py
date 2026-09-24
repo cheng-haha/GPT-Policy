@@ -17,6 +17,7 @@ from .mcap_demo import McapDemo, is_mcap_episode
 from .request import RunInput
 from .video import FfmpegVideoExtractor
 from .video_cache import VideoProcessingCache, _sha256_file
+from ..paths import generated_var_path
 
 
 HISTORICAL = (
@@ -286,7 +287,7 @@ def _extract_demo(source, mode, destination, instruction, selector, extractor, c
         extractor.event_times = tuple(recording.event_pts()) if mode == "video+action" else ()
         extractor.end_time_s = recording.end_pts
     extractor.views = recording.views if recording else {}
-    cache = cache or VideoProcessingCache(Path(__file__).resolve().parents[3] / "var/cache/video-input")
+    cache = cache or VideoProcessingCache(generated_var_path("cache", "video-input"))
     source_hash = _sha256_file(video)
     view_identity = extractor.view_identity()
     result = cache.resolve(instruction, VideoPart(video, label), extractor, selector)

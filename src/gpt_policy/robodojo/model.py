@@ -11,6 +11,7 @@ from __future__ import annotations
 import io
 import json
 import os
+import re
 import time
 from copy import deepcopy
 from dataclasses import dataclass
@@ -26,6 +27,7 @@ from ..harness.factory import create_agent
 from ..harness.errors import AgentOverloadedError
 from ..harness.models import AgentContext, AgentTurn
 from ..harness.protocol import instructions, observation, output_schema, tool_schemas
+from ..paths import generated_var_path
 from ..settings import load_settings
 from ..tools import load_tool_catalog
 from .adapter import RoboDojoAdapter
@@ -81,6 +83,23 @@ def _canonical_tool_name(name: str) -> str:
     return {"done": "terminal.done", "give_up": "terminal.give_up"}.get(name, name)
 
 
+def _path_slug(value: Any, default: str = "robodojo") -> str:
+    text = str(value or "").strip()
+    text = re.sub(r"[^A-Za-z0-9_.-]+", "_", text).strip("._-")
+    return text or default
+
+
+def _task_name_from_environment(model_cfg: Mapping[str, Any]) -> str:
+    task = os.environ.get("ROBODOJO_TASK_NAME") or model_cfg.get("task_name")
+    if task:
+        return _path_slug(task)
+    run_id = os.environ.get("ROBODOJO_RUN_ID", "")
+    for marker in ("_smoke_", "_benchmark_"):
+        if marker in run_id:
+            return _path_slug(run_id.split(marker, 1)[1])
+    return "robodojo"
+
+
 class GPTPolicyModel:
     """ModelTemplate-shaped class without importing XPolicyLab at import time."""
 
@@ -107,7 +126,7 @@ class GPTPolicyModel:
         self.latest_state: dict[str, Any] | None = None
         self.latest_images: dict[str, _Image] = {}
         dataset_root = model_cfg.get("icl_dataset_root") or os.environ.get("ROBODOJO_ICL_ROOT", "/mnt/data/cpfs/b5/post_train_data/robodojo_sim")
-        cache_root = model_cfg.get("icl_cache_dir") or os.environ.get("ROBODOJO_ICL_CACHE", str(Path(__file__).resolve().parents[3] / "var/cache/robodojo_icl"))
+        cache_root = model_cfg.get("icl_cache_dir") or os.environ.get("ROBODOJO_ICL_CACHE", str(generated_var_path("cache", "robodojo_icl")))
         icl_mode = os.environ.get("ROBODOJO_ICL_MODE", str(model_cfg.get("icl_mode", "video+action"))).lower()
         if icl_mode not in {"video+action", "video", "none"}:
             raise ValueError("ROBODOJO_ICL_MODE must be video+action, video, or none")
@@ -134,13 +153,19 @@ class GPTPolicyModel:
         self._max_tracking_error_m = float(model_cfg.get("robodojo_max_tracking_error_m", 0.03))
         self._max_tracking_error_rad = float(model_cfg.get("robodojo_max_tracking_error_rad", 0.20))
         self._max_consecutive_tracking_failures = int(model_cfg.get("robodojo_max_consecutive_tracking_failures", 2))
-        # These are deliberately conservative pre-flight limits. They prevent
-        # a guessed EEF pose from reaching RoboDojo's IK solver, which may
-        # otherwise return a large, misleading joint-space deviation.
+        # Keep coarse workspace and rotation guards here; RoboDojo's own IK and
+        # physics remain the authority for how far a valid Cartesian move may go.
         self._reachability_bounds = model_cfg.get("robodojo_reachability_bounds", {
-            "x": [-0.05, 0.65], "y": [-0.55, 0.55], "z": [0.04, 0.45],
+            "x": [-0.05, 0.65], "y": [-0.55, 0.55], "z": [None, 0.45],
         })
-        self._max_reachability_step_m = float(model_cfg.get("robodojo_max_step_m", 0.30))
+        self._control_mode = os.environ.get("ROBODOJO_CONTROL_MODE", "native-ee")
+        if self._control_mode not in {"native-ee", "dls"}:
+            raise ValueError(f"Unsupported RoboDojo control mode: {self._control_mode}")
+        self._max_reachability_rotation_rad = float(model_cfg.get("robodojo_max_rotation_step_rad", 0.35))
+        self._disable_step_limits = bool(
+            model_cfg.get("robodojo_disable_step_limits", False)
+            or os.environ.get("ROBODOJO_DISABLE_STEP_LIMITS", "").lower() in {"1", "true", "yes"}
+        )
         self._terminal_reason: str | None = None
         self.step = 0
         self._started = False
@@ -148,10 +173,11 @@ class GPTPolicyModel:
         # the normal hardware runner that owns RunRecorder. Keep an equivalent
         # lightweight trace here so every simulator turn has durable JSONL
         # evidence and camera frames.
-        default_trace_root = Path(__file__).resolve().parents[3] / "var/runs/gpt/robodojo"
+        default_trace_root = generated_var_path("runs", "gpt", "robodojo")
         trace_root = Path(str(model_cfg.get("trace_dir") or default_trace_root)).expanduser()
         trace_root.mkdir(parents=True, exist_ok=True)
-        run_name = f"{time.strftime('%Y%m%d-%H%M%S')}-{time.time_ns() % 1_000_000:06d}-push_T-pid{os.getpid()}"
+        task_name = _task_name_from_environment(model_cfg)
+        run_name = f"{time.strftime('%Y%m%d-%H%M%S')}-{time.time_ns() % 1_000_000:06d}-{task_name}-pid{os.getpid()}"
         self.trace_dir = trace_root / run_name
         self.trace_dir.mkdir(parents=True, exist_ok=False)
         self.trace_frames = self.trace_dir / "frames"
@@ -361,7 +387,7 @@ class GPTPolicyModel:
             # selected side is null, emit a complete measured-state hold
             # action instead of asking the adapter to build an empty dict.
             positions = arguments.get("positions") if canonical_name == "set_gripper" else None
-            single_hold = canonical_name == "set_gripper" and arguments.get("gripper") is None
+            single_hold = canonical_name == "set_gripper" and "gripper" in arguments and arguments.get("gripper") is None
             all_hold = isinstance(positions, Mapping) and all(
                 positions.get(arm) is None for arm in self.arms
             )
@@ -413,17 +439,38 @@ class GPTPolicyModel:
         })
         return actions
 
+    def _workspace_context(self):
+        disable_step_limits = getattr(self, "_disable_step_limits", False)
+        context = {"frame": "each arm base", "tcp_bounds_m": deepcopy(self._reachability_bounds),
+                "max_step_m": None,
+                "max_rotation_step_rad": None if disable_step_limits else self._max_reachability_rotation_rad,
+                "step_limits_enabled": not disable_step_limits,
+                "bound_semantics": "null tcp_bounds_m side means no policy pre-check on that side; null max_step_m means no local Cartesian step-distance limit; no default TCP minimum height",
+                "collision_check": "policy bounds do not certify collision-free motion; simulator IK and physics still apply"}
+        if getattr(self, "_control_mode", "native-ee") == "dls":
+            if not disable_step_limits:
+                context["max_step_m"] = 0.05
+                context["max_step_frame"] = "measured environment-origin link6"
+                context["max_rotation_step_rad"] = min(self._max_reachability_rotation_rad, 0.35)
+            context["control_steps_range"] = [1, 5]
+            context["controller"] = "bounded robot-only DLS; model chooses native joint steps per target"
+        return context
+
     def _validate_reachability(self, actions: list[Mapping[str, Any]]) -> dict[str, Any] | None:
         """Reject obviously unreachable EEF targets before simulator IK.
 
         This is a safety pre-check, not a proof that IK will succeed. The
         simulator remains the final authority, but it must never be asked to
-        solve a target outside the configured per-arm workspace or a single
-        jump larger than the safe step limit.
+        solve a target outside the configured coarse per-arm workspace.
         """
         if not self.latest_frame:
             return None
         measured = self.latest_frame.get("state") or {}
+        dls_mode = getattr(self, "_control_mode", "native-ee") == "dls"
+        disable_step_limits = getattr(self, "_disable_step_limits", False)
+        if dls_mode and len(actions) != 1:
+            return {"accepted": False, "executed": False, "reason": "unsupported_dls_chunk",
+                    "error": "DLS mode accepts one measured-state target per decision"}
         previous_targets: dict[str, np.ndarray] = {}
         for action_index, action in enumerate(actions):
             for arm in self.arms:
@@ -444,15 +491,20 @@ class GPTPolicyModel:
                 target_base = (base_from_world @ target_h)[:3, 3]
                 limits = self._reachability_bounds
                 for axis, value in zip(("x", "y", "z"), target_base):
-                    low, high = map(float, limits[axis])
-                    if value < low or value > high:
+                    low_raw, high_raw = limits[axis]
+                    low = None if low_raw is None else float(low_raw)
+                    high = None if high_raw is None else float(high_raw)
+                    if (low is not None and value < low) or (high is not None and value > high):
                         return {
                             "accepted": False, "executed": False,
                             "reason": "unreachable",
                             "error": f"{arm} target is outside the configured RoboDojo workspace",
                             "arm": arm, "waypoint_index": action_index,
                             "target_base_xyz": target_base.tolist(),
-                            "workspace_bounds": {name: list(map(float, limits[name])) for name in ("x", "y", "z")},
+                            "workspace_bounds": {
+                                name: [None if bound is None else float(bound) for bound in limits[name]]
+                                for name in ("x", "y", "z")
+                            },
                             "axis": axis, "value": float(value),
                         }
                 if arm in previous_targets:
@@ -462,17 +514,31 @@ class GPTPolicyModel:
                     if actual is None:
                         continue
                     start_world = np.asarray(actual, dtype=np.float64).reshape(7)
-                start_tcp = self.adapter.calibration.world_from_tcp(arm, start_world)
-                distance = float(np.linalg.norm(target_h[:3, 3] - start_tcp[:3, 3]))
-                if distance > self._max_reachability_step_m:
+                if dls_mode and not disable_step_limits:
+                    # Adapter.action has already mapped the GPT TCP target
+                    # back to RoboDojo's environment-origin link6 pose.
+                    distance = float(np.linalg.norm(target[:3] - start_world[:3]))
+                    if distance > 0.05 + 1e-9:
+                        return {
+                            "accepted": False, "executed": False,
+                            "reason": "unreachable", "arm": arm,
+                            "waypoint_index": action_index,
+                            "error": f"{arm} DLS link6 target requires {distance:.4f} m, above the 0.05 m limit",
+                            "distance_from_measured_link6_m": distance,
+                            "max_step_m": 0.05, "step_frame": "link6",
+                        }
+                rotation_step = self._quat_angle_wxyz(start_world[3:], target[3:])
+                rotation_limit = getattr(self, "_max_reachability_rotation_rad", 0.35)
+                max_rotation = min(rotation_limit, 0.35) if dls_mode else rotation_limit
+                if not disable_step_limits and rotation_step > max_rotation + (1e-9 if dls_mode else 0.0):
                     return {
                         "accepted": False, "executed": False,
                         "reason": "unreachable",
-                        "error": f"{arm} target requires a {distance:.3f} m TCP jump, above the {self._max_reachability_step_m:.3f} m safety limit",
+                        "error": f"{arm} target requires a {rotation_step:.3f} rad rotation, above the {max_rotation:.3f} rad safety limit",
                         "arm": arm, "waypoint_index": action_index,
                         "target_base_xyz": target_base.tolist(),
-                        "distance_from_previous_m": distance,
-                        "max_step_m": self._max_reachability_step_m,
+                        "rotation_step_rad": rotation_step,
+                        "max_rotation_step_rad": max_rotation,
                     }
                 previous_targets[arm] = target
         return None
