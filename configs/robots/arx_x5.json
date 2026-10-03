@@ -12,7 +12,7 @@
     "trajectory_hz": 100.0,
     "task_name": "task",
     "record_dir": null,
-    "input_json": null
+    "input_json": "../../request_json/plain_text.json"
   },
   "tool_catalog": "configs/tools.json",
   "robot": {

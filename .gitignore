@@ -7,11 +7,12 @@ configs/machine.local.json
 .venv-*/
 .runtime/
 request_json/*.json
+!request_json/plain_text.json
 .pytest_cache/
 **/__pycache__/
 
-# Machine-specific settings and credentials stay local.
+# Local overrides and credentials stay local.
 configs/default.local.json
-configs/machines/*.json
+configs/machines/*.local.json
 .env
 .env.*

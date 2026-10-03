@@ -1,0 +1,37 @@
+{
+  "extends": [
+    "../robots/arx_x5.json",
+    "../calibration/arx247.json"
+  ],
+  "machine": "arx247",
+  "camera_controls": {
+    "exposure_us": 12000,
+    "gain": 16
+  },
+  "cameras": {
+    "left": {
+      "device": "/dev/v4l/by-path/pci-0000:00:14.0-usb-0:1.3:1.0-video-index4",
+      "serial": "262622271164",
+      "role": "left wrist RGB"
+    },
+    "right": {
+      "device": "/dev/v4l/by-path/pci-0000:00:14.0-usb-0:3.2.1:1.0-video-index4",
+      "serial": "262622270814",
+      "role": "right wrist RGB"
+    },
+    "top": {
+      "device": "/dev/v4l/by-path/pci-0000:00:14.0-usb-0:1.4:1.0-video-index4",
+      "serial": "262422274559",
+      "role": "top RGB"
+    }
+  },
+  "scene": {
+    "safety_notes": [
+      "The top camera is supported by a fixed pole in the middle of the workspace. This pole is invisible in all left, right and top camera views, but remains a physical obstacle. Plan conservative detours with safety clearance when crossing the central workspace."
+    ]
+  },
+  "motion": {
+    "trajectory_start_delay_s": 0.1,
+    "time_uniform_resampling_passes": 2
+  }
+}

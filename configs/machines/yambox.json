@@ -1,0 +1,25 @@
+{
+  "extends": [
+    "../robots/yam.json",
+    "../calibration/yambox.json"
+  ],
+  "machine": "yambox",
+  "camera_controls": {
+    "exposure_us": 12000,
+    "gain": 16
+  },
+  "cameras": {
+    "left": {
+      "serial": "260322272084",
+      "role": "left RGB"
+    },
+    "right": {
+      "serial": "260322275878",
+      "role": "right RGB"
+    },
+    "top": {
+      "serial": "260322275573",
+      "role": "top RGB"
+    }
+  }
+}

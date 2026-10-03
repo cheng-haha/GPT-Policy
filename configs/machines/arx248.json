@@ -1,0 +1,30 @@
+{
+  "extends": [
+    "../robots/arx_x5.json",
+    "../calibration/arx248.json"
+  ],
+  "machine": "arx248",
+  "camera_controls": {
+    "exposure_us": 12000,
+    "gain": 16
+  },
+  "cameras": {
+    "left": {
+      "device": "/dev/video10",
+      "role": "left wrist RGB"
+    },
+    "right": {
+      "device": "/dev/video18",
+      "role": "right wrist RGB"
+    },
+    "top": {
+      "device": "/dev/video4",
+      "role": "top RGB"
+    }
+  },
+  "scene": {
+    "safety_notes": [
+      "The top camera is supported by a fixed pole in the middle of the workspace. This pole is invisible in all left, right and top camera views, but remains a physical obstacle. Plan conservative detours with safety clearance when crossing the central workspace."
+    ]
+  }
+}

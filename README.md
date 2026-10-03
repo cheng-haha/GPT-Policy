@@ -105,6 +105,14 @@ The command resolves `configs/default.json` automatically. To validate the profi
 gpt-policy --check
 ```
 
+The deployed machine profiles are also available directly:
+
+```bash
+gpt-policy --machine yambox --check
+gpt-policy --machine yambox "pick up the red block"
+# Also available: --machine arx247 or --machine arx248
+```
+
 For another machine or provider, pass an explicit profile:
 
 ```bash
@@ -126,7 +134,7 @@ The Codex live-image window is **off by default** (`live_image_window: null`). U
 - [Runtime, camera controls and recording layout](docs/runtime.md)
 - [Demonstration inputs and views](docs/demonstrations.md)
 - [Portable evaluation and provider checks](docs/evaluation.md)
-- [Local machine configuration](configs/machines/README.md)
+- [Deployed machine profiles and local configuration](configs/machines/README.md)
 
 ## Results from the paper
 
@@ -141,6 +149,8 @@ src/gpt_policy/       protocol, input preparation, planning, recording, adapters
 configs/default.json  default sanitized ARX profile for `gpt-policy "..."`
 configs/agents/       provider examples
 configs/examples/     local-machine templates
+configs/machines/     yambox, arx247 and arx248 deployment profiles
+configs/calibration/  measured intrinsics and camera transforms
 configs/robots/       portable robot and motion defaults
 requirements/         installation entry points for each backend
 scripts/              driver installation, evaluation and provider checks
@@ -148,7 +158,7 @@ tests/                offline protocol and configuration tests
 docs/assets/          figures used in this README
 ```
 
-The public tree excludes deployment hosts, private prompts, real credentials, run recordings, site-specific calibration, and evaluation history. The paper's physical demonstration records and complete evaluation environment are not included by implication.
+The public tree includes the deployed YAM/ARX machine profiles and their measured calibration. It excludes private task prompts, real credentials, run recordings and evaluation history. The paper's physical demonstration records and complete evaluation environment are not included by implication.
 
 ## Development
 

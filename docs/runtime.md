@@ -13,13 +13,13 @@ These requirements use the optional extras in `pyproject.toml`; the YAM SDK revi
 
 ## Machine profiles
 
-Use the [machine profile instructions](../configs/machines/README.md). The example profiles inherit portable robot/motion defaults and placeholder geometry. Replace serials, interfaces, intrinsics and camera transforms with your measurements. `--check` validates structure; it does not verify a physical calibration or connection. Site profiles, local overrides and credentials stay outside Git.
+Use the [machine profile instructions](../configs/machines/README.md). The deployed `yambox`, `arx247` and `arx248` profiles and their measured calibration are included. The separate `configs/examples/` profiles still contain placeholder geometry for new installations. `--check` validates structure; it does not verify a physical calibration or connection. Machine selection/local overrides and credentials stay outside Git.
 
 ```bash
 gpt-policy --check
 gpt-policy --config configs/machine.local.json --check
-# Or configs/machines/lab-yam.json:
-gpt-policy --machine lab-yam --check
+# Included deployment profile:
+gpt-policy --machine yambox --check
 ```
 
 ## Live image window
@@ -41,8 +41,8 @@ ARX and YAM examples include `camera_controls: {"exposure_us": 12000, "gain": 16
 
 Default runs use `var/runs/<provider>/<task-category>/<ICL>/<timestamp-task>_<outcome>/`, where provider is `gpt`, `claude` or `kimi` and ICL is `none_icl`, `video_icl` or `video_action_icl`. The sibling ICL directories are created together. `runtime.task_category` can supply a stable category; `runtime.record_dir` overrides the complete destination. Pre-run initialization failures go under `_initialization_failed`.
 
-Recorded files include configuration, events, status, transcript, usage and available video/state streams. Human review determines the final success/failed label; an unrated model completion remains unreviewed. All `var/` contents, caches and generated request archives are ignored by Git.
+Recorded files include configuration, events, status, transcript, usage and available video/state streams. Human review determines the final success/failed label; an unrated model completion remains unreviewed. All `var/` contents, caches and generated request archives are ignored by Git. The existing `request_json/plain_text.json` default task is tracked because the ARX robot configuration references it.
 
 ## Public synchronization scope
 
-The public runtime includes live-window controls, camera controls, recording layout, generic evaluation and portable tests. Task-specific plug prompts, the fast/slow hybrid policy, machine calibration/serials, private experiment plans/history and generated run data are excluded. General control prompts and provider integrations remain available.
+The public runtime includes live-window controls, camera controls, recording layout, generic evaluation, portable tests and the deployed machine/calibration profiles. Task-specific plug prompts, the fast/slow hybrid policy, credentials, private experiment plans/history and generated run data are excluded. General control prompts and provider integrations remain available.
