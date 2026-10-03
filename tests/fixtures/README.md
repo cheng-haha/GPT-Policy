@@ -1,1 +1,0 @@
-This observation fixture retains recorded numeric telemetry for protocol regression tests. Task paths and camera identifiers have been replaced; it contains no deployable calibration or demonstration media.

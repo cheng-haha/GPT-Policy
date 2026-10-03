@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import pytest
 
@@ -81,8 +81,14 @@ def test_invalid_live_window_rejected_by_configuration(tmp_path, window):
 
 
 def test_native_replay_is_size_checked_before_turn_start():
-    from test_codex_regression import client
-    native = client()
+    native = object.__new__(CodexAppServer)
+    native.model = "gpt-test"
+    native.effort = "high"
+    native.project_root = Path("/robot")
+    native.thread_id = "thread-1"
+    native.convert_camera_images_to_jpeg = False
+    native.camera_jpeg_quality = 85
+    native._request = Mock(return_value={"turn": {"id": "turn-1"}})
     with pytest.raises(ValueError, match="too large"):
         native.decide("current", {}, replay=[{"type": "text", "text": "x" * 1048576}])
     native._request.assert_not_called()

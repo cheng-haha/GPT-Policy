@@ -154,13 +154,15 @@ configs/calibration/  measured intrinsics and camera transforms
 configs/robots/       portable robot and motion defaults
 requirements/         installation entry points for each backend
 scripts/              driver installation, evaluation and provider checks
-tests/                offline protocol and configuration tests
+tests/                core offline configuration/runtime regression tests
 docs/assets/          figures used in this README
 ```
 
 The public tree includes the deployed YAM/ARX machine profiles and their measured calibration. It excludes private task prompts, real credentials, run recordings and evaluation history. The paper's physical demonstration records and complete evaluation environment are not included by implication.
 
 ## Development
+
+The public repository keeps a focused [offline regression suite](tests/README.md) for configuration, live-window behavior, camera controls and recording layout.
 
 ```bash
 python -m pytest -q

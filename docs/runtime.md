@@ -9,7 +9,7 @@ python -m pip install -r requirements/yam.txt
 # ARX: python -m pip install -r requirements/arx.txt
 ```
 
-These requirements use the optional extras in `pyproject.toml`; the YAM SDK revision is pinned there. FFmpeg/ffprobe and authenticated provider CLIs are external tools. The offline test suite does not require robot SDKs; install `.[dev]` to run it. Tests for optional SDKs/media tools skip when those tools are absent.
+These requirements use the optional extras in `pyproject.toml`; the YAM SDK revision is pinned there. FFmpeg/ffprobe and authenticated provider CLIs are external tools. Install `.[dev]` to run the [core offline regression suite](../tests/README.md). It covers configuration, live-window behavior, camera controls and recording layout using simulated devices/providers. The broader hardware, historical and evaluation test suites remain in the main development project.
 
 ## Machine profiles
 
@@ -45,4 +45,4 @@ Recorded files include configuration, events, status, transcript, usage and avai
 
 ## Public synchronization scope
 
-The public runtime includes live-window controls, camera controls, recording layout, generic evaluation, portable tests and the deployed machine/calibration profiles. Task-specific plug prompts, the fast/slow hybrid policy, credentials, private experiment plans/history and generated run data are excluded. General control prompts and provider integrations remain available.
+The public runtime includes live-window controls, camera controls, recording layout, generic evaluation, core offline tests and the deployed machine/calibration profiles. Task-specific plug prompts, the fast/slow hybrid policy, credentials, private experiment plans/history and generated run data are excluded. General control prompts and provider integrations remain available.
