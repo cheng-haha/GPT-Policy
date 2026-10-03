@@ -108,9 +108,9 @@ gpt-policy --check
 For another machine or provider, pass an explicit profile:
 
 ```bash
-cp configs/examples/yam-local.json configs/my-machine.json
-# edit interfaces, camera serials, and measured calibration
-gpt-policy --config configs/my-machine.json "pick up the red block"
+# configs/machine.local.json starts with {"extends":"examples/yam-local.json"}.
+# Add your interfaces, camera serials and measured calibration to that local file.
+gpt-policy --config configs/machine.local.json "pick up the red block"
 ```
 
 An input package can contain text, images, videos, or reviewed demonstrations:
@@ -120,6 +120,13 @@ gpt-policy --input-json task.json
 ```
 
 Each motion is planned from fresh feedback, checked with per-sample IK, and recorded as an append-only run directory. `Ctrl+C` requests software cancellation and cleanup; it does not replace a hardware emergency stop.
+
+The Codex live-image window is **off by default** (`live_image_window: null`). Use `--live-window 8` to enable it for one run or `--no-live-window` to explicitly disable it.
+
+- [Runtime, camera controls and recording layout](docs/runtime.md)
+- [Demonstration inputs and views](docs/demonstrations.md)
+- [Portable evaluation and provider checks](docs/evaluation.md)
+- [Local machine configuration](configs/machines/README.md)
 
 ## Results from the paper
 
@@ -134,7 +141,9 @@ src/gpt_policy/       protocol, input preparation, planning, recording, adapters
 configs/default.json  default sanitized ARX profile for `gpt-policy "..."`
 configs/agents/       provider examples
 configs/examples/     local-machine templates
-scripts/              opt-in driver installation
+configs/robots/       portable robot and motion defaults
+requirements/         installation entry points for each backend
+scripts/              driver installation, evaluation and provider checks
 tests/                offline protocol and configuration tests
 docs/assets/          figures used in this README
 ```

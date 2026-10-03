@@ -9,3 +9,9 @@ configs/machine.local.json
 request_json/*.json
 .pytest_cache/
 **/__pycache__/
+
+# Machine-specific settings and credentials stay local.
+configs/default.local.json
+configs/machines/*.json
+.env
+.env.*

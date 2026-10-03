@@ -11,7 +11,7 @@ from .tools.catalog import load_tool_catalog
 from .vision.perception import PixelLocalizer
 
 
-def check_configuration(settings, path):
+def check_configuration(settings, path, *, resolved_agent=None):
     runtime = runtime_config(settings, base_dir=path.parent)
     backend = settings.get("backend", "arx")
     if backend not in {"arx", "yam"}:
@@ -22,7 +22,7 @@ def check_configuration(settings, path):
         raise ValueError("trajectory_hz must be finite")
     frames = FrameCalibration(settings)
     localizer = PixelLocalizer(settings)
-    agent = agent_config(settings, path.parent)
+    agent = resolved_agent if resolved_agent is not None else agent_config(settings, path.parent)
     arms = ("left", "right") if runtime.right_interface else ("left",)
     catalog = load_tool_catalog(settings)
     catalog.function_schemas(6, arms)
@@ -41,6 +41,8 @@ def check_configuration(settings, path):
             "backend": backend, "model": runtime.robot_model, "config": str(path),
             "interfaces": [runtime.interface, runtime.right_interface], "cameras": cameras,
             "agent": agent.type, "agent_profile": settings.get("agent"), "agent_model": agent.model,
+            **({"live_image_window": agent.live_image_window,
+                "live_window_enabled": agent.live_image_window is not None} if agent.type == "codex" else {}),
             "top_camera_bases": list(frames.fixed_camera_arms("top")),
             "max_decisions": runtime.max_decisions,
             "recording": settings.get("recording", {})}

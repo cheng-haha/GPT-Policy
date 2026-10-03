@@ -72,8 +72,9 @@ def test_claude_selector_maps_to_claude_code_provider(tmp_path):
 
 
 def test_repository_main_and_agent_configs_resolve_together(tmp_path):
-    configs = Path(__file__).resolve().parents[2] / "configs"
-    settings = json.loads((configs / "default.json").read_text(encoding="utf-8"))
+    configs = Path(__file__).resolve().parents[1] / "configs"
+    from gpt_policy.settings import load_settings
+    settings = load_settings(configs / "default.json")
     credentials = tmp_path / "credentials.json"
     save_claude_key("secret-key", credentials)
 
@@ -260,7 +261,7 @@ def test_repository_native_profiles_resolve_without_legacy_credentials(tmp_path,
         source.write_text(json.dumps({"env": {
             "ANTHROPIC_BASE_URL": "https://example", "ANTHROPIC_AUTH_TOKEN": token,
         }}))
-    configs = Path(__file__).resolve().parents[2] / "configs"
+    configs = Path(__file__).resolve().parents[1] / "configs"
     assert AGENT_NAMES == ("codex", "claude", "kimi")
     for name in ["claude", "kimi"]:
         config = named_agent_config(name, configs, tmp_path / "missing.json")

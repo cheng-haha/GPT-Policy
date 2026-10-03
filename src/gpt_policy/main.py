@@ -17,7 +17,7 @@ from .hardware.camera_warmup import warm_up_cameras
 from .hardware.bimanual import BimanualRobot
 from .hardware.robot import ArxRobot
 from .hardware.motion_control import MotionFault
-from .harness.config import AGENT_NAMES, agent_config, named_agent_config, save_claude_key
+from .harness.config import AGENT_NAMES, agent_config, named_agent_config, save_claude_key, with_live_image_window
 from .harness.factory import create_agent, preflight_agent
 from .harness.models import AgentContext
 from .harness.input_content import FIRST_TURN_RESERVE_CHARS, validate_input_size
@@ -34,6 +34,7 @@ from .input.request import normalize_request, save_request, save_task_request
 from .input.preparation import has_video_input, prepare_input_videos
 from .input.video import FfmpegVideoExtractor, VideoProcessingConfig
 from .input.demonstration import demonstration_instruction, save_input
+from .recording.layout import icl_directory, recording_directory, task_category
 from .recording.trace import RunRecorder
 from .recording.video import RunVideo
 from .recording.state import StateRecorder
@@ -82,9 +83,16 @@ def parse_args(default_agent: str | None = None) -> argparse.Namespace:
         action="store_true",
         help="隐藏输入并保存 Claude 网关 API Key，然后退出",
     )
-    parser.add_argument("--machine", help="选择 configs/machines/<name>.json 中的本地机器配置")
+    parser.add_argument("--machine", help="Machine profile name under configs/machines/")
     parser.add_argument("--agent", choices=AGENT_NAMES, default=default_agent, help="覆盖本次运行的 agent 配置")
     parser.add_argument("--check", action="store_true", help="只检查配置，不打开相机、CAN 或模型会话")
+    live_window = parser.add_mutually_exclusive_group()
+    live_window.add_argument("--live-window", dest="live_image_window", type=int, metavar="N",
+                             default=argparse.SUPPRESS,
+                             help="Codex 实时图像窗口大小（N>=3），仅覆盖本次运行；默认沿用 agent 配置")
+    live_window.add_argument("--no-live-window", dest="live_image_window", action="store_const", const=None,
+                             default=argparse.SUPPRESS,
+                             help="关闭按实时图像数量触发的会话重建，保留服务过载后的恢复")
     parser.add_argument("--demo", type=Path, help="Historical demo.json, recorded run directory, or video")
     parser.add_argument("--demo-mode", choices=("video", "video+action"), help="Override the mode in task text or JSON (default: video)")
     parser.add_argument("--prepare-only", type=Path, metavar="DIRECTORY", help="Save portable input and exit before opening hardware")
@@ -120,14 +128,22 @@ def _run(args, interrupts) -> None:
     if selected_agent := getattr(args, "agent", None):
         settings["agent"] = selected_agent
     runtime = runtime_config(settings, legacy=args, base_dir=config_path.parent)
+    agent_settings = agent_config(settings, config_path.parent)
+    if hasattr(args, "live_image_window"):
+        agent_settings = with_live_image_window(agent_settings, args.live_image_window)
+    window_metadata = ({"live_image_window": agent_settings.live_image_window,
+                        "live_window_enabled": agent_settings.live_image_window is not None}
+                       if agent_settings.type == "codex" else {})
     if getattr(args, "check", False):
         from .preflight import check_configuration
-        print(json.dumps(check_configuration(settings, config_path), ensure_ascii=False, indent=2))
+        print(json.dumps(check_configuration(settings, config_path, resolved_agent=agent_settings), ensure_ascii=False, indent=2))
         return
-    agent_settings = agent_config(settings, config_path.parent)
     runs_root = Path("var/runs") / {"codex": "gpt", "claude": "claude", "kimi": "kimi"}[settings.get("agent", "codex")]
-    set_usage_run_root(runs_root)
+    set_usage_run_root(runs_root / "_initialization_failed")
     display = RunConsole()
+    if agent_settings.type == "codex":
+        window = agent_settings.live_image_window
+        display.message(f"Live image window: {'off (no image-count refresh)' if window is None else window}")
     instruction = getattr(args, "instruction", None)
     input_json = getattr(args, "input_json", None)
     inline_images = ()
@@ -189,15 +205,21 @@ def _run(args, interrupts) -> None:
             request_path = save_task_request(run_input, REQUEST_DIRECTORY, task_name)
     run_name = f"{datetime.now():%Y%m%d-%H%M%S-%f}-{task_name}"
     display.message(f"Request: {request_path}")
-    record_dir = runtime.record_dir or runs_root / run_name
+    category = task_category(run_input, task_name, settings.get("runtime", {}).get("task_category"))
+    icl = icl_directory(run_input)
+    record_dir = runtime.record_dir or recording_directory(runs_root, category, icl, run_name)
     recorder = RunRecorder(
         record_dir,
         {
             "instruction": run_input.instruction,
             "task_name": task_name,
+            "task_category": category,
+            "icl_type": icl,
             "max_decisions": runtime.max_decisions,
+            **window_metadata,
             "model": run_input.model,
-            "agent": {"profile": settings.get("agent"), "type": agent_settings.type, "model": run_input.model},
+            "agent": {"profile": settings.get("agent"), "type": agent_settings.type, "model": run_input.model,
+                      **window_metadata},
             "input": run_input.record(),
             "request_json": str(request_path),
             "robot_model": runtime.robot_model,
@@ -222,15 +244,19 @@ def _run(args, interrupts) -> None:
         display.header(run_input.instruction, run_input.model, settings.get("machine", runtime.robot_model), record_dir, runtime.max_decisions)
         run_input = _prepare_inputs(run_input, args, record_dir, settings, config_path, agent_settings, display, recorder)
         camera_specs = parse_camera_specs(camera_values)
-        if settings.get("camera_backend", "v4l2") == "realsense":
+        camera_backend = settings.get("camera_backend", "v4l2")
+        if camera_backend == "realsense":
             from .hardware.realsense import RealSenseCameraSet
             cameras = RealSenseCameraSet(camera_specs, runtime.camera_width, runtime.camera_height)
         else:
             cameras = CameraSet(camera_specs, runtime.camera_width, runtime.camera_height)
-            if controls := settings.get("camera_controls"):
+        if controls := settings.get("camera_controls"):
+            if camera_backend == "realsense":
+                applied = cameras.configure_controls(**controls)
+            else:
                 from .hardware.d405_controls import configure_d405_cameras
                 applied = configure_d405_cameras(camera_specs, **controls)
-                recorder.write("camera_controls_applied", {"cameras": applied})
+            recorder.write("camera_controls_applied", {"cameras": applied})
         recorder.write("camera_warmup_started", {"cameras": cameras.describe()})
         with display.waiting("Warming up cameras; waiting for exposure and white balance to stabilize"):
             warmup = warm_up_cameras(cameras)

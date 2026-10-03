@@ -1,13 +1,92 @@
 {
-  "extends": "simulated.json",
+  "extends": [
+    "simulated.json",
+    "../robots/yam.json"
+  ],
   "machine": "yam-local",
   "backend": "yam",
   "camera_backend": "realsense",
-  "runtime": {"robot_model": "YAM", "interface": "can0", "right_interface": "can1"},
-  "robot": {"gripper_type": "LINEAR_4310", "gripper_width_m": 0.095},
+  "runtime": {
+    "robot_model": "YAM",
+    "interface": "can0",
+    "right_interface": "can1"
+  },
+  "robot": {
+    "gripper_type": "LINEAR_4310",
+    "gripper_width_m": 0.095
+  },
   "cameras": {
-    "left": {"serial": "REPLACE_WITH_LEFT_SERIAL", "role": "left wrist RGB"},
-    "right": {"serial": "REPLACE_WITH_RIGHT_SERIAL", "role": "right wrist RGB"},
-    "top": {"serial": "REPLACE_WITH_TOP_SERIAL", "role": "overhead RGB"}
-  }
+    "left": {
+      "serial": "REPLACE_WITH_LEFT_SERIAL",
+      "role": "left wrist RGB"
+    },
+    "right": {
+      "serial": "REPLACE_WITH_RIGHT_SERIAL",
+      "role": "right wrist RGB"
+    },
+    "top": {
+      "serial": "REPLACE_WITH_TOP_SERIAL",
+      "role": "overhead RGB"
+    }
+  },
+  "camera_controls": {
+    "exposure_us": 12000,
+    "gain": 16
+  },
+  "vision": {
+    "camera_intrinsics": {
+      "left": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ]
+      ],
+      "right": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ]
+      ],
+      "top": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ]
+      ]
+    }
+  },
+  "calibration_note": "Identity intrinsics are placeholders. Replace camera intrinsics and transforms with measured calibration before running hardware."
 }

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 import time
 from types import SimpleNamespace
 
@@ -30,6 +31,71 @@ class RealSenseCameraSet:
         except BaseException:
             self.close()
             raise
+
+    def configure_controls(self, *, exposure_us: int, gain: int) -> list[dict]:
+        """Reapply manual RGB exposure on each task before warmup.
+
+        Camera power cycles and other applications can change these controls.
+        Use the existing streams, preserve white balance, and reject a failed
+        readback before recording or robot initialization.
+        """
+        for name, value in (("exposure_us", exposure_us), ("gain", gain)):
+            if type(value) is not int or value <= 0:
+                raise ValueError(f"camera_controls.{name} must be a positive integer")
+        if not self.cameras:
+            raise ValueError("camera_controls requires explicitly named RealSense devices")
+        rs = self.rs
+        options = {
+            "auto_exposure": rs.option.enable_auto_exposure,
+            "exposure_us": rs.option.exposure,
+            "gain": rs.option.gain,
+        }
+        target = {"auto_exposure": 0, "exposure_us": exposure_us, "gain": gain}
+        selected = []
+        # Validate every RGB sensor before changing any camera. On D405 this
+        # is the Stereo Module, rather than a separate RGB Camera sensor.
+        for camera in self.cameras:
+            device = camera.pipeline.get_active_profile().get_device()
+            sensors = [sensor for sensor in device.query_sensors()
+                       if any(p.stream_type() == rs.stream.color
+                              for p in sensor.get_stream_profiles())]
+            if len(sensors) != 1:
+                raise RuntimeError(f"{camera.name}: expected one RealSense RGB sensor")
+            sensor = sensors[0]
+            for key, option in options.items():
+                if not sensor.supports(option) or sensor.is_option_read_only(option):
+                    raise ValueError(f"{camera.name}: {key} is not writable")
+                limits = sensor.get_option_range(option)
+                value = target[key]
+                steps = (value - limits.min) / limits.step if limits.step > 0 else 0
+                if not limits.min <= value <= limits.max or not math.isclose(
+                    steps, round(steps), abs_tol=1e-6,
+                ):
+                    raise ValueError(
+                        f"{camera.name}: {key} must be within "
+                        f"{limits.min}..{limits.max}, step {limits.step}"
+                    )
+            selected.append((camera, sensor))
+        results = []
+        for camera, sensor in selected:
+            before = {key: sensor.get_option(option) for key, option in options.items()}
+            # Always write all three values, even when they already match.
+            for key, option in options.items():
+                sensor.set_option(option, target[key])
+            deadline = time.monotonic() + 1.0
+            while True:
+                after = {key: sensor.get_option(option) for key, option in options.items()}
+                if after == target:
+                    break
+                if time.monotonic() >= deadline:
+                    raise RuntimeError(
+                        f"{camera.name}: RealSense controls did not apply: "
+                        f"expected {target}, got {after}"
+                    )
+                time.sleep(0.05)
+            results.append({"name": camera.name, "device": camera.serial,
+                            "before": before, "after": after})
+        return results
 
     def capture(self, stop=None):
         images = {}

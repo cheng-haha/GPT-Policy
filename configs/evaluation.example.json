@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "pick-block",
+      "title": "Pick up a block",
+      "reset": "Place a block within the calibrated workspace and clear the motion area.",
+      "criterion": "The intended block is lifted and held without dropping.",
+      "conditions": [
+        {
+          "id": "text",
+          "request": "configs/evaluation_requests/pick-block.json"
+        }
+      ]
+    }
+  ]
+}

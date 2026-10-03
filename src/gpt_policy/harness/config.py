@@ -6,7 +6,7 @@ import json
 import math
 import os
 import tempfile
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -33,6 +33,19 @@ class AgentConfig:
     task_name_model: str | None = None
     task_name_effort: str | None = None
     live_image_window: int | None = 8
+
+
+def _validate_live_image_window(window: int | None) -> None:
+    if window is not None and (isinstance(window, bool) or not isinstance(window, int) or window < 3):
+        raise ValueError("live_image_window must be an integer >= 3 or null")
+
+
+def with_live_image_window(config: AgentConfig, window: int | None) -> AgentConfig:
+    """Apply a per-run override without rewriting the shared agent profile."""
+    if config.type != "codex":
+        raise ValueError("live_image_window is only supported by Codex")
+    _validate_live_image_window(window)
+    return replace(config, live_image_window=window)
 
 
 def agent_config(
@@ -76,8 +89,7 @@ def named_agent_config(
     window = value.get("live_image_window", 8)
     if "live_image_window" in value and not codex:
         raise ValueError("live_image_window is only supported by Codex")
-    if window is not None and (isinstance(window, bool) or not isinstance(window, int) or window < 3):
-        raise ValueError("live_image_window must be an integer >= 3 or null")
+    _validate_live_image_window(window)
     model = value.get("model")
     if model is not None:
         model = _text(model, f"{selected}.model")

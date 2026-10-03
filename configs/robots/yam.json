@@ -1,0 +1,59 @@
+{
+  "agent": "codex",
+  "agent_config_dir": "..",
+  "backend": "yam",
+  "camera_backend": "realsense",
+  "tool_catalog": "configs/tools.json",
+  "runtime": {
+    "robot_model": "YAM",
+    "interface": "can0",
+    "right_interface": "can1",
+    "gripper_open_readout": -3.4,
+    "camera_width": 640,
+    "camera_height": 480,
+    "convert_camera_images_to_jpeg": true,
+    "camera_jpeg_quality": 85,
+    "trajectory_hz": 100.0,
+    "task_name": "task",
+    "record_dir": null,
+    "input_json": null
+  },
+  "robot": {
+    "gripper_type": "LINEAR_4310",
+    "gripper_width_m": 0.095,
+    "gripper_speed_normalized_s": 0.5,
+    "motor_temp_limit_c": 80.0,
+    "gripper_width_source": "nominal two 0.0475 m sliders from I2RT linear_4310.xml; commands/feedback remain normalized"
+  },
+  "motion": {
+    "home_time_scale": 3.0,
+    "bimanual_start_delay_s": 0.1,
+    "trajectory_start_delay_s": 0.1,
+    "time_uniform_resampling_passes": 2,
+    "cartesian_step_m": 0.005,
+    "cartesian_step_rad": 0.035,
+    "tcp_velocity_m_s": 0.08,
+    "tcp_angular_velocity_rad_s": 0.5,
+    "joint_velocity_scale": 0.25,
+    "joint_acceleration_rad_s2": 2.0,
+    "joint_jerk_rad_s3": 12.0,
+    "endpoint_hold_s": 0.12,
+    "settle_position_tolerance_rad": 0.03,
+    "settle_velocity_tolerance_rad_s": 0.05,
+    "settle_samples": 10,
+    "settle_window_s": 0.3,
+    "settle_position_span_rad": 0.002,
+    "settle_timeout_s": 3.0,
+    "ik_refine_iterations": 12,
+    "ik_translation_tolerance_m": 0.0001,
+    "ik_rotation_tolerance_rad": 0.0005,
+    "ik_execution_translation_tolerance_m": 0.002,
+    "ik_execution_rotation_tolerance_rad": 0.0174532925,
+    "joint_velocity_rad_s": 0.6
+  },
+  "recording": {
+    "fps": 10,
+    "jpeg_quality": 65,
+    "state_hz": 50
+  }
+}

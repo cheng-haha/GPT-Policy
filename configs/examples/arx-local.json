@@ -1,10 +1,85 @@
 {
-  "extends": "simulated.json",
+  "extends": [
+    "simulated.json",
+    "../robots/arx_x5.json"
+  ],
   "machine": "arx-local",
-  "runtime": {"interface": "can0", "right_interface": "can1"},
+  "runtime": {
+    "interface": "can0",
+    "right_interface": "can1"
+  },
   "cameras": {
-    "left": {"device": "/dev/video-left", "role": "left wrist RGB"},
-    "right": {"device": "/dev/video-right", "role": "right wrist RGB"},
-    "top": {"device": "/dev/video-top", "role": "overhead RGB"}
-  }
+    "left": {
+      "device": "/dev/video-left",
+      "role": "left wrist RGB"
+    },
+    "right": {
+      "device": "/dev/video-right",
+      "role": "right wrist RGB"
+    },
+    "top": {
+      "device": "/dev/video-top",
+      "role": "overhead RGB"
+    }
+  },
+  "camera_controls": {
+    "exposure_us": 12000,
+    "gain": 16
+  },
+  "vision": {
+    "camera_intrinsics": {
+      "left": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ]
+      ],
+      "right": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ]
+      ],
+      "top": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ]
+      ]
+    }
+  },
+  "calibration_note": "Identity intrinsics are placeholders. Replace camera intrinsics and transforms with measured calibration before running hardware."
 }

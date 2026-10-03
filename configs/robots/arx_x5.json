@@ -1,0 +1,55 @@
+{
+  "agent": "codex",
+  "runtime": {
+    "robot_model": "X5",
+    "interface": "can1",
+    "right_interface": "can3",
+    "gripper_open_readout": -3.4,
+    "camera_width": 640,
+    "camera_height": 480,
+    "convert_camera_images_to_jpeg": true,
+    "camera_jpeg_quality": 85,
+    "trajectory_hz": 100.0,
+    "task_name": "task",
+    "record_dir": null,
+    "input_json": null
+  },
+  "tool_catalog": "configs/tools.json",
+  "robot": {
+    "gravity_compensation": true,
+    "gripper_width_m": 0.088,
+    "gripper_velocity_rad_s": 3.0,
+    "gripper_control_hz": 100.0,
+    "gripper_kp": 2.0,
+    "gripper_kd": 0.1
+  },
+  "motion": {
+    "home_time_scale": 3.0,
+    "bimanual_start_delay_s": 0.1,
+    "cartesian_step_m": 0.005,
+    "cartesian_step_rad": 0.035,
+    "tcp_velocity_m_s": 0.08,
+    "tcp_angular_velocity_rad_s": 0.5,
+    "joint_velocity_scale": 0.25,
+    "joint_acceleration_rad_s2": 2.0,
+    "joint_jerk_rad_s3": 12.0,
+    "endpoint_hold_s": 0.12,
+    "settle_position_tolerance_rad": 0.03,
+    "settle_velocity_tolerance_rad_s": 0.05,
+    "settle_samples": 10,
+    "settle_timeout_s": 3.0,
+    "tracking_error_limit_rad": 0.12,
+    "ik_refine_iterations": 12,
+    "ik_translation_tolerance_m": 0.0001,
+    "ik_rotation_tolerance_rad": 0.0005,
+    "ik_execution_translation_tolerance_m": 0.002,
+    "ik_execution_rotation_tolerance_rad": 0.0174532925
+  },
+  "recording": {
+    "fps": 10,
+    "jpeg_quality": 65,
+    "state_hz": 50
+  },
+  "backend": "arx",
+  "agent_config_dir": ".."
+}
