@@ -94,7 +94,7 @@ def parse_args(default_agent: str | None = None) -> argparse.Namespace:
                              default=argparse.SUPPRESS,
                              help="关闭按实时图像数量触发的会话重建，保留服务过载后的恢复")
     parser.add_argument("--demo", type=Path, help="Historical demo.json, recorded run directory, or video")
-    parser.add_argument("--demo-mode", choices=("video", "video+action"), help="Override the mode in task text or JSON (default: video)")
+    parser.add_argument("--demo-mode", choices=("auto", "video", "video+action"), help="Override the mode in task text or JSON (default: auto from available state/action data)")
     parser.add_argument("--prepare-only", type=Path, metavar="DIRECTORY", help="Save portable input and exit before opening hardware")
     return parser.parse_args()
 

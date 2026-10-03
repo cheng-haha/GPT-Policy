@@ -31,12 +31,16 @@ def instruction_text_without_media(instruction: str) -> str:
 def instruction_mode(instruction: str | None) -> str | None:
     """Read explicit mode words without interpreting filenames or URLs."""
     modes = set()
-    text = re.sub(r"video\s*\+\s*action", "video+action", instruction or "", flags=re.I)
-    for token in _TOKENS.finditer(text):
-        text = next((g for g in token.groups() if g is not None), token.group())
-        if "/" in text or Path(text).suffix.lower() in _VIDEO_SUFFIXES | _IMAGE_SUFFIXES | {".json"}:
-            continue
-        modes.update("video+action" if "+" in m.group() else "video" for m in _MODE.finditer(text))
+    text = instruction_text_without_media(instruction or "")
+    for match in _MODE.finditer(text):
+        mode = "video+action" if "+" in match.group() else "video"
+        # A generic phrase such as "video demonstration" is not a video-only
+        # override: automatic selection must still retain its recorded actions.
+        explicit = (mode == "video+action" or text.strip().lower() == "video"
+                    or re.search(r"(?:--demo-mode|\bmode|模式)\s*[:=：]?\s*$", text[:match.start()], re.I)
+                    or re.match(r"\s*(?:的?\s*模式|mode\b|only\b)", text[match.end():], re.I))
+        if explicit:
+            modes.add(mode)
     if len(modes) > 1:
         raise ValueError("Conflicting demonstration modes; specify only video or video+action")
     return next(iter(modes), None)

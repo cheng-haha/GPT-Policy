@@ -10,6 +10,7 @@ from pathlib import Path
 import tempfile
 
 from .manifest import ContentPart, InputManifest, TextPart, VideoPart, content_records, load_manifest
+from .demo_mode import resolve_demo_mode
 
 
 @dataclass(frozen=True)
@@ -38,7 +39,8 @@ def normalize_request(run_input: RunInput, demo: Path | None = None, mode: str |
     normalized = []
     for part in content:
         if isinstance(part, VideoPart):
-            part = replace(part, path=part.path.expanduser().resolve(), mode=mode or part.mode or "video")
+            source = part.path.expanduser().resolve()
+            part = replace(part, path=source, mode=resolve_demo_mode(source, mode or part.mode))
             if part.mode == "video+action" and part.path.is_file() and part.path.suffix.lower() != ".json":
                 raise ValueError("video+action requires a recorded run or demo.json; a video alone has no action data")
         normalized.append(part)

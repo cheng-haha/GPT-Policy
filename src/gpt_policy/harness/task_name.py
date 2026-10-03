@@ -139,7 +139,7 @@ def select_task_request(run_input: RunInput, directory: Path, config: AgentConfi
             continue
         if media and _media(candidate) != media:
             continue
-        if mode is not None:
+        if mode not in (None, "auto"):
             videos = [p for p in candidate.content if isinstance(p, VideoPart)]
             if not videos or any(p.mode != mode for p in videos):
                 continue

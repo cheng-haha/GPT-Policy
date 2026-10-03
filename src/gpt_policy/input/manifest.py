@@ -40,7 +40,7 @@ def content_records(parts: tuple[ContentPart, ...]) -> list:
             continue
         item = {"video" if isinstance(part, VideoPart) else "image": str(part.path)}
         if isinstance(part, VideoPart):
-            item["mode"] = part.mode or "video"
+            item["mode"] = part.mode or "auto"
         if part.label is not None:
             item["label"] = part.label
         if part.detail is not None:
@@ -134,9 +134,9 @@ def _parse_part(value: Any, base_dir: Path, index: int) -> ContentPart:
     if detail is not None and detail not in {"auto", "low", "high"}:
         raise ValueError(f"content[{index}] 的 detail 必须是 auto、low 或 high")
     if media_key == "video":
-        mode = value.get("mode", "video")
-        if mode not in ("video", "video+action"):
-            raise ValueError(f"content[{index}].mode must be video or video+action")
+        mode = value.get("mode", "auto")
+        if mode not in ("auto", "video", "video+action"):
+            raise ValueError(f"content[{index}].mode must be auto, video or video+action")
         return VideoPart(media_path, label.strip() if label else None, detail, mode)
     if "mode" in value:
         raise ValueError(f"content[{index}].mode only applies to video inputs")
