@@ -1,12 +1,3 @@
 {
-  "extends": "examples/arx-local.json",
-  "machine": "default",
-  "agent": "codex",
-  "agent_config_dir": ".",
-  "tool_catalog": "configs/tools.json",
-  "runtime": {
-    "task_name": "task",
-    "record_dir": null,
-    "input_json": null
-  }
+  "extends": "machines/yambox.json"
 }

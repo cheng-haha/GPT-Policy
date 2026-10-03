@@ -4,23 +4,38 @@
 
 ## Quick start
 
-Run these commands from the project directory with `gpt-policy` available in the environment. Replace `/path/to/demo.json` with an existing reviewed demonstration.
+The shipped default is **YAM (`yambox`) + Codex (`gpt-6-astra`)**. Run from the project directory after [installation and machine setup](runtime.md).
+
+### 1. Check the configuration
 
 ```bash
-# 1. Generate context for inspection, without opening cameras or the robot.
-gpt-policy "Unscrew and remove the bottle cap, leaving the bottle standing securely on the table." \
-  --demo /path/to/demo.json \
-  --prepare-only var/prepared/bottle-auto
-
-# 2. Inspect the effective mode and saved text/image context.
-python -m json.tool var/prepared/bottle-auto/input-videos/video-000/provenance.json
-python -m json.tool var/prepared/bottle-auto/input.json
-
-# 3. Execute using that prepared context. This starts a physical robot task.
-gpt-policy --input-json var/prepared/bottle-auto/input.json
+gpt-policy --check
 ```
 
-The preparation destination must be a **new directory**. A reviewed `demo.json` is expanded offline, without model calls. Preparing a raw video or a new recorded run requires FFmpeg and can call the configured vision selector. `--prepare-only` skips task naming, robot decisions, and hardware initialization.
+This checks configuration without opening hardware or calling a model. The default reports `machine: yambox` and `backend: yam`; [profile overrides](../configs/machines/README.md) take precedence.
+
+### 2. Run with a robot demonstration
+
+Replace the path with your reviewed `demo.json`. This starts a physical robot task:
+
+```bash
+gpt-policy "Use the robot demonstration as a reference. Unscrew and remove the bottle cap, leaving the bottle standing securely on the table." \
+  --demo /path/to/robot-demonstration/demo.json
+```
+
+The runner loads the source and automatically includes available states/actions. There is no separate JSON-generation step required.
+
+### 3. Reuse the saved task
+
+Use the filename printed by `Request:`, for example:
+
+```bash
+gpt-policy --input-json request_json/unscrew-remove-bottle-cap.json
+```
+
+Task requests belong in `request_json/`; generated context and recordings belong in `var/`.
+
+Next: [choose a mode](#select-a-mode), [preview context and check the loaded mode](#see-which-mode-was-actually-loaded), or [understand the saved files](#files-to-inspect-and-reuse).
 
 ## How context is generated
 
@@ -118,6 +133,18 @@ gpt-policy --input-json request_json/bottle.json --demo-mode auto \
 **A prepared `input.json` contains text and images, not unresolved video blocks.** Adding `--demo-mode` to that file does not change or remove its historical state/action text. To change modes, re-prepare the original demonstration or the saved `request.json` into a new directory. For an explicit no-demonstration run, use `--input-json` with a text-only request; a free-form task alone can otherwise match a saved request containing a demonstration.
 
 ## See which mode was actually loaded
+
+To inspect a saved task before execution, prepare it into a new directory:
+
+```bash
+gpt-policy --input-json request_json/unscrew-remove-bottle-cap.json \
+  --prepare-only var/prepared/bottle-auto
+
+python -m json.tool var/prepared/bottle-auto/input-videos/video-000/provenance.json
+python -m json.tool var/prepared/bottle-auto/input.json
+```
+
+This optional step leaves the task request in `request_json/` and creates an inspection package in `var/`. `json.tool` only formats the files for reading; image paths are shown without displaying the images. Preparation opens no cameras or robot and skips task naming and robot decisions. Reviewed `demo.json` inputs expand offline; raw videos and new recordings require FFmpeg and may call the vision selector. The output directory must not already exist.
 
 Preparation and normal execution print the **resolved** mode for each expanded demonstration. `auto` therefore appears as `video` or `video+action`, not as a third model-input format. Example output for a reviewed bottle demonstration:
 

@@ -26,6 +26,10 @@ def test_public_profile_check_is_hardware_free(profile, flags, expected, monkeyp
     assert report["ok"] and not report["hardware_opened"]
     assert report["live_image_window"] == expected
     assert report["live_window_enabled"] is (expected is not None)
+    if profile == "default.json":
+        assert (report["machine"], report["backend"], report["model"]) == ("yambox", "yam", "YAM")
+        assert report["agent"] == "codex"
+        assert report["top_camera_bases"] == ["left", "right"]
     if profile.startswith("machines/"):
         assert report["machine"] == Path(profile).stem
         assert report["top_camera_bases"] == ["left", "right"]

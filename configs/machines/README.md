@@ -9,15 +9,15 @@ gpt-policy --machine arx248 --check
 gpt-policy --machine yambox "pick up the red block"
 ```
 
-`--check` opens no hardware or model session. These measurements describe the named installations; they must match the hardware and camera placement you use. The default `configs/default.json` remains the generic ARX example.
+`--check` opens no hardware or model session. These measurements describe the named installations; they must match the hardware and camera placement you use. The default `configs/default.json` inherits `machines/yambox.json`, selecting the deployed YAM configuration and Codex agent.
 
-To select a named machine by default, create an ignored `configs/machine.local.json` containing:
+To override the default on another host, create an ignored `configs/machine.local.json`, for example:
 
 ```json
-{"extends":"machines/yambox.json"}
+{"extends":"machines/arx247.json"}
 ```
 
-The main yam checkout uses an equivalent symlink to `machines/yambox.json`. Keep host selection in this local file rather than changing the shared default for every machine.
+The main yam checkout selects `machines/yambox.json` through its local machine selector. Existing local selectors and configuration environment variables still override the public default. Use `--machine arx247` or `--machine arx248` for a single run, or `--config` for a custom profile.
 
 For a new installation, create `configs/machines/lab-yam.json` inheriting `../examples/yam-local.json` and supply measured calibration and hardware settings. Files named `*.local.json` remain ignored; regular machine profiles and calibration files can be committed. Adjust relative `extends` paths when moving a file.
 

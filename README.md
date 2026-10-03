@@ -82,59 +82,53 @@ The base install is hardware-free. Install only the backend you need:
 
 ```bash
 source .venv/bin/activate
-python scripts/install_drivers.py arx
 python scripts/install_drivers.py yam
 python scripts/install_drivers.py realsense
-# or: python -m pip install -e '.[arx,realsense]'
+# ARX instead: python scripts/install_drivers.py arx
+# YAM alternative: python -m pip install -e '.[yam,realsense]'
 ```
 
 Agent CLIs are external dependencies. Install and authenticate the provider you select; credentials are stored outside this repository.
 
 ## Quick start
 
-For the default ARX profile, edit the placeholders in `configs/default.json` once, then run a task directly:
+The default is **YAM (`yambox`) + Codex (`gpt-6-astra`)**. Run from the project directory after installation. For different hardware, configure a [machine profile](configs/machines/README.md) first.
+
+### 1. Check the configuration
 
 ```bash
 source .venv/bin/activate
-gpt-policy "pick up the red block"
-```
-
-The command resolves `configs/default.json` automatically. To validate the profile without opening hardware or a model session:
-
-```bash
 gpt-policy --check
 ```
 
-The deployed machine profiles are also available directly:
+The default reports `machine: yambox`, `backend: yam`, and `hardware_opened: false`. Local or explicit profile overrides take precedence.
+
+### 2. Run with a robot demonstration
+
+Replace the path with your reviewed `demo.json`. This command starts the robot task:
 
 ```bash
-gpt-policy --machine yambox --check
-gpt-policy --machine yambox "pick up the red block"
-# Also available: --machine arx247 or --machine arx248
+gpt-policy "Use the robot demonstration as a reference. Unscrew and remove the bottle cap, leaving the bottle standing securely on the table." \
+  --demo /path/to/robot-demonstration/demo.json
 ```
 
-For another machine or provider, pass an explicit profile:
+The default `auto` mode includes recorded states and actions when available. No extra `--demo-mode video+action` is needed.
+
+### 3. Reuse the saved task
+
+Use the filename printed by `Request:`, for example:
 
 ```bash
-# configs/machine.local.json starts with {"extends":"examples/yam-local.json"}.
-# Add your interfaces, camera serials and measured calibration to that local file.
-gpt-policy --config configs/machine.local.json "pick up the red block"
+gpt-policy --input-json request_json/unscrew-remove-bottle-cap.json
 ```
 
-An input package can contain text, images, videos, or reviewed demonstrations:
+Task requests live in `request_json/`; generated context, images and recordings live in `var/`.
 
-```bash
-gpt-policy --input-json task.json
-```
-
-Each motion is planned from fresh feedback, checked with per-sample IK, and recorded as an append-only run directory. `Ctrl+C` requests software cancellation and cleanup; it does not replace a hardware emergency stop.
-
-The Codex live-image window is **off by default** (`live_image_window: null`). Use `--live-window 8` to enable it for one run or `--no-live-window` to explicitly disable it.
-
-- [Runtime, camera controls and recording layout](docs/runtime.md)
-- [Demonstration inputs and views](docs/demonstrations.md)
-- [Portable evaluation and provider checks](docs/evaluation.md)
-- [Deployed machine profiles and local configuration](configs/machines/README.md)
+| Need | Documentation |
+| --- | --- |
+| Choose `auto`, `video`, or `video+action` | [Demonstration modes](docs/demonstrations.md#select-a-mode) |
+| Preview context and see the loaded mode | [Context inspection](docs/demonstrations.md#see-which-mode-was-actually-loaded) |
+| Change machines, cameras, or live-window settings | [Runtime configuration](docs/runtime.md) |
 
 ## Results from the paper
 
@@ -146,7 +140,7 @@ The Codex live-image window is **off by default** (`live_image_window: null`). U
 
 ```text
 src/gpt_policy/       protocol, input preparation, planning, recording, adapters
-configs/default.json  default sanitized ARX profile for `gpt-policy "..."`
+configs/default.json  default YAM/yambox profile for `gpt-policy "..."`
 configs/agents/       provider examples
 configs/examples/     local-machine templates
 configs/machines/     yambox, arx247 and arx248 deployment profiles

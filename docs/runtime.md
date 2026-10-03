@@ -13,7 +13,7 @@ These requirements use the optional extras in `pyproject.toml`; the YAM SDK revi
 
 ## Machine profiles
 
-Use the [machine profile instructions](../configs/machines/README.md). The deployed `yambox`, `arx247` and `arx248` profiles and their measured calibration are included. The separate `configs/examples/` profiles still contain placeholder geometry for new installations. `--check` validates structure; it does not verify a physical calibration or connection. Machine selection/local overrides and credentials stay outside Git.
+Use the [machine profile instructions](../configs/machines/README.md). The deployed `yambox`, `arx247` and `arx248` profiles and their measured calibration are included. The separate `configs/examples/` profiles still contain placeholder geometry for new installations. `--check` validates structure; it does not verify a physical calibration or connection. The default `configs/default.json` selects YAM through `machines/yambox.json`; the Codex agent uses `gpt-6-astra`. Host-specific overrides and credentials stay outside Git.
 
 ```bash
 gpt-policy --check
