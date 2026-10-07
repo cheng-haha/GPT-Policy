@@ -3,25 +3,25 @@
   if (!section) return;
 
   // GPT-Policy values transcribed from the supplied evaluation table.
-  // Each tuple: English label, Chinese label, mean score, successes, timeouts, native failures.
+  // Each tuple: English label, Chinese label, mean score, successes.
   const tasks = [
-    ["Classify objects", "物品分类", 100, 5, 0, 0],
-    ["Classify by language", "语言分类", 100, 5, 0, 0],
-    ["Organize the table", "整理桌面", 75, 1, 4, 0],
-    ["Imitate a sorting sequence", "顺序模仿", 100, 5, 0, 0],
-    ["Arrange the largest number", "排列最大数", 100, 5, 0, 0],
-    ["Pack objects into a box", "物品装箱", 60, 2, 3, 0],
-    ["Build a tower", "搭塔", 64, 3, 2, 0],
-    ["Make Kong", "Make Kong", 80, 4, 1, 0],
-    ["Fold clothes", "折衣服", 80, 4, 0, 1],
-    ["Put bottles in a bin", "瓶子入垃圾桶", 100, 5, 0, 0],
+    ["Classify objects", "物品分类", 100, 5],
+    ["Classify by language", "语言分类", 100, 5],
+    ["Organize the table", "整理桌面", 75, 1],
+    ["Imitate a sorting sequence", "顺序模仿", 100, 5],
+    ["Arrange the largest number", "排列最大数", 100, 5],
+    ["Pack objects into a box", "物品装箱", 60, 2],
+    ["Build a tower", "搭塔", 64, 3],
+    ["Make Kong", "Make Kong", 80, 4],
+    ["Fold clothes", "折衣服", 80, 4],
+    ["Put bottles in a bin", "瓶子入垃圾桶", 100, 5],
   ];
   const trialsPerTask = 5;
   const totalTrials = tasks.length * trialsPerTask;
   const totals = tasks.reduce((sum, task) => {
     task.slice(2).forEach((value, index) => { sum[index] += value; });
     return sum;
-  }, [0, 0, 0, 0]);
+  }, [0, 0]);
   const ours = {
     name: "GPT-Policy", score: totals[0] / tasks.length,
     success: totals[1] / totalTrials * 100, kind: "ours", logos: ["assets/morphi-logo.png", "assets/benchmarks/logos/openai.ico"],
@@ -55,7 +55,7 @@
       note: "GPT-Policy results are from our evaluation. Other methods are reported values from the reference study’s ten-task subset; evaluation settings may differ.",
       definition: "Score measures partial completion; success rate measures completed episodes.",
       details: "GPT-Policy · Per-task results", download: "Download CSV",
-      task: "Task", successes: "Successes", timeouts: "Timeouts", failures: "Native failures", total: "Overall",
+      task: "Task", successes: "Successes", total: "Overall",
     },
     "zh-CN": {
       title: "十项任务的平均得分", successTitle: "十项任务的平均成功率",
@@ -66,7 +66,7 @@
       note: "GPT-Policy 数据来自我们的评测。其他方法的数据引自参考报告的十任务子集，评测设置可能不同。",
       definition: "得分衡量部分完成程度；成功率衡量完整完成任务的比例。",
       details: "GPT-Policy · 各任务明细", download: "下载 CSV",
-      task: "任务", successes: "成功数", timeouts: "超时未完成", failures: "原生失败", total: "合计 / 平均",
+      task: "任务", successes: "成功数", total: "合计 / 平均",
     },
   };
   const format = (value, selectedMetric) => selectedMetric === "score"
@@ -113,9 +113,9 @@
         <div class="benchmark-table-scroll" role="region" aria-label="${t.details}" tabindex="0">
           <table>
             <caption>${t.subtitle}</caption>
-            <thead><tr><th scope="col">${t.task}</th><th scope="col">${t.score}<br>(0–100)</th><th scope="col">${t.successes}</th><th scope="col">${t.success}</th><th scope="col">${t.timeouts}</th><th scope="col">${t.failures}</th></tr></thead>
-            <tbody>${tasks.map(task => `<tr><th scope="row">${task[chinese ? 1 : 0]}</th><td>${task[2].toFixed(2)}</td><td>${task[3]}/${trialsPerTask}</td><td>${format(task[3] / trialsPerTask * 100, "success")}</td><td>${task[4]}</td><td>${task[5]}</td></tr>`).join("")}</tbody>
-            <tfoot><tr><th scope="row">${t.total}</th><td>${ours.score.toFixed(2)}</td><td>${totals[1]}/${totalTrials}</td><td>${format(ours.success, "success")}</td><td>${totals[2]}</td><td>${totals[3]}</td></tr></tfoot>
+            <thead><tr><th scope="col">${t.task}</th><th scope="col">${t.score}<br>(0–100)</th><th scope="col">${t.successes}</th><th scope="col">${t.success}</th></tr></thead>
+            <tbody>${tasks.map(task => `<tr><th scope="row">${task[chinese ? 1 : 0]}</th><td>${task[2].toFixed(2)}</td><td>${task[3]}/${trialsPerTask}</td><td>${format(task[3] / trialsPerTask * 100, "success")}</td></tr>`).join("")}</tbody>
+            <tfoot><tr><th scope="row">${t.total}</th><td>${ours.score.toFixed(2)}</td><td>${totals[1]}/${totalTrials}</td><td>${format(ours.success, "success")}</td></tr></tfoot>
           </table>
         </div>
         <a class="benchmark-download" href="assets/benchmarks/robodojo-tasks.csv" download>${t.download} ↓</a>

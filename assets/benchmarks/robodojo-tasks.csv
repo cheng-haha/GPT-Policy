@@ -1,11 +1,11 @@
-task,task_zh,mean_score,successes,trials,success_rate_percent,timeouts,native_failures
-Classify objects,物品分类,100.00,5,5,100,0,0
-Classify by language,语言分类,100.00,5,5,100,0,0
-Organize the table,整理桌面,75.00,1,5,20,4,0
-Imitate a sorting sequence,顺序模仿,100.00,5,5,100,0,0
-Arrange the largest number,排列最大数,100.00,5,5,100,0,0
-Pack objects into a box,物品装箱,60.00,2,5,40,3,0
-Build a tower,搭塔,64.00,3,5,60,2,0
-Make Kong,Make Kong,80.00,4,5,80,1,0
-Fold clothes,折衣服,80.00,4,5,80,0,1
-Put bottles in a bin,瓶子入垃圾桶,100.00,5,5,100,0,0
+task,task_zh,mean_score,successes,trials,success_rate_percent
+Classify objects,物品分类,100.00,5,5,100
+Classify by language,语言分类,100.00,5,5,100
+Organize the table,整理桌面,75.00,1,5,20
+Imitate a sorting sequence,顺序模仿,100.00,5,5,100
+Arrange the largest number,排列最大数,100.00,5,5,100
+Pack objects into a box,物品装箱,60.00,2,5,40
+Build a tower,搭塔,64.00,3,5,60
+Make Kong,Make Kong,80.00,4,5,80
+Fold clothes,折衣服,80.00,4,5,80
+Put bottles in a bin,瓶子入垃圾桶,100.00,5,5,100
