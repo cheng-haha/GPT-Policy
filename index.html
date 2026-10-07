@@ -11,7 +11,7 @@
     <title>In-Context Robot Learning with VLM Agents</title>
     <link rel="preload" as="image" href="assets/gpt-policy-logo.png" fetchpriority="high" />
     <link rel="stylesheet" href="styles.css?v=20260915-entry-logo" />
-    <link rel="stylesheet" href="robodojo.css?v=20261007" />
+    <link rel="stylesheet" href="robodojo.css?v=20261007-reference" />
   </head>
   <body id="top">
     <button class="language-toggle" id="language-toggle" type="button" aria-label="Switch to Chinese" title="Switch to Chinese">
@@ -60,10 +60,6 @@
           </a>
         </div>
 
-        <section id="robodojo" class="benchmark" aria-label="RoboDojo benchmark results">
-          <noscript>GPT-Policy on ten RoboDojo tasks: mean score 85.90 / 100; success rate 78% (39/50). <a href="assets/benchmarks/robodojo-tasks.csv">Download task results</a>.</noscript>
-        </section>
-
         <div class="hero-figure">
           <figure class="hero-cover-figure">
             <div class="hero-cover-media">
@@ -72,6 +68,10 @@
             <figcaption><b>Figure 1.</b> A general-purpose VLM combines the task instruction, initial state, and contextual information to guide robot actions. Context includes human videos, robot videos with recorded actions, goal images, human–robot interaction, and self-interaction history.</figcaption>
           </figure>
         </div>
+      </section>
+
+      <section id="robodojo" class="benchmark" aria-label="RoboDojo benchmark results">
+        <noscript>GPT-Policy on ten RoboDojo tasks: mean score 85.90 / 100; success rate 78% (39/50). <a href="assets/benchmarks/robodojo-tasks.csv">Download task results</a>.</noscript>
       </section>
 
       <div class="content-layout shell">
@@ -359,6 +359,6 @@
     </footer>
 
     <script src="script.js?v=20260915-goal-neat"></script>
-    <script src="robodojo.js?v=20261007"></script>
+    <script src="robodojo.js?v=20261007-reference"></script>
   </body>
 </html>
