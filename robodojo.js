@@ -24,7 +24,7 @@
   }, [0, 0, 0, 0]);
   const ours = {
     name: "GPT-Policy", score: totals[0] / tasks.length,
-    success: totals[1] / totalTrials * 100, kind: "ours", logos: ["assets/morphi-logo.png"],
+    success: totals[1] / totalTrials * 100, kind: "ours", logos: ["assets/morphi-logo.png", "assets/benchmarks/logos/openai.ico"],
   };
 
   // Published references, NOT reruns of our evaluation. See assets/benchmarks/README.md.

@@ -45,7 +45,7 @@
 .benchmark-icons { display: flex; align-items: center; gap: 2px; flex: 0 0 52px; height: 24px; }
 .benchmark-icons img { width: 24px; height: 24px; object-fit: contain; }
 .benchmark-row.ours .benchmark-icons { position: relative; }
-.benchmark-row.ours .benchmark-icons img { width: 48px; height: 48px; margin-left: -10px; max-width: none; mix-blend-mode: multiply; }
+.benchmark-row.ours .benchmark-icons img:first-child { width: 44px; height: 44px; margin-inline: -10px; max-width: none; mix-blend-mode: multiply; }
 .benchmark-pi { font-style: italic; white-space: nowrap; }
 .benchmark-pi sub { font-size: .66em; font-style: normal; }
 .benchmark-ours-label { font-size: 13px; white-space: nowrap; }
@@ -84,6 +84,7 @@
   .benchmark-model { font-size: 13px; gap: 7px; }
   .benchmark-icons { flex-basis: 46px; }
   .benchmark-icons img { width: 21px; height: 21px; }
+  .benchmark-row.ours .benchmark-icons img:first-child { width: 40px; height: 40px; margin-inline: -9px; }
   .benchmark-value { font-size: 13px; }
 }
 @media (max-width: 520px) {
@@ -99,7 +100,7 @@
   .benchmark-model { font-size: 12px; gap: 5px; }
   .benchmark-icons { flex-basis: 37px; gap: 1px; }
   .benchmark-icons img { width: 18px; height: 18px; }
-  .benchmark-row.ours .benchmark-icons img { width: 40px; height: 40px; margin-left: -8px; }
+  .benchmark-row.ours .benchmark-icons img:first-child { width: 34px; height: 34px; margin-inline: -8px; }
   .benchmark-ours-label { display: none; }
   .benchmark-value { font-size: 12px; }
   .benchmark-axis { font-size: 10px; }
