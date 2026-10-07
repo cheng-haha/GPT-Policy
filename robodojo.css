@@ -17,7 +17,7 @@
   margin: 10px 0 64px;
   padding: 32px 4% 22px;
   border-top: 4px solid var(--benchmark-blue);
-  background: #f3f7ff;
+  background: #fff;
   color: #294462;
   font-family: "Benchmark Latin", "Benchmark Song", Georgia, "Songti SC", serif;
   text-align: left;
@@ -51,7 +51,8 @@
 .benchmark-ours-label { font-size: 13px; white-space: nowrap; }
 .benchmark-track { position: relative; display: flex; align-items: center; height: 100%; border-left: 1px solid #e0e7f2; border-right: 1px solid #e0e7f2; background: repeating-linear-gradient(to right, transparent 0, transparent calc(20% - 1px), #e6ecf6 calc(20% - 1px), #e6ecf6 20%); }
 .benchmark-bar { width: var(--bar-value); height: 20px; border-radius: 0 4px 4px 0; background: #a7bddc; }
-.benchmark-row.ours .benchmark-bar, .benchmark-row.hybrid .benchmark-bar { background: #3478f6; }
+.benchmark-row.ours .benchmark-bar { background: #000; }
+.benchmark-row.hybrid .benchmark-bar { background: #3478f6; }
 .benchmark-row.direct .benchmark-bar { background: #56b5a4; }
 .benchmark-row.pi .benchmark-bar { background: #e9a150; }
 .benchmark-row.ours .benchmark-model, .benchmark-row.hybrid .benchmark-model { color: #2463ce; font-weight: 700; }
