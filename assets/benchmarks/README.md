@@ -2,7 +2,7 @@
 
 ## GPT-Policy
 
-The ten task rows in `robodojo-tasks.csv` were transcribed from the evaluation-table screenshot supplied by the project owner on 2026-10-07. The chart calculates the aggregate from the task rows: mean score **85.90 / 100**, success **39/50 (78%)**. Each task has five trials. Scores and success rates are distinct metrics. The displayed table and CSV include task names, scores, and success counts/rates.
+The ten task rows in `robodojo-tasks.csv` were transcribed from the latest evaluation-table screenshot supplied by the project owner on 2026-10-07. The chart calculates the aggregate from the task rows: mean score **86.90 / 100**, success **40/50 (80%)**. The updated results give packing objects a mean score of 50 and folding clothes a mean score of 100 with 5/5 successes. Each task has five trials. Scores and success rates are distinct metrics. The displayed table and CSV include task names, scores, and success counts/rates.
 
 The screenshot does not specify seeds, scene mixture, control budgets, or a context condition. The page does not assign such settings or claim matched evaluation against the published references.
 

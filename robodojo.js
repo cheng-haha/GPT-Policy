@@ -10,10 +10,10 @@
     ["Organize the table", "整理桌面", 75, 1],
     ["Imitate a sorting sequence", "顺序模仿", 100, 5],
     ["Arrange the largest number", "排列最大数", 100, 5],
-    ["Pack objects into a box", "物品装箱", 60, 2],
+    ["Pack objects into a box", "物品装箱", 50, 2],
     ["Build a tower", "搭塔", 64, 3],
     ["Make Kong", "Make Kong", 80, 4],
-    ["Fold clothes", "折衣服", 80, 4],
+    ["Fold clothes", "折衣服", 100, 5],
     ["Put bottles in a bin", "瓶子入垃圾桶", 100, 5],
   ];
   const trialsPerTask = 5;
