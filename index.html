@@ -11,6 +11,7 @@
     <title>In-Context Robot Learning with VLM Agents</title>
     <link rel="preload" as="image" href="assets/gpt-policy-logo.png" fetchpriority="high" />
     <link rel="stylesheet" href="styles.css?v=20260915-entry-logo" />
+    <link rel="stylesheet" href="robodojo.css?v=20261007" />
   </head>
   <body id="top">
     <button class="language-toggle" id="language-toggle" type="button" aria-label="Switch to Chinese" title="Switch to Chinese">
@@ -58,6 +59,10 @@
             <span>X</span>
           </a>
         </div>
+
+        <section id="robodojo" class="benchmark" aria-label="RoboDojo benchmark results">
+          <noscript>GPT-Policy on ten RoboDojo tasks: mean score 85.90 / 100; success rate 78% (39/50). <a href="assets/benchmarks/robodojo-tasks.csv">Download task results</a>.</noscript>
+        </section>
 
         <div class="hero-figure">
           <figure class="hero-cover-figure">
@@ -354,5 +359,6 @@
     </footer>
 
     <script src="script.js?v=20260915-goal-neat"></script>
+    <script src="robodojo.js?v=20261007"></script>
   </body>
 </html>

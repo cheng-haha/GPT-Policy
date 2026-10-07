@@ -690,6 +690,7 @@ function applyLanguage(language) {
   const label = language === "zh-CN" ? "切换到英文" : "Switch to Chinese";
   toggle.setAttribute("aria-label", label);
   toggle.title = label;
+  document.dispatchEvent(new CustomEvent("languagechange", { detail: language }));
 }
 
 const demoTasks = [
