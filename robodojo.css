@@ -29,14 +29,11 @@
 .benchmark-heading { min-width: 0; text-align: right; }
 .benchmark h2 { margin: 0 0 3px; font-family: inherit; font-size: 28px; font-weight: 650; line-height: 1.5; letter-spacing: 0; color: #234674; }
 .benchmark-subtitle { margin: 6px 0 0; color: #5f7595; font-size: 12px; line-height: 1.85; }
-.benchmark-toolbar { display: flex; justify-content: flex-end; height: 48px; margin: 0 0 10px; }
-.benchmark-menu { position: relative; align-self: flex-start; z-index: 2; }
-.benchmark-menu > summary { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 4px; color: #627087; font: 20px/1 Georgia, serif; cursor: pointer; list-style: none; }
-.benchmark-menu > summary::-webkit-details-marker { display: none; }
-.benchmark-menu > summary:hover { background: #e6eefc; }
-.benchmark-controls { position: absolute; top: 32px; right: 0; display: grid; min-width: 155px; padding: 5px; border: 1px solid #dae3f2; border-radius: 6px; background: #fff; box-shadow: 0 5px 18px #29446215; }
-.benchmark-controls button { border: 0; border-radius: 3px; padding: 9px 11px; background: transparent; color: #5f7595; text-align: left; font-family: inherit; font-size: 14px; line-height: 1.4; cursor: pointer; }
-.benchmark-controls button[aria-pressed="true"] { background: #edf3ff; color: #2463ce; }
+.benchmark-toolbar { display: flex; justify-content: flex-end; margin: 0 0 20px; }
+.benchmark-controls { display: inline-grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 4px; border: 1px solid #d9dce1; border-radius: 999px; background: #fff; }
+.benchmark-controls button { min-width: 130px; min-height: 44px; border: 0; border-radius: 999px; padding: 10px 20px; background: #fff; color: #5b6068; text-align: center; font: 600 14px/1.4 "Geist", system-ui, sans-serif; cursor: pointer; }
+.benchmark-controls button:hover { background: #f3f4f6; color: #202124; }
+.benchmark-controls button[aria-pressed="true"] { background: #202124; color: #fff; }
 .benchmark-controls button:focus-visible, .benchmark a:focus-visible, .benchmark summary:focus-visible, .benchmark-table-scroll:focus-visible { outline: 2px solid var(--benchmark-blue); outline-offset: 4px; }
 .benchmark-axis, .benchmark-row { display: grid; grid-template-columns: var(--benchmark-label) minmax(0, 1fr) var(--benchmark-value); column-gap: 12px; align-items: center; }
 .benchmark-bars { margin: 0; padding: 0; list-style: none; }
@@ -96,7 +93,9 @@
   .benchmark-brand img { width: 170px; height: 44px; }
   .benchmark h2 { font-size: 22px; }
   .benchmark-subtitle { font-size: 11px; }
-  .benchmark-toolbar { height: 32px; margin-bottom: 8px; }
+  .benchmark-toolbar { margin-bottom: 16px; }
+  .benchmark-controls { width: 100%; }
+  .benchmark-controls button { min-width: 0; padding-inline: 12px; }
   .benchmark-axis, .benchmark-row { column-gap: 6px; }
   .benchmark-row { height: 42px; }
   .benchmark-model { font-size: 12px; gap: 5px; }

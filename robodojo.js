@@ -50,7 +50,7 @@
       title: "Mean Score Across Ten Tasks", successTitle: "Mean Success Rate Across Ten Tasks",
       subtitle: "RoboDojo-Sim · 10 tasks",
       score: "Mean score", success: "Success rate", ours: "Ours",
-      chart: "Results by model", metric: "Chart metric", options: "Chart options", axisScore: "Mean score (0–100)",
+      chart: "Results by model", metric: "Chart metric", axisScore: "Mean score (0–100)",
       axisSuccess: "Success rate (%)", source: "Published reference results",
       note: "GPT-Policy results are from our evaluation. Other methods are reported values from the reference study’s ten-task subset; evaluation settings may differ.",
       definition: "Score measures partial completion; success rate measures completed episodes.",
@@ -61,7 +61,7 @@
       title: "十项任务的平均得分", successTitle: "十项任务的平均成功率",
       subtitle: "RoboDojo-Sim · 10 项任务",
       score: "平均得分", success: "成功率", ours: "我们的方法",
-      chart: "各模型评测结果", metric: "图表指标", options: "图表选项", axisScore: "平均得分（0–100）",
+      chart: "各模型评测结果", metric: "图表指标", axisScore: "平均得分（0–100）",
       axisSuccess: "成功率（%）", source: "公开报告中的参考结果",
       note: "GPT-Policy 数据来自我们的评测。其他方法的数据引自参考报告的十任务子集，评测设置可能不同。",
       definition: "得分衡量部分完成程度；成功率衡量完整完成任务的比例。",
@@ -88,13 +88,10 @@
         </div>
       </header>
       <div class="benchmark-toolbar">
-        <details class="benchmark-menu">
-          <summary aria-label="${t.options}" title="${t.options}">⋯</summary>
-          <div class="benchmark-controls" role="group" aria-label="${t.metric}">
-            <button type="button" data-metric="score" aria-pressed="${metric === "score"}">${t.score}</button>
-            <button type="button" data-metric="success" aria-pressed="${metric === "success"}">${t.success}</button>
-          </div>
-        </details>
+        <div class="benchmark-controls" role="group" aria-label="${t.metric}">
+          <button type="button" data-metric="score" aria-pressed="${metric === "score"}">${t.score}</button>
+          <button type="button" data-metric="success" aria-pressed="${metric === "success"}">${t.success}</button>
+        </div>
       </div>
       <div class="benchmark-plot" role="group" aria-label="${t.chart}">
         <ol class="benchmark-bars">
@@ -127,7 +124,7 @@
     if (!button || button.dataset.metric === metric) return;
     metric = button.dataset.metric;
     render();
-    section.querySelector(".benchmark-menu summary").focus({ preventScroll: true });
+    section.querySelector(`button[data-metric="${metric}"]`).focus({ preventScroll: true });
   });
   document.addEventListener("languagechange", render);
   render();

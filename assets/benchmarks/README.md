@@ -27,13 +27,13 @@ Source: [GPT 6 Astra as an Embodied Policy](https://anonymous-report-421.github.
 
 The source recomputes official-model aggregates for its selected task subset and scene mixture. These are not full-benchmark leaderboard values, and are not reruns of the GPT-Policy evaluation. The visible chart caption keeps this distinction explicit.
 
-The chart is implemented locally in `robodojo.js` and `robodojo.css`, following the reference's horizontal bars, blue panel, highlighted method, and numeric labels. The existing site's language control switches both the chart and task table between English and Chinese. Both chart metrics use a fixed 0–100 axis and sort by the selected metric.
+The chart is implemented locally in `robodojo.js` and `robodojo.css`, following the reference's horizontal bars, highlighted method, and numeric labels. The existing site's language control switches both the chart and task table between English and Chinese. Both chart metrics use a fixed 0–100 axis and sort by the selected metric.
 
 The MORPHI logo is the original 540×540 PNG supplied by the project owner. It is displayed with its aspect ratio preserved in the GPT-Policy row.
 
 
 ## Reference-style revision
 
-The chart sits directly after Figure 1 and its caption. Its full-width light-blue panel, 4 px blue top border, right-aligned heading, 38.667 px rows, 20 px bars, bottom axis, and model-icon column follow the reference opening chart. The compact options menu retains mean-score/success-rate switching.
+The chart sits directly after Figure 1 and its caption. Its full-width layout, 4 px blue top border, right-aligned heading, 38.667 px rows, 20 px bars, bottom axis, and model-icon column follow the reference opening chart. At the project owner's request, the background is white and the GPT-Policy bar and label are charcoal (#202124). Two always-visible buttons switch directly between mean score and success rate, with the active metric highlighted in charcoal.
 
 The RoboDojo and model logos under `logos/`, and the chart font subsets under `fonts/`, are original embedded assets from the reference page, retrieved on 2026-10-07. Logo correspondence follows that page: Physical Intelligence plus OpenAI for the hybrid, Galaxea, OpenAI for direct GPT, Xiaomi, OpenWAM, DM, Meituan, Spatial Forcing, Physical Intelligence, StarVLA, InternVLA, and Hunyuan for Hy-VLA. They identify the reported models; ownership remains with their respective owners. The MORPHI logo comes from the project owner, as noted above.
