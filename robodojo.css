@@ -30,8 +30,8 @@
 .benchmark h2 { margin: 0 0 3px; font-family: inherit; font-size: 28px; font-weight: 650; line-height: 1.5; letter-spacing: 0; color: #234674; }
 .benchmark-subtitle { margin: 6px 0 0; color: #5f7595; font-size: 12px; line-height: 1.85; }
 .benchmark-toolbar { display: flex; justify-content: flex-end; margin: 0 0 14px; }
-.benchmark-controls { display: inline-grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px; padding: 3px; border: 1px solid #d9dce1; border-radius: 999px; background: #fff; }
-.benchmark-controls button { min-width: 100px; min-height: 32px; border: 0; border-radius: 999px; padding: 6px 12px; background: #fff; color: #5b6068; text-align: center; font: 600 12px/1.4 "Geist", system-ui, sans-serif; cursor: pointer; }
+.benchmark-controls { display: inline-grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px; padding: 2px; border: 1px solid #d9dce1; border-radius: 999px; background: #fff; }
+.benchmark-controls button { min-width: 86px; min-height: 26px; border: 0; border-radius: 999px; padding: 4px 9px; background: #fff; color: #5b6068; text-align: center; font: 600 11px/1.4 "Geist", system-ui, sans-serif; cursor: pointer; }
 .benchmark-controls button:hover { background: #f3f4f6; color: #202124; }
 .benchmark-controls button[aria-pressed="true"] { background: #202124; color: #fff; }
 .benchmark-controls button:focus-visible, .benchmark a:focus-visible, .benchmark summary:focus-visible, .benchmark-table-scroll:focus-visible { outline: 2px solid var(--benchmark-blue); outline-offset: 4px; }
@@ -95,7 +95,7 @@
   .benchmark-subtitle { font-size: 11px; }
   .benchmark-toolbar { margin-bottom: 16px; }
   .benchmark-controls { max-width: 100%; }
-  .benchmark-controls button { min-width: 0; padding-inline: 12px; }
+  .benchmark-controls button { min-width: 0; padding-inline: 9px; }
   .benchmark-axis, .benchmark-row { column-gap: 6px; }
   .benchmark-row { height: 42px; }
   .benchmark-model { font-size: 12px; gap: 5px; }
