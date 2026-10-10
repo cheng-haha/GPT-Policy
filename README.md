@@ -179,10 +179,10 @@ See [THIRD_PARTY.md](THIRD_PARTY.md) for third-party notices and optional SDK so
 ## Citation
 
 ```bibtex
-@article{cheng2026incontextrobotlearningvlm,
+@article{cheng2026context,
   title={In-Context Robot Learning with VLM Agents},
-  author={Dongzhou Cheng and Taoran Yi and Ye Fang and Xingwu Zhang and Fan Feng and Yixuan Li and Gengxiong Zhuang and Rongze Wang and Shuai Yang and Wei Song and Weizhi Xue and Minyan Wu and Jie Gui and Jiaqi Wang and Tong Wu},
-  journal={arxiv:2609.19138},
+  author={Cheng, Dongzhou and Yi, Taoran and Fang, Ye and Zhang, Xingwu and Feng, Fan and Li, Yixuan and Zhuang, Gengxiong and Wang, Rongze and Yang, Shuai and Song, Wei and others},
+  journal={arXiv preprint arXiv:2609.19138},
   year={2026}
 }
 ```
