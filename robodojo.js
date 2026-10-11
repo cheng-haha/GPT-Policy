@@ -6,15 +6,15 @@
   // Each tuple: English label, Chinese label, mean score, successes.
   const tasks = [
     ["Classify objects", "物品分类", 100, 5],
-    ["Classify by language", "语言分类", 100, 5],
-    ["Organize the table", "整理桌面", 75, 1],
+    ["Classify by language", "语言分类", 88, 4],
+    ["Organize the table", "整理桌面", 65, 1],
     ["Imitate a sorting sequence", "顺序模仿", 100, 5],
     ["Arrange the largest number", "排列最大数", 100, 5],
-    ["Pack objects into a box", "物品装箱", 50, 2],
-    ["Build a tower", "搭塔", 64, 3],
+    ["Pack objects into a box", "物品装箱", 70, 3],
+    ["Build a tower", "搭塔", 46, 2],
     ["Make Kong", "Make Kong", 80, 4],
-    ["Fold clothes", "折衣服", 100, 5],
-    ["Put bottles in a bin", "瓶子入垃圾桶", 100, 5],
+    ["Fold clothes", "折衣服", 80, 4],
+    ["Put bottles in a bin", "瓶子入垃圾桶", 73, 3],
   ];
   const trialsPerTask = 5;
   const totalTrials = tasks.length * trialsPerTask;
