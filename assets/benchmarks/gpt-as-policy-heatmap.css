@@ -1,0 +1,24 @@
+/* Table 1 CSS copied from GPT 6 Astra as an Embodied Policy.
+ * Source: https://anonymous-report-421.github.io/public-website/?view=1
+ * Retrieved 2026-10-11. Layout integration overrides are in robodojo.css.
+ */
+.rr-report .rr-chart-switch{justify-content:flex-end;gap:0;margin:20px 0 10px;display:flex}
+.rr-report .rr-chart-switch button{cursor:pointer;color:#444;background:#fff;border:1px solid #bdbdbd;padding:6px 13px;font-size:12px}
+.rr-report .rr-chart-switch button+button{border-left:0}
+.rr-report .rr-chart-switch button[aria-pressed=true]{color:#2463ce;background:#eaf2ff;font-weight:600}
+.rr-report .rr-heat-legend{justify-content:flex-end;align-items:center;gap:1px;margin-top:10px;font-size:11px;display:flex}
+.rr-report .rr-heat-legend span{padding:4px 12px}
+.rr-report .rr-table-scroll{width:100%;margin:18px 0;overflow-x:auto}
+.rr-report .rr-table{border-collapse:collapse;font-variant-numeric:tabular-nums;border-block:1.5px solid #777;width:100%;font-size:12px}
+.rr-report .rr-table th,.rr-report .rr-table td{text-align:right;white-space:nowrap;border-bottom:1px solid #e5e5e5;padding:11px 7px}
+.rr-report .rr-table th:first-child{text-align:left;z-index:1;background:#fff;position:sticky;left:0}
+.rr-report .rr-table thead th{white-space:normal;vertical-align:bottom;border-bottom:1px solid #999;min-width:0;font-size:11px;font-weight:600}
+.rr-report .rr-table tbody th{font-weight:400}
+.rr-report .rr-table tfoot{border-top:1px solid #777;font-weight:600}
+.rr-report .rr-table sup{color:#666;padding-left:3px;font-size:9px}
+.rr-report .rr-heat-table td{font-variant-numeric:tabular-nums;border:1px solid #fff}
+.rr-report .rr-heat-table td sup{color:inherit}
+.rr-report .rr-heat-table{table-layout:fixed}
+.rr-report .rr-heat-table th{min-width:0}
+.rr-report .rr-heat-table th:first-child{width:126px}
+.rr-report[lang=en] .rr-heat-table tbody th{white-space:normal;overflow-wrap:break-word;line-height:1.45}

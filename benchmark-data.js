@@ -1,5 +1,5 @@
-// Paper Tables 2 and 5; supplementary official references from the linked report.
-// See assets/benchmarks/README.md for aggregation and source precedence.
+// Confirmed paper Table 2 supplied by the user; supplementary references from GPT-as-Policy.
+// The confirmed table takes precedence over the older local PDF. See assets/benchmarks/README.md.
 const benchmarkData = {
   "version": "2026-10-11",
   "paper": "paper.pdf",
@@ -22,19 +22,19 @@ const benchmarkData = {
     {
       "id": "GalaxeaVLA (G0.5)",
       "name": "Galaxea G0.5",
-      "header": "Galaxea<br>G0.5",
-      "score": 38.26,
-      "success": 30.9464,
+      "header": "GalaxeaVLA (G0.5)",
+      "score": 38.78,
+      "success": 31.33,
       "logos": [
         "assets/benchmarks/logos/galaxea.png"
       ],
       "kind": "reference",
-      "source": "paper-score-reference-success"
+      "source": "confirmed-paper-table-2"
     },
     {
       "id": "Xiaomi-Robotics-1",
       "name": "Xiaomi R1",
-      "header": "Xiaomi<br>R1",
+      "header": "Xiaomi-Robotics-1",
       "score": 33.9746,
       "success": 25.5072,
       "logos": [
@@ -46,19 +46,19 @@ const benchmarkData = {
     {
       "id": "OpenWAM-α",
       "name": "OpenWAM-α",
-      "header": "OpenWAM<br>α",
-      "score": 32.73,
-      "success": 23.0662,
+      "header": "OpenWAM-α",
+      "score": 33.57,
+      "success": 23.8,
       "logos": [
         "assets/benchmarks/logos/openwam.png"
       ],
       "kind": "reference",
-      "source": "paper-score-reference-success"
+      "source": "confirmed-paper-table-2"
     },
     {
       "id": "Meituan-Robotics-0",
       "name": "Meituan R0",
-      "header": "Meituan R0",
+      "header": "Meituan-Robotics-0",
       "score": 28.328599999999998,
       "success": 17.8796,
       "logos": [
@@ -70,7 +70,7 @@ const benchmarkData = {
     {
       "id": "Hy-Embodied-0.5-VLA",
       "name": "Hy-VLA 0.5",
-      "header": "Hy-VLA 0.5",
+      "header": "Hy-Embodied-0.5-VLA",
       "score": 21.1594,
       "success": 13.935,
       "logos": [
@@ -96,17 +96,17 @@ const benchmarkData = {
       "name": "π₀.₅",
       "header": "π₀.₅",
       "score": 24.9,
-      "success": 16.0,
+      "success": 16,
       "logos": [
         "assets/benchmarks/logos/pi.png"
       ],
       "kind": "pi",
-      "source": "paper"
+      "source": "confirmed-paper-table-2"
     },
     {
       "id": "InternVLA-A1.5",
       "name": "InternVLA A1.5",
-      "header": "InternVLA A1.5",
+      "header": "InternVLA-A1.5",
       "score": 21.7398,
       "success": 15.0268,
       "logos": [
@@ -118,7 +118,7 @@ const benchmarkData = {
     {
       "id": "StarVLA-PI_v3",
       "name": "StarVLA-PI",
-      "header": "StarVLA-PI",
+      "header": "StarVLA-PI_v3",
       "score": 22.3636,
       "success": 16.1734,
       "logos": [
@@ -130,7 +130,7 @@ const benchmarkData = {
     {
       "id": "mix",
       "name": "π₀.₅ + GPT 6 Astra",
-      "header": "GPT-as-Policy<br>Hybrid",
+      "header": "π₀.₅ + GPT 6 Astra",
       "score": 62.6,
       "success": 48,
       "logos": [
@@ -138,62 +138,32 @@ const benchmarkData = {
         "assets/benchmarks/logos/openai.ico"
       ],
       "kind": "hybrid",
-      "source": "paper"
+      "source": "confirmed-paper-table-2"
     },
     {
       "id": "gpt",
       "name": "GPT 6 Astra (direct)",
-      "header": "GPT-as-Policy<br>Direct",
+      "header": "GPT 6 Astra (direct)",
       "score": 38.5,
       "success": 26,
       "logos": [
         "assets/benchmarks/logos/openai.ico"
       ],
       "kind": "direct",
-      "source": "paper"
-    },
-    {
-      "id": "roboicl-zero",
-      "name": "RoboICL (0-shot)",
-      "header": "RoboICL<br>0-shot",
-      "score": 45.6,
-      "success": null,
-      "logos": [],
-      "kind": "paper",
-      "source": "paper"
-    },
-    {
-      "id": "robodawn",
-      "name": "RoboDawn (1-shot)",
-      "header": "RoboDawn<br>1-shot",
-      "score": 62.5,
-      "success": 48,
-      "logos": [],
-      "kind": "paper",
-      "source": "paper"
-    },
-    {
-      "id": "roboicl-one",
-      "name": "RoboICL (1-shot)",
-      "header": "RoboICL<br>1-shot",
-      "score": 60.6,
-      "success": null,
-      "logos": [],
-      "kind": "paper",
-      "source": "paper"
+      "source": "confirmed-paper-table-2"
     },
     {
       "id": "ours",
       "name": "GPT-Policy",
       "header": "GPT-Policy<br>(Ours)",
-      "score": 63,
-      "success": 52,
+      "score": 80.2,
+      "success": 72,
       "logos": [
         "assets/morphi-logo.png",
         "assets/benchmarks/logos/openai.ico"
       ],
       "kind": "ours",
-      "source": "paper"
+      "source": "confirmed-paper-table-2"
     }
   ],
   "tasks": [
@@ -201,7 +171,7 @@ const benchmarkData = {
       "id": "organize_table",
       "en": "Organize table",
       "zh": "整理桌面",
-      "successes": 0,
+      "successes": 1,
       "trials": 5,
       "values": {
         "DM0.5": {
@@ -218,7 +188,7 @@ const benchmarkData = {
         },
         "OpenWAM-α": {
           "score": 62.5,
-          "success": 13.330000000000002
+          "success": 13.33
         },
         "Meituan-Robotics-0": {
           "score": 43.67,
@@ -252,21 +222,9 @@ const benchmarkData = {
           "score": 30,
           "success": 0
         },
-        "roboicl-zero": {
-          "score": 45,
-          "success": null
-        },
-        "robodawn": {
-          "score": 75,
-          "success": 20
-        },
-        "roboicl-one": {
-          "score": 50,
-          "success": null
-        },
         "ours": {
-          "score": 60,
-          "success": 0
+          "score": 65,
+          "success": 20
         }
       }
     },
@@ -283,7 +241,7 @@ const benchmarkData = {
         },
         "GalaxeaVLA (G0.5)": {
           "score": 1.07,
-          "success": 0.0
+          "success": 0
         },
         "Xiaomi-Robotics-1": {
           "score": 2.0,
@@ -291,7 +249,7 @@ const benchmarkData = {
         },
         "OpenWAM-α": {
           "score": 1.33,
-          "success": 0.0
+          "success": 0
         },
         "Meituan-Robotics-0": {
           "score": 2.47,
@@ -325,18 +283,6 @@ const benchmarkData = {
           "score": 60,
           "success": 40
         },
-        "roboicl-zero": {
-          "score": 44,
-          "success": null
-        },
-        "robodawn": {
-          "score": 44,
-          "success": 20
-        },
-        "roboicl-one": {
-          "score": 44,
-          "success": null
-        },
         "ours": {
           "score": 88,
           "success": 80
@@ -347,7 +293,7 @@ const benchmarkData = {
       "id": "imitate_sorting_sequence",
       "en": "Imitate sorting sequence",
       "zh": "顺序模仿",
-      "successes": 4,
+      "successes": 5,
       "trials": 5,
       "values": {
         "DM0.5": {
@@ -356,7 +302,7 @@ const benchmarkData = {
         },
         "GalaxeaVLA (G0.5)": {
           "score": 1.67,
-          "success": 0.0
+          "success": 0
         },
         "Xiaomi-Robotics-1": {
           "score": 2.5,
@@ -398,21 +344,9 @@ const benchmarkData = {
           "score": 0,
           "success": 0
         },
-        "roboicl-zero": {
-          "score": 90,
-          "success": null
-        },
-        "robodawn": {
-          "score": 66,
-          "success": 60
-        },
-        "roboicl-one": {
-          "score": 90,
-          "success": null
-        },
         "ours": {
-          "score": 86,
-          "success": 80
+          "score": 100,
+          "success": 100
         }
       }
     },
@@ -428,16 +362,16 @@ const benchmarkData = {
           "success": 3.2
         },
         "GalaxeaVLA (G0.5)": {
-          "score": 4.11,
-          "success": 0.532
+          "score": 4.7,
+          "success": 0.67
         },
         "Xiaomi-Robotics-1": {
           "score": 8.562,
           "success": 3.732
         },
         "OpenWAM-α": {
-          "score": 4.36,
-          "success": 0.532
+          "score": 4.94,
+          "success": 0.67
         },
         "Meituan-Robotics-0": {
           "score": 6.414000000000001,
@@ -471,18 +405,6 @@ const benchmarkData = {
           "score": 57,
           "success": 40
         },
-        "roboicl-zero": {
-          "score": 71,
-          "success": null
-        },
-        "robodawn": {
-          "score": 100,
-          "success": 100
-        },
-        "roboicl-one": {
-          "score": 58,
-          "success": null
-        },
         "ours": {
           "score": 100,
           "success": 100
@@ -493,7 +415,7 @@ const benchmarkData = {
       "id": "build_tower",
       "en": "Build tower",
       "zh": "搭塔",
-      "successes": 1,
+      "successes": 2,
       "trials": 5,
       "values": {
         "DM0.5": {
@@ -544,21 +466,9 @@ const benchmarkData = {
           "score": 12,
           "success": 0
         },
-        "roboicl-zero": {
-          "score": 16,
-          "success": null
-        },
-        "robodawn": {
-          "score": 54,
-          "success": 40
-        },
-        "roboicl-one": {
-          "score": 100,
-          "success": null
-        },
         "ours": {
-          "score": 38,
-          "success": 20
+          "score": 46,
+          "success": 40
         }
       }
     },
@@ -566,7 +476,7 @@ const benchmarkData = {
       "id": "fold_clothes",
       "en": "Fold clothes",
       "zh": "折衣服",
-      "successes": 1,
+      "successes": 4,
       "trials": 5,
       "values": {
         "DM0.5": {
@@ -574,16 +484,16 @@ const benchmarkData = {
           "success": 24.534
         },
         "GalaxeaVLA (G0.5)": {
-          "score": 32.75,
-          "success": 28.002
+          "score": 36.27,
+          "success": 31.34
         },
         "Xiaomi-Robotics-1": {
           "score": 41.49,
           "success": 38.932
         },
         "OpenWAM-α": {
-          "score": 51.31,
-          "success": 49.068
+          "score": 57.47,
+          "success": 55.34
         },
         "Meituan-Robotics-0": {
           "score": 19.787999999999997,
@@ -617,21 +527,9 @@ const benchmarkData = {
           "score": 40,
           "success": 40
         },
-        "roboicl-zero": {
-          "score": 4,
-          "success": null
-        },
-        "robodawn": {
-          "score": 36,
-          "success": 20
-        },
-        "roboicl-one": {
-          "score": 84,
-          "success": null
-        },
         "ours": {
-          "score": 20,
-          "success": 20
+          "score": 80,
+          "success": 80
         }
       }
     },
@@ -639,7 +537,7 @@ const benchmarkData = {
       "id": "put_bottles_into_dustbin",
       "en": "Put bottles into dustbin",
       "zh": "瓶子入垃圾桶",
-      "successes": 4,
+      "successes": 3,
       "trials": 5,
       "values": {
         "DM0.5": {
@@ -648,7 +546,7 @@ const benchmarkData = {
         },
         "GalaxeaVLA (G0.5)": {
           "score": 96.3,
-          "success": 94.0
+          "success": 94
         },
         "Xiaomi-Robotics-1": {
           "score": 97.7,
@@ -690,21 +588,9 @@ const benchmarkData = {
           "score": 36,
           "success": 20
         },
-        "roboicl-zero": {
-          "score": 70,
-          "success": null
-        },
-        "robodawn": {
-          "score": 88,
-          "success": 80
-        },
-        "roboicl-one": {
-          "score": 73,
-          "success": null
-        },
         "ours": {
-          "score": 88,
-          "success": 80
+          "score": 73,
+          "success": 60
         }
       }
     },
@@ -712,7 +598,7 @@ const benchmarkData = {
       "id": "pack_objects_into_box",
       "en": "Pack objects into box",
       "zh": "物品装箱",
-      "successes": 0,
+      "successes": 3,
       "trials": 5,
       "values": {
         "DM0.5": {
@@ -720,16 +606,16 @@ const benchmarkData = {
           "success": 1.33
         },
         "GalaxeaVLA (G0.5)": {
-          "score": 17.12,
-          "success": 2.93
+          "score": 18.24,
+          "success": 3.33
         },
         "Xiaomi-Robotics-1": {
           "score": 18.694,
           "success": 2.398
         },
         "OpenWAM-α": {
-          "score": 20.83,
-          "success": 3.732
+          "score": 22.47,
+          "success": 4.67
         },
         "Meituan-Robotics-0": {
           "score": 13.614,
@@ -763,21 +649,9 @@ const benchmarkData = {
           "score": 50,
           "success": 20
         },
-        "roboicl-zero": {
-          "score": 16,
-          "success": null
-        },
-        "robodawn": {
-          "score": 19,
-          "success": 0
-        },
-        "roboicl-one": {
-          "score": 36,
-          "success": null
-        },
         "ours": {
-          "score": 10,
-          "success": 0
+          "score": 70,
+          "success": 60
         }
       }
     },
@@ -785,7 +659,7 @@ const benchmarkData = {
       "id": "make_kong",
       "en": "Make Kong",
       "zh": "Make Kong",
-      "successes": 2,
+      "successes": 4,
       "trials": 5,
       "values": {
         "DM0.5": {
@@ -794,7 +668,7 @@ const benchmarkData = {
         },
         "GalaxeaVLA (G0.5)": {
           "score": 90,
-          "success": 90.0
+          "success": 90
         },
         "Xiaomi-Robotics-1": {
           "score": 41.33,
@@ -802,7 +676,7 @@ const benchmarkData = {
         },
         "OpenWAM-α": {
           "score": 32,
-          "success": 32.0
+          "success": 32
         },
         "Meituan-Robotics-0": {
           "score": 56.0,
@@ -836,21 +710,9 @@ const benchmarkData = {
           "score": 0,
           "success": 0
         },
-        "roboicl-zero": {
-          "score": 0,
-          "success": null
-        },
-        "robodawn": {
-          "score": 60,
-          "success": 60
-        },
-        "roboicl-one": {
-          "score": 0,
-          "success": null
-        },
         "ours": {
-          "score": 40,
-          "success": 40
+          "score": 80,
+          "success": 80
         }
       }
     },
@@ -867,7 +729,7 @@ const benchmarkData = {
         },
         "GalaxeaVLA (G0.5)": {
           "score": 10.33,
-          "success": 4.0
+          "success": 4
         },
         "Xiaomi-Robotics-1": {
           "score": 17.2,
@@ -909,18 +771,6 @@ const benchmarkData = {
           "score": 100,
           "success": 100
         },
-        "roboicl-zero": {
-          "score": 100,
-          "success": null
-        },
-        "robodawn": {
-          "score": 83,
-          "success": 80
-        },
-        "roboicl-one": {
-          "score": 71,
-          "success": null
-        },
         "ours": {
           "score": 100,
           "success": 100
@@ -934,11 +784,21 @@ const benchmarkData = {
     "Xiaomi-Robotics-1",
     "OpenWAM-α",
     "Pi-05",
-    "gpt",
     "mix",
-    "roboicl-zero",
-    "robodawn",
-    "roboicl-one",
+    "gpt",
     "ours"
+  ],
+  "resultsSource": "User-confirmed Table 2 screenshot, 2026-10-11; supersedes simulation results in the local PDF export.",
+  "heatmapTasks": [
+    "organize_table",
+    "classify_objects_by_language",
+    "imitate_sorting_sequence",
+    "arrange_largest_number",
+    "pack_objects_into_box",
+    "classify_objects",
+    "build_tower",
+    "make_kong",
+    "fold_clothes",
+    "put_bottles_into_dustbin"
   ]
 };

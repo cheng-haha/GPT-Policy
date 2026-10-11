@@ -10,8 +10,9 @@
     <meta name="theme-color" content="#f7f8fa" />
     <title>In-Context Robot Learning with VLM Agents</title>
     <link rel="preload" as="image" href="assets/gpt-policy-logo.png" fetchpriority="high" />
-    <link rel="stylesheet" href="styles.css?v=20261011-paper" />
-    <link rel="stylesheet" href="robodojo.css?v=20261011-paper-heatmap" />
+    <link rel="stylesheet" href="styles.css?v=20261011-reference-table" />
+    <link rel="stylesheet" href="robodojo.css?v=20261011-reference-table" />
+    <link rel="stylesheet" href="assets/benchmarks/gpt-as-policy-heatmap.css?v=20261011-reference-table" />
   </head>
   <body id="top">
     <button class="language-toggle" id="language-toggle" type="button" aria-label="Switch to Chinese" title="Switch to Chinese">
@@ -71,7 +72,7 @@
       </section>
 
       <section id="robodojo" class="benchmark" aria-label="RoboDojo benchmark results">
-        <noscript>GPT-Policy on ten RoboDojo tasks: mean score 63.00 / 100; success rate 52% (26/50). <a href="assets/benchmarks/robodojo-tasks.csv">Download task results</a>.</noscript>
+        <noscript>GPT-Policy on ten RoboDojo tasks: mean score 80.20 / 100; success rate 72% (36/50). <a href="assets/benchmarks/robodojo-tasks.csv">Download task results</a>.</noscript>
       </section>
 
       <div class="content-layout shell">
@@ -97,7 +98,7 @@
                 Enabling robots to adapt to unfamiliar environments as readily as humans remains a moonshot goal of embodied AI. No finite collection of demonstrations can cover every task and situation a robot will encounter, making the ability to learn from context at deployment essential for generalization. Such in-context learning (ICL), however, remains largely beyond the reach of existing robotic policies. The broad agentic capabilities of commercial vision-language models (VLMs), such as GPT-6 Astra, raise a compelling question: can these models learn from demonstrations and interaction feedback, then translate that information into executable robot behavior without gradient updates or persistent changes to task-specific parameters?
               </p>
               <p>
-                We introduce <b>GPT-Policy</b>, a general-agent framework for in-context robot learning. GPT-Policy equips a VLM agent with a context compiler that organizes task-relevant information and an execution harness that supports geometric grounding, action chunking, and closed-loop decision-making through execution feedback. We evaluate GPT-Policy on ten real-world tasks spanning five context types and ten RoboDojo simulation tasks. Across four real-world demonstration tasks, mean success rate increases from 10% without demonstrations to 80% with human videos or robot demonstrations that include action references. Videos provide procedural guidance, while action references can clarify motion details. Targeted ablations suggest that calibrated localization and action chunking improve success and execution efficiency. Across ten RoboDojo tasks, one-shot GPT-Policy achieves 52% mean success. These results suggest that general-purpose VLMs can use deployment-time context to adapt robot behavior, while reliable physical execution remains a challenge.
+                We introduce <b>GPT-Policy</b>, a general-agent framework for in-context robot learning. GPT-Policy equips a VLM agent with a context compiler that organizes task-relevant information and an execution harness that supports geometric grounding, action chunking, and closed-loop decision-making through execution feedback. We evaluate GPT-Policy on ten real-world tasks spanning five context types and ten RoboDojo simulation tasks. Across four real-world demonstration tasks, mean success rate increases from 10% without demonstrations to 80% with human videos or robot demonstrations that include action references. Videos provide procedural guidance, while action references can clarify motion details. Targeted ablations suggest that calibrated localization and action chunking improve success and execution efficiency. Across ten RoboDojo tasks, one-shot GPT-Policy achieves 72% mean success. These results suggest that general-purpose VLMs can use deployment-time context to adapt robot behavior, while reliable physical execution remains a challenge.
               </p>
             </div>
             <div class="research-question">
@@ -374,8 +375,8 @@
       </div>
     </footer>
 
-    <script src="script.js?v=20261011-paper"></script>
-    <script src="benchmark-data.js?v=20261011-paper"></script>
-    <script src="robodojo.js?v=20261011-paper-heatmap"></script>
+    <script src="script.js?v=20261011-reference-table"></script>
+    <script src="benchmark-data.js?v=20261011-reference-table"></script>
+    <script src="robodojo.js?v=20261011-reference-table"></script>
   </body>
 </html>

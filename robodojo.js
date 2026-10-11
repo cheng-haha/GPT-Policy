@@ -1,11 +1,12 @@
 (() => {
   const section = document.querySelector("#robodojo");
   if (!section) return;
-  const { tasks, models, heatmapModels, reference: source } = benchmarkData;
+  const { tasks, models, heatmapModels, heatmapTasks, reference: source } = benchmarkData;
   const ours = models.find(model => model.id === "ours");
   const totalTrials = tasks.reduce((sum, task) => sum + task.trials, 0);
   const totalSuccesses = tasks.reduce((sum, task) => sum + task.successes, 0);
   const columns = heatmapModels.map(id => models.find(model => model.id === id));
+  const rows = heatmapTasks.map(id => tasks.find(task => task.id === id));
   let metric = "score";
   const labels = {
     en: {
@@ -13,14 +14,14 @@
       subtitle: "RoboDojo-Sim · 10 tasks · one-shot GPT-Policy",
       score: "Mean score", success: "Success rate", ours: "Ours",
       chart: "Results by model", metric: "Chart metric", axisScore: "Mean score (0–100)",
-      axisSuccess: "Success rate (%)", source: "Reference report", paper: "Paper · Tables 2 & 5",
-      note: "GPT-Policy: 63.00 mean score and 52% success. Paper results take precedence; additional official-model results come from the reference report. Baselines retain their published protocols.",
-      definition: "Score measures partial completion; success rate measures completed episodes. Means weight the ten tasks equally. RoboICL success rates are not reported.",
+      axisSuccess: "Success rate (%)", source: "Reference report", paper: "Paper",
+      note: "Ten-task averages. GPT-Policy uses one demonstration per task; baselines follow their published protocols.",
       details: "GPT-Policy · Per-task results", download: "Download CSV",
       task: "Task", successes: "Successes", total: "Mean (10 tasks)",
-      heatTitle: "Per-task comparison", tableCaption: "Table 1. Per-task score and success rate.",
-      heatDescription: "Switch between metrics; darker colors indicate higher values. Official references include the reference report’s overall top four models and π₀.₅, alongside the paper’s agent baselines.",
-      heatNote: "— Not reported. † RoboICL uses its zero-shot score for language-guided classification. Official-model success rates outside the paper are from the reference report. π₀.₅ uses the paper’s standard/random averaging; Direct uses a task-averaged score of 38.50.",
+      heatScore: "Score heatmap", heatSuccess: "Success-rate heatmap",
+      heatScoreTitle: "Per-task Score (0–100)", heatSuccessTitle: "Per-task success rate (%)",
+      tableCaption: "Table 1. Per-task Score and success rate.", overall: "Overall",
+      heatDescription: "Switch between metrics; darker colors indicate higher values. The official references include the top four models on the overall leaderboard and π₀.₅.",
       heatRegion: "Per-task heatmap; scroll horizontally on small screens", missing: "Not reported", scale: "Color scale (0–100)",
     },
     "zh-CN": {
@@ -28,14 +29,14 @@
       subtitle: "RoboDojo-Sim · 10 项任务 · GPT-Policy 单次示范",
       score: "平均得分", success: "成功率", ours: "我们的方法",
       chart: "各模型评测结果", metric: "图表指标", axisScore: "平均得分（0–100）",
-      axisSuccess: "成功率（%）", source: "参考报告", paper: "论文 · 表 2 与表 5",
-      note: "GPT-Policy：平均得分 63.00，成功率 52%。优先采用论文数值，补充的官方模型数据来自参考报告。各基线保留其原始评测方案。",
-      definition: "得分衡量部分完成程度，成功率衡量完整完成任务的比例。十项任务等权平均；RoboICL 未报告成功率。",
+      axisSuccess: "成功率（%）", source: "参考报告", paper: "论文",
+      note: "十项任务等权平均。GPT-Policy 每项任务使用一次示范；各基线沿用其原始评测方案。",
       details: "GPT-Policy · 各任务明细", download: "下载 CSV",
       task: "任务", successes: "成功数", total: "平均（10 项任务）",
-      heatTitle: "逐任务对比", tableCaption: "表 1. 各任务得分与成功率。",
-      heatDescription: "点击切换指标；颜色越深，数值越高。官方参考包括参考报告总榜前四模型和 π₀.₅，并列展示论文中的智能体基线。",
-      heatNote: "— 表示未报告。† RoboICL 的语言分类沿用零样本得分。论文之外的官方模型成功率来自参考报告。π₀.₅ 按论文对标准/随机场景取平均；Direct 按任务等权平均为 38.50 分。",
+      heatScore: "Score 热力表", heatSuccess: "成功率热力表",
+      heatScoreTitle: "逐任务 Score（0–100）", heatSuccessTitle: "逐任务成功率（%）",
+      tableCaption: "表 1. 各任务得分与成功率。", overall: "总体",
+      heatDescription: "切换指标；颜色越深，数值越高。官方参考包含总榜前四模型和 π₀.₅。",
       heatRegion: "逐任务热力图；小屏可横向滑动", missing: "未报告", scale: "色阶（0–100）",
     },
   };
@@ -43,14 +44,40 @@
     `${fixed ? value.toFixed(2) : Number(value.toFixed(2))}${selectedMetric === "success" ? "%" : ""}`;
   const modelName = name => name.replace("π₀.₅", '<span class="benchmark-pi">π<sub>0.5</sub></span>');
   const icons = model => model.logos.map(logo => `<img src="${logo}" alt="" width="24" height="24" />`).join("");
-  // Match the reference heatmap's fixed 0–100 blue scale; choose readable text.
+  // Table 1 color function adapted directly from GPT-as-Policy's X9 function:
+  // https://anonymous-report-421.github.io/public-website/?view=1 (2026-10-11).
   function heatStyle(value) {
     if (value == null) return "";
-    const ratio = Math.max(0, Math.min(100, value)) / 100;
+    const ratio = Number(value) / 100;
     const rgb = [247 - 214 * ratio, 250 - 159 * ratio, 255 - 78 * ratio].map(Math.round);
     const linear = rgb.map(v => v / 255).map(v => v <= .04045 ? v / 12.92 : ((v + .055) / 1.055) ** 2.4);
     const luminance = linear[0] * .2126 + linear[1] * .7152 + linear[2] * .0722;
     return `background-color:rgb(${rgb.join(",")});color:${1.05 / (luminance + .05) >= 4.5 ? "#fff" : "#000"}`;
+  }
+  // Preserve the reference's column order, markup, legend, and metric switch.
+  // GPT-Policy is the only appended column; no special cell outline or logos.
+  function heatmap(t, chinese) {
+    const title = metric === "score" ? t.heatScoreTitle : t.heatSuccessTitle;
+    return `<div class="benchmark-heatmap rr-report" id="robodojo-heatmap" lang="${chinese ? "zh-CN" : "en"}">
+      <div class="rr-chart-switch" role="group" aria-label="${t.metric}" data-control="heatmap">
+        <button type="button" data-metric="score" aria-pressed="${metric === "score"}">${t.heatScore}</button>
+        <button type="button" data-metric="success" aria-pressed="${metric === "success"}">${t.heatSuccess}</button>
+      </div>
+      <h3>${title}</h3>
+      <div class="rr-heat-legend" aria-label="${t.scale}"><span>${metric === "score" ? "Score" : t.axisSuccess}</span>${[0,20,40,60,80,100].map(value => `<span style="${heatStyle(value)}">${value}</span>`).join("")}</div>
+      <div class="rr-table-scroll" role="region" aria-label="${t.heatRegion}" tabindex="0">
+        <table class="rr-table rr-heat-table" aria-describedby="heatmap-description">
+          <caption class="benchmark-sr-only">${title}</caption>
+          <thead><tr><th scope="col">${t.task}</th>${columns.map(model => `<th scope="col" data-model="${model.id}">${modelName(model.header).replace("(Ours)", `(${t.ours})`)}</th>`).join("")}</tr></thead>
+          <tbody>${rows.map(task => `<tr data-task="${task.id}"><th scope="row">${task[chinese ? "zh" : "en"]}</th>${columns.map(model => {
+            const value = task.values[model.id][metric];
+            return `<td data-model="${model.id}" data-value="${value}" style="${heatStyle(value)}">${format(value, metric, true)}</td>`;
+          }).join("")}</tr>`).join("")}</tbody>
+          <tfoot><tr><th scope="row">${t.overall}</th>${columns.map(model => `<td data-model="${model.id}" data-value="${model[metric]}" style="${heatStyle(model[metric])}">${format(model[metric], metric, true)}</td>`).join("")}</tr></tfoot>
+        </table>
+      </div>
+      <div class="rr-prose"><p id="heatmap-description"><b>${t.tableCaption}</b> ${modelName(t.heatDescription)}</p></div>
+    </div>`;
   }
   function controls(t, location) {
     return `<div class="benchmark-controls" role="group" aria-label="${t.metric}" data-control="${location}">
@@ -62,7 +89,7 @@
     const chinese = document.documentElement.lang === "zh-CN";
     const t = labels[chinese ? "zh-CN" : "en"];
     const detailsOpen = section.querySelector(".benchmark-details")?.open;
-    const scrollLeft = section.querySelector(".benchmark-heat-scroll")?.scrollLeft || 0;
+    const scrollLeft = section.querySelector(".rr-table-scroll")?.scrollLeft || 0;
     const ranked = models.filter(model => model[metric] != null).sort((a, b) => b[metric] - a[metric]);
     section.setAttribute("aria-label", `RoboDojo · ${metric === "score" ? t.title : t.successTitle}`);
     section.innerHTML = `
@@ -79,25 +106,8 @@
         <div class="benchmark-axis" aria-hidden="true"><span></span><div>${[0, 20, 40, 60, 80, 100].map(value => `<span>${value}${metric === "success" ? "%" : ""}</span>`).join("")}</div><span></span></div>
         <p class="benchmark-axis-label">${metric === "score" ? t.axisScore : t.axisSuccess}</p>
       </div>
-      <div class="benchmark-caption"><p>${t.note} <a href="paper.pdf?v=20261011#page=8">${t.paper} ↗</a> · <a href="${source}" target="_blank" rel="noopener noreferrer">${t.source} ↗</a></p><p>${t.definition}</p></div>
-      <div class="benchmark-heatmap" id="robodojo-heatmap">
-        <div class="benchmark-heat-heading"><h3>${t.heatTitle}</h3>${controls(t, "heatmap")}</div>
-        <p class="benchmark-heat-description" id="heatmap-description"><b>${t.tableCaption}</b> ${t.heatDescription}</p>
-        <div class="benchmark-heat-scroll benchmark-table-scroll" role="region" aria-label="${t.heatRegion}" tabindex="0">
-          <table class="benchmark-heat-table" aria-describedby="heatmap-description heatmap-note">
-            <caption class="benchmark-sr-only">${t.heatTitle} · ${metric === "score" ? t.score : t.success}</caption>
-            <thead><tr><th scope="col">${t.task}</th>${columns.map(model => `<th scope="col" class="${model.kind === "ours" ? "heat-ours" : ""}" title="${model.name}"><span class="heat-model-icons ${model.kind}">${icons(model)}</span><span>${modelName(model.header).replace("(Ours)", `(${t.ours})`)}</span></th>`).join("")}</tr></thead>
-            <tbody>${tasks.map(task => `<tr data-task="${task.id}"><th scope="row">${task[chinese ? "zh" : "en"]}</th>${columns.map(model => {
-              const value = task.values[model.id][metric];
-              const footnote = model.id === "roboicl-one" && task.id === "classify_objects_by_language" && metric === "score";
-              return `<td data-model="${model.id}" class="${model.kind === "ours" ? "heat-ours" : ""}${value == null ? " heat-missing" : ""}" style="${heatStyle(value)}" title="${model.name}: ${value == null ? t.missing : format(value, metric, true)}">${format(value, metric, true)}${footnote ? "<sup>†</sup>" : ""}</td>`;
-            }).join("")}</tr>`).join("")}</tbody>
-            <tfoot><tr><th scope="row">${t.total}</th>${columns.map(model => `<td data-model="${model.id}" class="${model.kind === "ours" ? "heat-ours" : ""}${model[metric] == null ? " heat-missing" : ""}" style="${heatStyle(model[metric])}">${format(model[metric], metric, true)}</td>`).join("")}</tr></tfoot>
-          </table>
-        </div>
-        <div class="benchmark-heat-footer"><a class="benchmark-download" href="assets/benchmarks/robodojo-comparison.csv" download>${t.download} ↓</a><div class="benchmark-heat-legend" aria-label="${t.scale}">${[0,20,40,60,80,100].map(value => `<span style="${heatStyle(value)}">${value}${metric === "success" ? "%" : ""}</span>`).join("")}</div></div>
-        <p class="benchmark-heat-note" id="heatmap-note">${t.heatNote}</p>
-      </div>
+      <div class="benchmark-caption"><p>${t.note} <a href="paper.pdf?v=20261011#page=8">${t.paper} ↗</a> · <a href="${source}" target="_blank" rel="noopener noreferrer">${t.source} ↗</a></p></div>
+      ${heatmap(t, chinese)}
       <details class="benchmark-details"${detailsOpen ? " open" : ""}>
         <summary>${t.details}<span aria-hidden="true">+</span></summary>
         <div class="benchmark-table-scroll" role="region" aria-label="${t.details}" tabindex="0">
@@ -107,13 +117,13 @@
           </table>
         </div><a class="benchmark-download" href="assets/benchmarks/robodojo-tasks.csv" download>${t.download} ↓</a>
       </details>`;
-    section.querySelector(".benchmark-heat-scroll").scrollLeft = scrollLeft;
+    section.querySelector(".rr-table-scroll").scrollLeft = scrollLeft;
   }
   section.addEventListener("click", event => {
     const button = event.target.closest("button[data-metric]");
     if (!button || button.dataset.metric === metric) return;
     const location = button.closest("[data-control]").dataset.control;
-    // The score chart has extra RoboICL rows; preserve the active control's position.
+    // Preserve the active control's position when the table height changes.
     const previousTop = button.getBoundingClientRect().top;
     metric = button.dataset.metric;
     render();
