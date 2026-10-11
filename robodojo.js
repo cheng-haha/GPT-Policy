@@ -1,6 +1,7 @@
 (() => {
   const section = document.querySelector("#robodojo");
-  if (!section) return;
+  const results = document.querySelector("#robodojo-results");
+  if (!section || !results) return;
   const { tasks, models, heatmapModels, heatmapTasks, reference: source } = benchmarkData;
   const ours = models.find(model => model.id === "ours");
   const totalTrials = tasks.reduce((sum, task) => sum + task.trials, 0);
@@ -88,8 +89,8 @@
   function render() {
     const chinese = document.documentElement.lang === "zh-CN";
     const t = labels[chinese ? "zh-CN" : "en"];
-    const detailsOpen = section.querySelector(".benchmark-details")?.open;
-    const scrollLeft = section.querySelector(".rr-table-scroll")?.scrollLeft || 0;
+    const detailsOpen = results.querySelector(".benchmark-details")?.open;
+    const scrollLeft = results.querySelector(".rr-table-scroll")?.scrollLeft || 0;
     const ranked = models.filter(model => model[metric] != null).sort((a, b) => b[metric] - a[metric]);
     section.setAttribute("aria-label", `RoboDojo · ${metric === "score" ? t.title : t.successTitle}`);
     section.innerHTML = `
@@ -106,7 +107,8 @@
         <div class="benchmark-axis" aria-hidden="true"><span></span><div>${[0, 20, 40, 60, 80, 100].map(value => `<span>${value}${metric === "success" ? "%" : ""}</span>`).join("")}</div><span></span></div>
         <p class="benchmark-axis-label">${metric === "score" ? t.axisScore : t.axisSuccess}</p>
       </div>
-      <div class="benchmark-caption"><p>${t.note} <a href="${source}" target="_blank" rel="noopener noreferrer">${t.source} ↗</a></p></div>
+      <div class="benchmark-caption"><p>${t.note} <a href="${source}" target="_blank" rel="noopener noreferrer">${t.source} ↗</a></p></div>`;
+    results.innerHTML = `<p class="benchmark-results-label">RoboDojo-Sim</p>
       ${heatmap(t, chinese)}
       <details class="benchmark-details"${detailsOpen ? " open" : ""}>
         <summary>${t.details}<span aria-hidden="true">+</span></summary>
@@ -117,9 +119,9 @@
           </table>
         </div><a class="benchmark-download" href="assets/benchmarks/robodojo-tasks.csv" download>${t.download} ↓</a>
       </details>`;
-    section.querySelector(".rr-table-scroll").scrollLeft = scrollLeft;
+    results.querySelector(".rr-table-scroll").scrollLeft = scrollLeft;
   }
-  section.addEventListener("click", event => {
+  function switchMetric(event) {
     const button = event.target.closest("button[data-metric]");
     if (!button || button.dataset.metric === metric) return;
     const location = button.closest("[data-control]").dataset.control;
@@ -127,10 +129,13 @@
     const previousTop = button.getBoundingClientRect().top;
     metric = button.dataset.metric;
     render();
-    const active = section.querySelector(`[data-control="${location}"] button[data-metric="${metric}"]`);
+    const root = location === "heatmap" ? results : section;
+    const active = root.querySelector(`[data-control="${location}"] button[data-metric="${metric}"]`);
     window.scrollBy({ top: active.getBoundingClientRect().top - previousTop, behavior: "instant" });
     active.focus({ preventScroll: true });
-  });
+  }
+  section.addEventListener("click", switchMetric);
+  results.addEventListener("click", switchMetric);
   document.addEventListener("languagechange", render);
   render();
 })();

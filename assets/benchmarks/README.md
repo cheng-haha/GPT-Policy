@@ -46,12 +46,12 @@ Column order is the reference's original seven models, followed by GPT-Policy: D
 - `robodojo-comparison.csv`: both metrics and provenance for all displayed methods.
 - `paper-real-robot-results.json`: the earlier PDF's real-robot Tables 1 and 3, unchanged by this simulation correction.
 
-No timeout/native-failure fields are displayed. The section stays beneath Figure 1. The bar background is white and GPT-Policy's bar is charcoal (#202124). The bar-chart model logos and font subsets were extracted from the reference page on 2026-10-07; ownership remains with their respective owners. MORPHI's logo is the user-provided image.
+No timeout/native-failure fields are displayed. The aggregate bar chart stays beneath Figure 1; the heatmap and per-task details are in the Experiments section, before the five real-world experiment families. The bar background is white and GPT-Policy's bar is charcoal (#202124). The bar-chart model logos and font subsets were extracted from the reference page on 2026-10-07; ownership remains with their respective owners. MORPHI's logo is the user-provided image.
 
 ## Figure refresh
 
-The website's overview, framework and execution-harness images were rendered at 6× from the same PDF, preserving proportions:
+The website's overview, framework and context-compiler images were rendered at 6× from the same PDF, preserving proportions:
 
 - `assets/paper-figures/context-overview.png`: paper Figure 1, page 2, crop [107,65,505,328] points.
 - `assets/method-overview.png`: paper Figure 2, page 4, crop [108,80,505,337] points.
-- `assets/paper-figures/execution-harness.png`: paper Figure 7, page 17, crop [112,80,497,246] points. It remains website Figure 3, with the source figure noted in its caption.
+- `assets/paper-figures/context-compiler.png`: paper Figure 6, page 15, crop [112,230,500,404] points. It is website Figure 3, replacing the execution-harness image. The source figure is noted in its caption.

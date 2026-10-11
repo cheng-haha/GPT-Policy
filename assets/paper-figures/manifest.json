@@ -23,13 +23,19 @@
     },
     {
       "figure": 3,
-      "source_page": 17,
-      "file": "assets/paper-figures/execution-harness.png",
-      "width": 2310,
-      "height": 996,
+      "source_page": 15,
+      "file": "assets/paper-figures/context-compiler.png",
+      "width": 2328,
+      "height": 1044,
       "source": "Overleaf project 6ab3f98275f46d738116b160; local PDF export compiled 2026-10-11 14:51:05 PDT",
       "pdf_sha256": "7f423f44d4d4fcdaa690adc09d41b9af8aa5d91f96a9d3117953d8f3d7e09134",
-      "source_figure": 7
+      "source_figure": 6,
+      "crop_points": [
+        112.0,
+        230.0,
+        500.0,
+        404.0
+      ]
     },
     {
       "figure": 4,

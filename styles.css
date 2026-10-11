@@ -415,6 +415,10 @@ footer { border-top: 1px solid var(--line); background: var(--soft); }
 .paper-figure a { display: block; padding: 12px; border: 1px solid var(--line); background: #fff; }
 .paper-figure img { display: block; width: 100%; height: auto; }
 .paper-figure figcaption b { color: #4f5968; }
+.paper-figure figcaption { font-family: "Geist", Inter, ui-sans-serif, sans-serif; }
+.method-detail-title, .real-world-title { margin: 48px 0 0; color: var(--ink); font-size: 25px; font-weight: 630; line-height: 1.35; letter-spacing: -.025em; }
+.method-detail-title + .paper-figure { margin-top: 22px; }
+#results .real-world-title { padding-top: 36px; border-top: 1px solid var(--line); }
 
 /* Keep each experiment family's results and demonstrations together. */
 .experiment-index { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 24px 0; }

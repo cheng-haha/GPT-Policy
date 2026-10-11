@@ -10,9 +10,9 @@
     <meta name="theme-color" content="#f7f8fa" />
     <title>In-Context Robot Learning with VLM Agents</title>
     <link rel="preload" as="image" href="assets/gpt-policy-logo.png" fetchpriority="high" />
-    <link rel="stylesheet" href="styles.css?v=20261011-reference-table" />
-    <link rel="stylesheet" href="robodojo.css?v=20261011-reference-table" />
-    <link rel="stylesheet" href="assets/benchmarks/gpt-as-policy-heatmap.css?v=20261011-reference-table" />
+    <link rel="stylesheet" href="styles.css?v=20261011-layout" />
+    <link rel="stylesheet" href="robodojo.css?v=20261011-layout" />
+    <link rel="stylesheet" href="assets/benchmarks/gpt-as-policy-heatmap.css?v=20261011-layout" />
   </head>
   <body id="top">
     <button class="language-toggle" id="language-toggle" type="button" aria-label="Switch to Chinese" title="Switch to Chinese">
@@ -163,24 +163,22 @@
                 <b>Figure 2.</b> A context compiler builds structured references from the task instruction and demonstrations. A frozen VLM uses these references, live observations, and history to choose one tool call per turn. Geometric grounding triangulates stationary features from calibrated wrist-camera views; action chunking plans multiple end-effector waypoints. Execution adapters validate and retime trajectories, then return feedback for the next decision.
               </figcaption>
             </figure>
-            <div class="pipeline" aria-label="GPT-Policy pipeline">
-              <article><span>1</span><h3>Construct context</h3><p>Combine task references, current views, state, and retained interaction history.</p></article>
-              <article><span>2</span><h3>Assemble input</h3><p>Interleave text and images with stable instructions, constraints, and tool schemas.</p></article>
-              <article><span>3</span><h3>Select action</h3><p>A fixed general VLM chooses one structured robot-tool request.</p></article>
-              <article><span>4</span><h3>Validate and execute</h3><p>The Cartesian adapter samples poses, checks inverse-kinematics residuals, times joint references, and returns execution or rejection feedback.</p></article>
-            </div>
-
+            <h3 class="method-detail-title">From demonstrations to context</h3>
             <figure class="paper-figure" id="paper-figure-3">
-              <a href="assets/paper-figures/execution-harness.png?v=20261011-paper-figures" target="_blank" rel="noopener">
-                <img src="assets/paper-figures/execution-harness.png?v=20261011-paper-figures" alt="GPT-Policy execution harness" loading="lazy" decoding="async" width="2310" height="996" />
+              <a href="assets/paper-figures/context-compiler.png?v=20261011-layout" target="_blank" rel="noopener">
+                <img src="assets/paper-figures/context-compiler.png?v=20261011-layout" alt="GPT-Policy context construction: demonstrations, keyframes, and aligned action records" loading="lazy" decoding="async" width="2328" height="1044" />
               </a>
-              <figcaption><b>Figure 3.</b> The ARX/YAM adapter samples the requested Cartesian path and solves inverse kinematics sequentially. A complete accepted plan is retimed and dispatched; a failed check returns rejection feedback before motion. The VLM observes again after completion or rejection. Adapted from paper Figure 7.</figcaption>
+              <figcaption><b>Figure 3.</b> A VLM selects keyframes, annotates subtasks and arm roles, and reviews the demonstration. Context assembly aligns measured states with keyframes, attaches historical actions between them, and combines the records with camera images. The plug-reinsertion example shows the resulting structured context. Adapted from paper Figure 6.</figcaption>
             </figure>
           </section>
 
           <section id="results" class="section ruled demo-section">
             <p class="section-kicker">Experiments</p>
-            <h2>Five experiment families</h2>
+            <h2>Simulation and real-world results</h2>
+            <section id="robodojo-results" class="benchmark-results" aria-label="RoboDojo simulation results">
+              <noscript>GPT-Policy on RoboDojo: mean score 80.20 / 100 and success rate 72%. <a href="assets/benchmarks/robodojo-tasks.csv">Download task results</a>.</noscript>
+            </section>
+            <h3 class="real-world-title">Five experiment families</h3>
             <p class="section-intro">Human-video tasks compare runs with and without the human demonstration. Robot-demonstration tasks compare no video, video, and video + action. Other tasks show one representative run. Human demonstrations play at real time; robot runs are accelerated as labeled. Success rates and mean costs summarize all trials.</p>
             <div class="metric-row">
               <div><strong>5</strong><span>experiment families</span></div>
@@ -375,8 +373,8 @@
       </div>
     </footer>
 
-    <script src="script.js?v=20261011-reference-table"></script>
-    <script src="benchmark-data.js?v=20261011-reference-table"></script>
-    <script src="robodojo.js?v=20261011-clean-caption"></script>
+    <script src="script.js?v=20261011-layout"></script>
+    <script src="benchmark-data.js?v=20261011-layout"></script>
+    <script src="robodojo.js?v=20261011-layout"></script>
   </body>
 </html>

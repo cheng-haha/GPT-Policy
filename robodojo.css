@@ -68,13 +68,13 @@
 .benchmark-details summary > span { font-size: 20px; font-weight: 400; }
 .benchmark-details[open] summary > span { transform: rotate(45deg); }
 .benchmark-table-scroll { overflow-x: auto; }
-.benchmark table { width: 100%; border-collapse: collapse; min-width: 630px; color: #40506a; font-size: 13px; font-variant-numeric: tabular-nums; }
-.benchmark caption { padding: 14px 0; text-align: left; color: #748096; font-size: 12px; }
-.benchmark th, .benchmark td { padding: 11px 9px; border-bottom: 1px solid #e0e6f0; text-align: right; }
-.benchmark th:first-child { text-align: left; padding-left: 0; }
-.benchmark tbody th { font-weight: 400; }
-.benchmark thead th { font-size: 12px; line-height: 1.5; font-weight: 650; }
-.benchmark tfoot { color: #254b99; font-weight: 700; }
+.benchmark table, .benchmark-results .benchmark-details table { width: 100%; border-collapse: collapse; min-width: 630px; color: #40506a; font-size: 13px; font-variant-numeric: tabular-nums; }
+.benchmark caption, .benchmark-results .benchmark-details caption { padding: 14px 0; text-align: left; color: #748096; font-size: 12px; }
+.benchmark th, .benchmark td, .benchmark-results .benchmark-details th, .benchmark-results .benchmark-details td { padding: 11px 9px; border-bottom: 1px solid #e0e6f0; text-align: right; }
+.benchmark th:first-child, .benchmark-results .benchmark-details th:first-child { text-align: left; padding-left: 0; }
+.benchmark tbody th, .benchmark-results .benchmark-details tbody th { font-weight: 400; }
+.benchmark thead th, .benchmark-results .benchmark-details thead th { font-size: 12px; line-height: 1.5; font-weight: 650; }
+.benchmark tfoot, .benchmark-results .benchmark-details tfoot { color: #254b99; font-weight: 700; }
 .benchmark-download { display: inline-block; margin: 16px 0 0; color: #3d63a6; font-size: 13px; }
 @media (max-width: 760px) {
   .benchmark { --benchmark-label: 190px; --benchmark-value: 45px; }
@@ -148,4 +148,8 @@
   outline-offset: 3px;
 }
 .benchmark-heatmap.rr-report .rr-prose p { margin: 14px 0; line-height: 1.9; }
-.benchmark .benchmark-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.benchmark-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+.benchmark-results { max-width: 760px; margin: 36px auto 0; color: #242b38; font-family: "Benchmark Latin", "Benchmark Song", Georgia, serif; }
+.benchmark-results-label { margin: 0; color: #627087; font: 600 12px/1.5 "Geist", sans-serif; }
+.benchmark-results .benchmark-heatmap { margin-top: 14px; }
