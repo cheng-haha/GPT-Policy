@@ -49,7 +49,7 @@ const zhTranslations = new Map([
   ["Context compiler →", "上下文编译器 →"],
   ["Keyframes · Subtasks · Aligned records", "关键帧 · 子任务 · 对齐记录"],
   ["Execution harness", "执行框架"],
-  ["Grounding · Action chunks · Validation", "几何定位 · 动作分块 · 轨迹检查"],
+  ["Grounding · EEF Chunks · Validation", "几何定位 · 末端执行器动作分块 · 轨迹检查"],
   ["Execute tool call", "执行工具调用"],
   ["New observations + execution feedback ↺", "新观测 + 执行反馈 ↺"],
   ["Direct and GPT-Policy.", "Direct 与 GPT-Policy。"],
