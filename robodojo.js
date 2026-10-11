@@ -14,7 +14,7 @@
       subtitle: "RoboDojo-Sim · 10 tasks · one-shot GPT-Policy",
       score: "Mean score", success: "Success rate", ours: "Ours",
       chart: "Results by model", metric: "Chart metric", axisScore: "Mean score (0–100)",
-      axisSuccess: "Success rate (%)", source: "Reference report", paper: "Paper",
+      axisSuccess: "Success rate (%)", source: "Reference report",
       note: "Ten-task averages. GPT-Policy uses one demonstration per task; baselines follow their published protocols.",
       details: "GPT-Policy · Per-task results", download: "Download CSV",
       task: "Task", successes: "Successes", total: "Mean (10 tasks)",
@@ -29,7 +29,7 @@
       subtitle: "RoboDojo-Sim · 10 项任务 · GPT-Policy 单次示范",
       score: "平均得分", success: "成功率", ours: "我们的方法",
       chart: "各模型评测结果", metric: "图表指标", axisScore: "平均得分（0–100）",
-      axisSuccess: "成功率（%）", source: "参考报告", paper: "论文",
+      axisSuccess: "成功率（%）", source: "参考报告",
       note: "十项任务等权平均。GPT-Policy 每项任务使用一次示范；各基线沿用其原始评测方案。",
       details: "GPT-Policy · 各任务明细", download: "下载 CSV",
       task: "任务", successes: "成功数", total: "平均（10 项任务）",
@@ -106,7 +106,7 @@
         <div class="benchmark-axis" aria-hidden="true"><span></span><div>${[0, 20, 40, 60, 80, 100].map(value => `<span>${value}${metric === "success" ? "%" : ""}</span>`).join("")}</div><span></span></div>
         <p class="benchmark-axis-label">${metric === "score" ? t.axisScore : t.axisSuccess}</p>
       </div>
-      <div class="benchmark-caption"><p>${t.note} <a href="paper.pdf?v=20261011#page=8">${t.paper} ↗</a> · <a href="${source}" target="_blank" rel="noopener noreferrer">${t.source} ↗</a></p></div>
+      <div class="benchmark-caption"><p>${t.note} <a href="${source}" target="_blank" rel="noopener noreferrer">${t.source} ↗</a></p></div>
       ${heatmap(t, chinese)}
       <details class="benchmark-details"${detailsOpen ? " open" : ""}>
         <summary>${t.details}<span aria-hidden="true">+</span></summary>
