@@ -1,0 +1,48 @@
+/* Method-flow rules copied from GPT 6 Astra as an Embodied Policy.
+ * https://anonymous-report-421.github.io/public-website/?view=1
+ * Retrieved 2026-10-11. Original rr-methods / rr-flow / rr-branches structure.
+ */
+.rr-report .rr-methods{border-block:1px solid var(--rr-line);grid-template-columns:1fr 1fr;gap:40px;margin:26px 0;padding:20px 0;display:grid}
+.rr-report .rr-method{min-width:0;padding:0 10px}
+.rr-report .rr-method h3{text-align:center;margin:0 0 16px;font-size:16px}
+.rr-report .rr-flow{text-align:center;flex-direction:column;align-items:center;gap:7px;font-size:13px;display:flex}
+.rr-report .rr-flow>div:not(.rr-branches):not(.rr-choice){background:#fff;border:1px solid #d5d5d5;width:100%;padding:9px 5px}
+.rr-report .rr-flow>b{color:#888;font-weight:400;line-height:1}
+.rr-report .rr-flow .rr-node-accent{color:#245bb4;background:#edf4ff;border-color:#a9c7f4}
+.rr-report .rr-method:nth-child(2) .rr-node-accent{color:#2f7566;background:#edf8f5;border-color:#acd7ca}
+.rr-report .rr-branches{gap:10px;width:100%;display:flex}
+.rr-report .rr-branches>div{border:1px solid #ddd;flex:1;padding:10px 2px}
+.rr-report .rr-flow small{color:#666;font-size:11px}
+
+/* Embed the reference flow in this page; align the two comparison columns. */
+.policy-comparison {
+  --rr-line: #dbe5f2;
+  max-width: 760px;
+  margin: 38px auto 48px;
+  color: #242b38;
+  font: 17px/1.85 "Benchmark Latin", "Benchmark Song", Georgia, serif;
+  scroll-margin-top: 40px;
+}
+.policy-comparison .rr-method h3 { color: #35567d; font-family: inherit; font-weight: 600; line-height: 1.6; }
+.policy-comparison .rr-flow > div:not(.rr-branches),
+.policy-comparison .rr-branches > div {
+  min-height: 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.policy-comparison .rr-node-accent { gap: 2px; }
+.policy-comparison.rr-report .rr-flow > div.rr-node-accent { background: #edf4ff; border-color: #a9c7f4; }
+.policy-comparison.rr-report .rr-method:nth-child(2) .rr-flow > div.rr-node-accent { background: #edf8f5; border-color: #acd7ca; }
+.policy-comparison .rr-flow .policy-equation { font-size: 14px; color: inherit; white-space: nowrap; }
+.policy-comparison .policy-equation i { font-family: "Times New Roman", serif; }
+.policy-comparison .policy-equation sub,
+.policy-comparison .policy-equation sup { font-size: .7em; line-height: 0; }
+.policy-comparison figcaption { margin: 14px 0 0; color: #666c78; font: 13px/1.65 "Geist", Inter, ui-sans-serif, sans-serif; text-align: left; }
+.policy-comparison figcaption b { color: #4f5968; }
+/* The reference also stacks its method columns on screens at or below 700 px. */
+@media (max-width: 700px) {
+  .policy-comparison .rr-methods { grid-template-columns: 1fr; gap: 26px; }
+  .policy-comparison .rr-method { padding-inline: 0; }
+}

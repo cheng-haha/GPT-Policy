@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="styles.css?v=20261011-layout" />
     <link rel="stylesheet" href="robodojo.css?v=20261011-layout" />
     <link rel="stylesheet" href="assets/benchmarks/gpt-as-policy-heatmap.css?v=20261011-layout" />
+    <link rel="stylesheet" href="policy-comparison.css?v=20261011-comparison" />
   </head>
   <body id="top">
     <button class="language-toggle" id="language-toggle" type="button" aria-label="Switch to Chinese" title="Switch to Chinese">
@@ -155,6 +156,67 @@
             <p class="section-intro">
               GPT-Policy connects a general-purpose VLM to robot tools through a shared context-to-action interface. Embodiment-specific adapters translate tool requests into executable commands. Model parameters remain fixed; updated observations and execution or rejection feedback inform each subsequent decision.
             </p>
+            <figure class="policy-comparison rr-report" id="policy-comparison" aria-labelledby="policy-comparison-caption">
+              <div class="rr-methods">
+                <div class="rr-method">
+                  <h3>GPT 6 Astra (direct)</h3>
+                  <div class="rr-flow">
+                    <div>
+                      <span>Images · Proprioception · Instruction</span>
+                      <small class="policy-equation"><i>o</i><sub>t</sub> · <i>p</i><sub>t</sub> · <i>ℓ</i></small>
+                    </div>
+                    <b aria-hidden="true">↓</b>
+                    <div>
+                      <span>Execution history <i>h</i><sub>t</sub></span>
+                      <small>Tools · Persistent notes</small>
+                    </div>
+                    <b aria-hidden="true">↓</b>
+                    <div class="rr-node-accent">
+                      <span>GPT 6 Astra</span>
+                      <span class="policy-equation">(<i>o</i><sub>t</sub>, <i>p</i><sub>t</sub>, <i>ℓ</i>, <i>h</i><sub>t</sub>) → <i>A</i><sub>t</sub><sup>Astra</sup></span>
+                    </div>
+                    <div class="rr-branches"><div>
+                      <span>Bimanual EEF targets <span class="policy-equation">(<i>x</i>, <i>R</i>, <i>g</i>)</span></span>
+                      <small>Position · Orientation · Gripper; 1–5 steps</small>
+                    </div></div>
+                    <b aria-hidden="true">↓</b>
+                    <div>
+                      <span>Inverse kinematics → Execute</span>
+                      <small>New images + state ↺</small>
+                    </div>
+                  </div>
+                </div>
+                <div class="rr-method">
+                  <h3>GPT-Policy (Ours)</h3>
+                  <div class="rr-flow">
+                    <div>
+                      <span>Demonstrations · Goal image</span>
+                      <small>Video · Optional actions · Target state</small>
+                    </div>
+                    <b aria-hidden="true">↓</b>
+                    <div>
+                      <span>Context compiler → <i>R</i></span>
+                      <small>Keyframes · Subtasks · Aligned records</small>
+                    </div>
+                    <b aria-hidden="true">↓</b>
+                    <div class="rr-node-accent">
+                      <span>GPT 6 Astra</span>
+                      <span class="policy-equation">(<i>R</i>, <i>o</i><sub>t</sub>, <i>ℓ</i>, <i>H</i><sub>t</sub>) → <i>a</i><sub>t</sub></span>
+                    </div>
+                    <div class="rr-branches"><div>
+                      <span>Execution harness</span>
+                      <small>Grounding · Action chunks · Validation</small>
+                    </div></div>
+                    <b aria-hidden="true">↓</b>
+                    <div>
+                      <span>Execute tool call</span>
+                      <small>New observations + execution feedback ↺</small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <figcaption id="policy-comparison-caption"><b>Direct and GPT-Policy.</b> Both use a frozen model in an observation–action loop. Direct generates end-effector targets from images, robot state, instructions, and execution history. GPT-Policy compiles task references into R and combines them with live observations (images and state), the instruction, and interaction history. Its execution harness supports geometric grounding, action chunking, and trajectory validation.</figcaption>
+            </figure>
             <figure class="method-figure">
               <a href="assets/method-overview.png?v=20261011-paper-figures" target="_blank" rel="noopener" aria-label="Open method figure at full size">
                 <img src="assets/method-overview.png?v=20261011-paper-figures" width="2382" height="1542" loading="lazy" decoding="async" alt="Overview of the GPT-Policy context-to-action framework" />
@@ -373,7 +435,7 @@
       </div>
     </footer>
 
-    <script src="script.js?v=20261011-layout"></script>
+    <script src="script.js?v=20261011-comparison"></script>
     <script src="benchmark-data.js?v=20261011-layout"></script>
     <script src="robodojo.js?v=20261011-layout"></script>
   </body>
