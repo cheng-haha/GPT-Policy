@@ -1,62 +1,80 @@
 {
-  "source": "Overleaf project 6aa022fe56f647092f7070de, compiled 2026-09-15 13:49 PDT",
-  "pdf_sha256": "b81115d476920c377416a750d3a68f99471061951cfc298a1bb472aec1ddee16",
+  "source": "Per-figure source versions are recorded below. Only figures 1–3 are currently displayed on the website.",
   "figures": [
     {
       "figure": 1,
       "source_page": 2,
       "file": "assets/paper-figures/context-overview.png",
-      "width": 2401,
-      "height": 1480
+      "width": 2388,
+      "height": 1578,
+      "source": "Overleaf project 6ab3f98275f46d738116b160; local PDF export compiled 2026-10-11 14:51:05 PDT",
+      "pdf_sha256": "7f423f44d4d4fcdaa690adc09d41b9af8aa5d91f96a9d3117953d8f3d7e09134",
+      "source_figure": 1
     },
     {
       "figure": 2,
       "source_page": 4,
       "file": "assets/method-overview.png",
-      "width": 2401,
-      "height": 1300
+      "width": 2382,
+      "height": 1542,
+      "source": "Overleaf project 6ab3f98275f46d738116b160; local PDF export compiled 2026-10-11 14:51:05 PDT",
+      "pdf_sha256": "7f423f44d4d4fcdaa690adc09d41b9af8aa5d91f96a9d3117953d8f3d7e09134",
+      "source_figure": 2
     },
     {
       "figure": 3,
-      "source_page": 5,
+      "source_page": 17,
       "file": "assets/paper-figures/execution-harness.png",
-      "width": 2401,
-      "height": 1270
+      "width": 2310,
+      "height": 996,
+      "source": "Overleaf project 6ab3f98275f46d738116b160; local PDF export compiled 2026-10-11 14:51:05 PDT",
+      "pdf_sha256": "7f423f44d4d4fcdaa690adc09d41b9af8aa5d91f96a9d3117953d8f3d7e09134",
+      "source_figure": 7
     },
     {
       "figure": 4,
       "source_page": 8,
       "file": "assets/paper-figures/human-video-results.png",
       "width": 2401,
-      "height": 1905
+      "height": 1905,
+      "source": "Overleaf project 6aa022fe56f647092f7070de, compiled 2026-09-15 13:49 PDT",
+      "pdf_sha256": "b81115d476920c377416a750d3a68f99471061951cfc298a1bb472aec1ddee16"
     },
     {
       "figure": 5,
       "source_page": 9,
       "file": "assets/paper-figures/robot-video-action-results.png",
       "width": 2401,
-      "height": 2480
+      "height": 2480,
+      "source": "Overleaf project 6aa022fe56f647092f7070de, compiled 2026-09-15 13:49 PDT",
+      "pdf_sha256": "b81115d476920c377416a750d3a68f99471061951cfc298a1bb472aec1ddee16"
     },
     {
       "figure": 6,
       "source_page": 10,
       "file": "assets/paper-figures/goal-history-interaction-results.png",
       "width": 2401,
-      "height": 2125
+      "height": 2125,
+      "source": "Overleaf project 6aa022fe56f647092f7070de, compiled 2026-09-15 13:49 PDT",
+      "pdf_sha256": "b81115d476920c377416a750d3a68f99471061951cfc298a1bb472aec1ddee16"
     },
     {
       "figure": 7,
       "source_page": 11,
       "file": "assets/paper-figures/action-reference-alignment.png",
       "width": 2401,
-      "height": 1493
+      "height": 1493,
+      "source": "Overleaf project 6aa022fe56f647092f7070de, compiled 2026-09-15 13:49 PDT",
+      "pdf_sha256": "b81115d476920c377416a750d3a68f99471061951cfc298a1bb472aec1ddee16"
     },
     {
       "figure": 8,
       "source_page": 12,
       "file": "assets/paper-figures/model-comparison.png",
       "width": 2401,
-      "height": 1610
+      "height": 1610,
+      "source": "Overleaf project 6aa022fe56f647092f7070de, compiled 2026-09-15 13:49 PDT",
+      "pdf_sha256": "b81115d476920c377416a750d3a68f99471061951cfc298a1bb472aec1ddee16"
     }
   ]
 }

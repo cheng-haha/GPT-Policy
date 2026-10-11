@@ -109,3 +109,38 @@
   .benchmark-axis > div span:last-child { visibility: visible; }
   .benchmark-caption { font-size: 12px; }
 }
+
+/* Per-task heatmap: fixed scale and compact cells follow the reference Table 1. */
+.benchmark-heatmap { padding: 24px 0 20px; border-top: 1px solid #dce5f3; scroll-margin-top: 24px; }
+.benchmark-heat-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.benchmark-heat-heading h3 { margin: 0; color: #234674; font: 600 23px/1.4 "Benchmark Latin", Georgia, serif; }
+.benchmark-heat-description { margin: 12px 0 20px; color: #526982; font-size: 13px; line-height: 1.7; }
+.benchmark .benchmark-heat-table { min-width: 1010px; table-layout: fixed; color: #273f5b; }
+.benchmark .benchmark-heat-table th, .benchmark .benchmark-heat-table td { padding: 11px 4px; text-align: center; line-height: 1.35; }
+.benchmark .benchmark-heat-table th:first-child { width: 148px; text-align: left; padding-left: 0; padding-right: 10px; }
+.benchmark .benchmark-heat-table thead th { vertical-align: bottom; padding-bottom: 14px; font-size: 11px; font-weight: 600; border-bottom: 2px solid #294462; }
+.benchmark .benchmark-heat-table tbody th { font-size: 12px; }
+.benchmark .benchmark-heat-table td { border: 1px solid #fff; font-size: 12px; }
+.benchmark .benchmark-heat-table tfoot th, .benchmark .benchmark-heat-table tfoot td { border-top: 2px solid #294462; font-weight: 700; }
+.benchmark .benchmark-heat-table th:first-child { position: sticky; left: 0; z-index: 1; background: #fff; }
+.benchmark .benchmark-heat-table .heat-ours { font-weight: 700; box-shadow: inset 2px 0 #202124, inset -2px 0 #202124; }
+.benchmark .benchmark-heat-table thead .heat-ours { border-top: 3px solid #202124; }
+.benchmark .benchmark-heat-table tfoot .heat-ours { border-bottom: 2px solid #202124; }
+.heat-model-icons { display: flex; justify-content: center; align-items: center; gap: 3px; height: 29px; margin-bottom: 5px; }
+.heat-model-icons img { width: 20px; height: 20px; object-fit: contain; }
+.heat-model-icons.ours img:first-child { width: 35px; height: 35px; margin-inline: -8px; }
+.benchmark .benchmark-heat-table .heat-missing { background: #f4f4f4; color: #767b82; }
+.benchmark-heat-footer { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 12px; }
+.benchmark-heat-footer .benchmark-download { margin: 0; font-size: 12px; }
+.benchmark-heat-legend { display: flex; gap: 1px; font-size: 11px; font-variant-numeric: tabular-nums; }
+.benchmark-heat-legend span { min-width: 42px; padding: 5px 9px; text-align: center; }
+.benchmark-heat-note { margin: 13px 0 0; color: #687b93; font-size: 11px; line-height: 1.7; }
+.benchmark .benchmark-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (max-width: 520px) {
+  .benchmark-heat-heading { flex-wrap: wrap; gap: 10px; }
+  .benchmark-heat-heading h3 { font-size: 21px; }
+  .benchmark-heat-description { font-size: 12px; }
+  .benchmark-heat-footer { flex-wrap: wrap; gap: 12px; }
+  .benchmark-heat-legend span { min-width: 36px; padding-inline: 7px; }
+  .benchmark .benchmark-heat-table th:first-child { width: 124px; }
+}

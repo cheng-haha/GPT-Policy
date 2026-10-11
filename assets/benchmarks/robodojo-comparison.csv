@@ -1,0 +1,177 @@
+task,model,mean_score,success_rate_percent,score_source,success_source
+Organize table,DM0.5,44.00,4.00,reference_table_1,reference_table_1
+Organize table,Galaxea G0.5,46.33,11.33,paper_table_2,reference_table_1
+Organize table,Xiaomi R1,57.67,14.67,reference_table_1,reference_table_1
+Organize table,OpenWAM-α,62.50,13.33,paper_table_2,reference_table_1
+Organize table,Meituan R0,43.67,4.00,reference_table_1,reference_table_1
+Organize table,Hy-VLA 0.5,42.00,4.67,reference_table_1,reference_table_1
+Organize table,Spatial Forcing,31.67,5.33,reference_table_1,reference_table_1
+Organize table,π₀.₅,23.30,0.00,paper_table_2,paper_table_5
+Organize table,InternVLA A1.5,35.67,2.67,reference_table_1,reference_table_1
+Organize table,StarVLA-PI,25.17,2.00,reference_table_1,reference_table_1
+Organize table,π₀.₅ + GPT 6 Astra,60.00,0.00,paper_table_2,paper_table_5
+Organize table,GPT 6 Astra (direct),30.00,0.00,paper_table_2,paper_table_5
+Organize table,RoboICL (0-shot),45.00,,paper_table_2,not_reported
+Organize table,RoboDawn (1-shot),75.00,20.00,paper_table_2,paper_table_5
+Organize table,RoboICL (1-shot),50.00,,paper_table_2,not_reported
+Organize table,GPT-Policy,60.00,0.00,paper_table_2,paper_table_5
+Classify by language,DM0.5,0.47,0.00,reference_table_1,reference_table_1
+Classify by language,Galaxea G0.5,1.07,0.00,paper_table_2,reference_table_1
+Classify by language,Xiaomi R1,2.00,0.67,reference_table_1,reference_table_1
+Classify by language,OpenWAM-α,1.33,0.00,paper_table_2,reference_table_1
+Classify by language,Meituan R0,2.47,0.67,reference_table_1,reference_table_1
+Classify by language,Hy-VLA 0.5,0.53,0.00,reference_table_1,reference_table_1
+Classify by language,Spatial Forcing,0.60,0.00,reference_table_1,reference_table_1
+Classify by language,π₀.₅,0.60,0.00,paper_table_2,paper_table_5
+Classify by language,InternVLA A1.5,0.13,0.00,reference_table_1,reference_table_1
+Classify by language,StarVLA-PI,0.27,0.00,reference_table_1,reference_table_1
+Classify by language,π₀.₅ + GPT 6 Astra,38.00,20.00,paper_table_2,paper_table_5
+Classify by language,GPT 6 Astra (direct),60.00,40.00,paper_table_2,paper_table_5
+Classify by language,RoboICL (0-shot),44.00,,paper_table_2,not_reported
+Classify by language,RoboDawn (1-shot),44.00,20.00,paper_table_2,paper_table_5
+Classify by language,RoboICL (1-shot),44.00,,paper_table_2,not_reported
+Classify by language,GPT-Policy,88.00,80.00,paper_table_2,paper_table_5
+Imitate sorting sequence,DM0.5,1.80,0.00,reference_table_1,reference_table_1
+Imitate sorting sequence,Galaxea G0.5,1.67,0.00,paper_table_2,reference_table_1
+Imitate sorting sequence,Xiaomi R1,2.50,0.67,reference_table_1,reference_table_1
+Imitate sorting sequence,OpenWAM-α,2.90,0.67,paper_table_2,reference_table_1
+Imitate sorting sequence,Meituan R0,1.53,0.00,reference_table_1,reference_table_1
+Imitate sorting sequence,Hy-VLA 0.5,0.90,0.00,reference_table_1,reference_table_1
+Imitate sorting sequence,Spatial Forcing,1.30,0.00,reference_table_1,reference_table_1
+Imitate sorting sequence,π₀.₅,1.60,0.00,paper_table_2,paper_table_5
+Imitate sorting sequence,InternVLA A1.5,0.60,0.00,reference_table_1,reference_table_1
+Imitate sorting sequence,StarVLA-PI,0.73,0.00,reference_table_1,reference_table_1
+Imitate sorting sequence,π₀.₅ + GPT 6 Astra,53.00,40.00,paper_table_2,paper_table_5
+Imitate sorting sequence,GPT 6 Astra (direct),0.00,0.00,paper_table_2,paper_table_5
+Imitate sorting sequence,RoboICL (0-shot),90.00,,paper_table_2,not_reported
+Imitate sorting sequence,RoboDawn (1-shot),66.00,60.00,paper_table_2,paper_table_5
+Imitate sorting sequence,RoboICL (1-shot),90.00,,paper_table_2,not_reported
+Imitate sorting sequence,GPT-Policy,86.00,80.00,paper_table_2,paper_table_5
+Arrange largest number,DM0.5,7.85,3.20,reference_table_1,reference_table_1
+Arrange largest number,Galaxea G0.5,4.11,0.53,paper_table_2,reference_table_1
+Arrange largest number,Xiaomi R1,8.56,3.73,reference_table_1,reference_table_1
+Arrange largest number,OpenWAM-α,4.36,0.53,paper_table_2,reference_table_1
+Arrange largest number,Meituan R0,6.41,2.67,reference_table_1,reference_table_1
+Arrange largest number,Hy-VLA 0.5,0.85,0.00,reference_table_1,reference_table_1
+Arrange largest number,Spatial Forcing,2.16,0.53,reference_table_1,reference_table_1
+Arrange largest number,π₀.₅,2.80,0.70,paper_table_2,paper_table_5
+Arrange largest number,InternVLA A1.5,0.57,0.00,reference_table_1,reference_table_1
+Arrange largest number,StarVLA-PI,1.76,0.00,reference_table_1,reference_table_1
+Arrange largest number,π₀.₅ + GPT 6 Astra,50.00,40.00,paper_table_2,paper_table_5
+Arrange largest number,GPT 6 Astra (direct),57.00,40.00,paper_table_2,paper_table_5
+Arrange largest number,RoboICL (0-shot),71.00,,paper_table_2,not_reported
+Arrange largest number,RoboDawn (1-shot),100.00,100.00,paper_table_2,paper_table_5
+Arrange largest number,RoboICL (1-shot),58.00,,paper_table_2,not_reported
+Arrange largest number,GPT-Policy,100.00,100.00,paper_table_2,paper_table_5
+Build tower,DM0.5,55.20,42.00,reference_table_1,reference_table_1
+Build tower,Galaxea G0.5,82.93,78.67,paper_table_2,reference_table_1
+Build tower,Xiaomi R1,52.60,47.33,reference_table_1,reference_table_1
+Build tower,OpenWAM-α,52.53,38.67,paper_table_2,reference_table_1
+Build tower,Meituan R0,32.73,11.33,reference_table_1,reference_table_1
+Build tower,Hy-VLA 0.5,20.87,12.00,reference_table_1,reference_table_1
+Build tower,Spatial Forcing,43.93,32.67,reference_table_1,reference_table_1
+Build tower,π₀.₅,37.70,24.00,paper_table_2,paper_table_5
+Build tower,InternVLA A1.5,37.40,28.67,reference_table_1,reference_table_1
+Build tower,StarVLA-PI,63.20,55.33,reference_table_1,reference_table_1
+Build tower,π₀.₅ + GPT 6 Astra,64.00,60.00,paper_table_2,paper_table_5
+Build tower,GPT 6 Astra (direct),12.00,0.00,paper_table_2,paper_table_5
+Build tower,RoboICL (0-shot),16.00,,paper_table_2,not_reported
+Build tower,RoboDawn (1-shot),54.00,40.00,paper_table_2,paper_table_5
+Build tower,RoboICL (1-shot),100.00,,paper_table_2,not_reported
+Build tower,GPT-Policy,38.00,20.00,paper_table_2,paper_table_5
+Fold clothes,DM0.5,28.96,24.53,reference_table_1,reference_table_1
+Fold clothes,Galaxea G0.5,32.75,28.00,paper_table_2,reference_table_1
+Fold clothes,Xiaomi R1,41.49,38.93,reference_table_1,reference_table_1
+Fold clothes,OpenWAM-α,51.31,49.07,paper_table_2,reference_table_1
+Fold clothes,Meituan R0,19.79,14.93,reference_table_1,reference_table_1
+Fold clothes,Hy-VLA 0.5,20.11,17.60,reference_table_1,reference_table_1
+Fold clothes,Spatial Forcing,36.37,31.73,reference_table_1,reference_table_1
+Fold clothes,π₀.₅,32.30,24.00,paper_table_2,paper_table_5
+Fold clothes,InternVLA A1.5,16.16,13.60,reference_table_1,reference_table_1
+Fold clothes,StarVLA-PI,32.21,28.53,reference_table_1,reference_table_1
+Fold clothes,π₀.₅ + GPT 6 Astra,100.00,100.00,paper_table_2,paper_table_5
+Fold clothes,GPT 6 Astra (direct),40.00,40.00,paper_table_2,paper_table_5
+Fold clothes,RoboICL (0-shot),4.00,,paper_table_2,not_reported
+Fold clothes,RoboDawn (1-shot),36.00,20.00,paper_table_2,paper_table_5
+Fold clothes,RoboICL (1-shot),84.00,,paper_table_2,not_reported
+Fold clothes,GPT-Policy,20.00,20.00,paper_table_2,paper_table_5
+Put bottles into dustbin,DM0.5,81.70,72.00,reference_table_1,reference_table_1
+Put bottles into dustbin,Galaxea G0.5,96.30,94.00,paper_table_2,reference_table_1
+Put bottles into dustbin,Xiaomi R1,97.70,96.67,reference_table_1,reference_table_1
+Put bottles into dustbin,OpenWAM-α,94.03,91.33,paper_table_2,reference_table_1
+Put bottles into dustbin,Meituan R0,82.50,72.67,reference_table_1,reference_table_1
+Put bottles into dustbin,Hy-VLA 0.5,90.00,84.67,reference_table_1,reference_table_1
+Put bottles into dustbin,Spatial Forcing,85.60,78.00,reference_table_1,reference_table_1
+Put bottles into dustbin,π₀.₅,79.90,69.30,paper_table_2,paper_table_5
+Put bottles into dustbin,InternVLA A1.5,86.23,79.33,reference_table_1,reference_table_1
+Put bottles into dustbin,StarVLA-PI,68.67,56.67,reference_table_1,reference_table_1
+Put bottles into dustbin,π₀.₅ + GPT 6 Astra,100.00,100.00,paper_table_2,paper_table_5
+Put bottles into dustbin,GPT 6 Astra (direct),36.00,20.00,paper_table_2,paper_table_5
+Put bottles into dustbin,RoboICL (0-shot),70.00,,paper_table_2,not_reported
+Put bottles into dustbin,RoboDawn (1-shot),88.00,80.00,paper_table_2,paper_table_5
+Put bottles into dustbin,RoboICL (1-shot),73.00,,paper_table_2,not_reported
+Put bottles into dustbin,GPT-Policy,88.00,80.00,paper_table_2,paper_table_5
+Pack objects into box,DM0.5,14.72,1.33,reference_table_1,reference_table_1
+Pack objects into box,Galaxea G0.5,17.12,2.93,paper_table_2,reference_table_1
+Pack objects into box,Xiaomi R1,18.69,2.40,reference_table_1,reference_table_1
+Pack objects into box,OpenWAM-α,20.83,3.73,paper_table_2,reference_table_1
+Pack objects into box,Meituan R0,13.61,3.20,reference_table_1,reference_table_1
+Pack objects into box,Hy-VLA 0.5,12.53,1.07,reference_table_1,reference_table_1
+Pack objects into box,Spatial Forcing,14.35,1.87,reference_table_1,reference_table_1
+Pack objects into box,π₀.₅,19.10,2.70,paper_table_2,paper_table_5
+Pack objects into box,InternVLA A1.5,8.93,0.00,reference_table_1,reference_table_1
+Pack objects into box,StarVLA-PI,7.69,0.53,reference_table_1,reference_table_1
+Pack objects into box,π₀.₅ + GPT 6 Astra,50.00,20.00,paper_table_2,paper_table_5
+Pack objects into box,GPT 6 Astra (direct),50.00,20.00,paper_table_2,paper_table_5
+Pack objects into box,RoboICL (0-shot),16.00,,paper_table_2,not_reported
+Pack objects into box,RoboDawn (1-shot),19.00,0.00,paper_table_2,paper_table_5
+Pack objects into box,RoboICL (1-shot),36.00,,paper_table_2,not_reported
+Pack objects into box,GPT-Policy,10.00,0.00,paper_table_2,paper_table_5
+Make Kong,DM0.5,56.67,56.67,reference_table_1,reference_table_1
+Make Kong,Galaxea G0.5,90.00,90.00,paper_table_2,reference_table_1
+Make Kong,Xiaomi R1,41.33,41.33,reference_table_1,reference_table_1
+Make Kong,OpenWAM-α,32.00,32.00,paper_table_2,reference_table_1
+Make Kong,Meituan R0,56.00,56.00,reference_table_1,reference_table_1
+Make Kong,Hy-VLA 0.5,18.67,18.67,reference_table_1,reference_table_1
+Make Kong,Spatial Forcing,12.00,12.00,reference_table_1,reference_table_1
+Make Kong,π₀.₅,26.70,26.70,paper_table_2,paper_table_5
+Make Kong,InternVLA A1.5,26.00,26.00,reference_table_1,reference_table_1
+Make Kong,StarVLA-PI,18.00,18.00,reference_table_1,reference_table_1
+Make Kong,π₀.₅ + GPT 6 Astra,40.00,40.00,paper_table_2,paper_table_5
+Make Kong,GPT 6 Astra (direct),0.00,0.00,paper_table_2,paper_table_5
+Make Kong,RoboICL (0-shot),0.00,,paper_table_2,not_reported
+Make Kong,RoboDawn (1-shot),60.00,60.00,paper_table_2,paper_table_5
+Make Kong,RoboICL (1-shot),0.00,,paper_table_2,not_reported
+Make Kong,GPT-Policy,40.00,40.00,paper_table_2,paper_table_5
+Classify objects,DM0.5,26.83,16.67,reference_table_1,reference_table_1
+Classify objects,Galaxea G0.5,10.33,4.00,paper_table_2,reference_table_1
+Classify objects,Xiaomi R1,17.20,8.67,reference_table_1,reference_table_1
+Classify objects,OpenWAM-α,5.53,1.33,paper_table_2,reference_table_1
+Classify objects,Meituan R0,24.57,13.33,reference_table_1,reference_table_1
+Classify objects,Hy-VLA 0.5,5.13,0.67,reference_table_1,reference_table_1
+Classify objects,Spatial Forcing,21.67,9.33,reference_table_1,reference_table_1
+Classify objects,π₀.₅,24.70,12.70,paper_table_2,paper_table_5
+Classify objects,InternVLA A1.5,5.70,0.00,reference_table_1,reference_table_1
+Classify objects,StarVLA-PI,5.93,0.67,reference_table_1,reference_table_1
+Classify objects,π₀.₅ + GPT 6 Astra,71.00,60.00,paper_table_2,paper_table_5
+Classify objects,GPT 6 Astra (direct),100.00,100.00,paper_table_2,paper_table_5
+Classify objects,RoboICL (0-shot),100.00,,paper_table_2,not_reported
+Classify objects,RoboDawn (1-shot),83.00,80.00,paper_table_2,paper_table_5
+Classify objects,RoboICL (1-shot),71.00,,paper_table_2,not_reported
+Classify objects,GPT-Policy,100.00,100.00,paper_table_2,paper_table_5
+Mean (10 tasks),DM0.5,31.82,22.04,reference_report,reference_report
+Mean (10 tasks),Galaxea G0.5,38.26,30.95,paper_table_2,reference_report
+Mean (10 tasks),Xiaomi R1,33.97,25.51,reference_report,reference_report
+Mean (10 tasks),OpenWAM-α,32.73,23.07,paper_table_2,reference_report
+Mean (10 tasks),Meituan R0,28.33,17.88,reference_report,reference_report
+Mean (10 tasks),Hy-VLA 0.5,21.16,13.94,reference_report,reference_report
+Mean (10 tasks),Spatial Forcing,24.96,17.15,reference_report,reference_report
+Mean (10 tasks),π₀.₅,24.90,16.00,paper_table_2,paper_table_5
+Mean (10 tasks),InternVLA A1.5,21.74,15.03,reference_report,reference_report
+Mean (10 tasks),StarVLA-PI,22.36,16.17,reference_report,reference_report
+Mean (10 tasks),π₀.₅ + GPT 6 Astra,62.60,48.00,paper_table_2,paper_table_5
+Mean (10 tasks),GPT 6 Astra (direct),38.50,26.00,paper_table_2,paper_table_5
+Mean (10 tasks),RoboICL (0-shot),45.60,,paper_table_2,not_reported
+Mean (10 tasks),RoboDawn (1-shot),62.50,48.00,paper_table_2,paper_table_5
+Mean (10 tasks),RoboICL (1-shot),60.60,,paper_table_2,not_reported
+Mean (10 tasks),GPT-Policy,63.00,52.00,paper_table_2,paper_table_5

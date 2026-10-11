@@ -39,7 +39,7 @@ const zhTranslations = new Map([
   ["A general-purpose VLM combines the task instruction, initial state, and contextual information to guide robot actions. Context includes human videos, robot videos with recorded actions, goal images, human–robot interaction, and self-interaction history.", "通用 VLM 将任务指令、初始状态与上下文信息结合起来，引导机器人动作。上下文包括人类视频、附带动作记录的机器人视频、目标图像、人机交互和自身交互历史。"],
   ["Figure 1.", "图 1。"],
   ["GPT-Policy execution harness", "GPT-Policy 执行框架"],
-  ["The VLM generates tool requests from interleaved image and text inputs. The Cartesian adapter resolves targets, samples the pose path, checks inverse-kinematics residuals, times joint references, and executes the motion. Execution or rejection feedback returns to the next decision.", "VLM 根据交错排列的图像与文本输入生成工具请求。笛卡尔适配器解析目标、采样位姿路径、检查逆运动学残差、为关节参考分配时间并执行运动。执行或拒绝反馈返回下一次决策。"],
+  ["The ARX/YAM adapter samples the requested Cartesian path and solves inverse kinematics sequentially. A complete accepted plan is retimed and dispatched; a failed check returns rejection feedback before motion. The VLM observes again after completion or rejection. Adapted from paper Figure 7.", "ARX/YAM 适配器采样请求的笛卡尔路径，依次求解逆运动学。完整方案通过检查后才调整时序并执行；检查失败则在运动前返回拒绝反馈。VLM 在完成或拒绝后重新观测。对应论文图 7。"],
   ["Figure 3.", "图 3。"],
   ["Human demonstrations and robot executions for towel and notebook pickup", "毛巾与笔记本拾取中的人类示范和机器人执行"],
   ["Example runs for towel and notebook pickup under None and Human Video conditions. Frames progress from left to right.", "毛巾与笔记本拾取在无示范和人类视频条件下的执行示例。画面按从左至右的时间顺序排列。"],
@@ -57,23 +57,23 @@ const zhTranslations = new Map([
   ["Human video context helps GPT-6 Astra complete the task with fewer unnecessary intermediate actions in these individual runs. Task progress is completion degree, not success rate; these examples do not establish a reliable model ranking.", "在这些单次试验中，人类视频上下文帮助 GPT-6 Astra 减少不必要的中间动作并完成任务。任务进度表示完成程度，而非成功率；这些示例不足以确立可靠的模型排名。"],
   ["Figure 8.", "图 8。"],
 
-  ["Enabling robots to adapt to unfamiliar environments as readily as humans remains a moonshot goal of embodied AI. No finite collection of demonstrations can cover every task and situation a robot will encounter, making the ability to learn from context at deployment essential for generalization. Such in-context learning (ICL), however, remains largely beyond the reach of existing robotic policies. The broad agentic capabilities of commercial vision-language models (VLMs), such as GPT-6 Astra, raise a compelling question: can these models learn from demonstrations, examples, and interaction feedback, then translate that information into executable and verifiable robot behavior from a new initial state without gradient updates or persistent changes to task-specific parameters?", "让机器人像人类一样适应陌生环境，仍是具身人工智能的长远目标。有限的示范无法覆盖机器人将遇到的所有任务与情境，因此在部署时从上下文中学习是实现泛化的关键。然而，现有机器人策略在很大程度上仍缺乏这种上下文学习（ICL）能力。GPT-6 Astra 等商用视觉语言模型（VLM）的通用智能体能力引出了一个问题：这些模型能否从示范、样例和交互反馈中学习，并在不更新梯度、不持久改变任务特定参数的前提下，从新的初始状态出发，将这些信息转化为可执行、可验证的机器人行为？"],
-  [", a general-agent framework for in-context robot learning. GPT-Policy integrates a context compiler that preserves task-relevant visual transitions, a VLM that proposes robot-tool actions, and a constrained controller that verifies and executes each action and reports its outcome. We evaluate its reliability and limitations through task success and efficiency metrics, matched comparisons across models, and controlled context ablations. In real-robot trials, human video demonstrations improve task completion even without robot action labels, while aligned action references yield further gains on contact-sensitive tasks. These findings position GPT-Policy as a step toward robot adaptation through in-context learning, providing an empirical foundation for translating the general-purpose capabilities of VLMs into physical behavior and clarifying the challenges that must be overcome for reliable deployment.", "，一个面向机器人上下文学习的通用智能体框架。GPT-Policy 整合了保留任务相关视觉变化的上下文编译器、提出机器人工具动作的 VLM，以及验证、执行并报告动作结果的受约束控制器。我们通过任务成功率与效率指标、配对模型比较和受控上下文消融评估其可靠性与局限。在真实机器人试验中，即使没有机器人动作标签，人类视频示范也能改善任务完成情况；对齐的动作参考则进一步提升接触敏感任务的表现。这些发现为通过上下文学习实现机器人适应迈出了一步，为将 VLM 的通用能力转化为物理行为提供了实证基础，也明确了可靠部署仍需克服的挑战。"],
+  ["Enabling robots to adapt to unfamiliar environments as readily as humans remains a moonshot goal of embodied AI. No finite collection of demonstrations can cover every task and situation a robot will encounter, making the ability to learn from context at deployment essential for generalization. Such in-context learning (ICL), however, remains largely beyond the reach of existing robotic policies. The broad agentic capabilities of commercial vision-language models (VLMs), such as GPT-6 Astra, raise a compelling question: can these models learn from demonstrations and interaction feedback, then translate that information into executable robot behavior without gradient updates or persistent changes to task-specific parameters?", "让机器人像人类一样适应陌生环境仍是具身人工智能的长远目标。有限示范无法覆盖所有任务和情境，因此部署时从上下文中学习对泛化至关重要，但现有机器人策略在很大程度上仍不具备这种能力。GPT-6 Astra 等商用视觉语言模型的通用智能体能力引出一个问题：能否在不更新梯度、不持久改变任务特定参数的前提下，将示范和交互反馈转化为可执行的机器人行为？"],
+  [", a general-agent framework for in-context robot learning. GPT-Policy equips a VLM agent with a context compiler that organizes task-relevant information and an execution harness that supports geometric grounding, action chunking, and closed-loop decision-making through execution feedback. We evaluate GPT-Policy on ten real-world tasks spanning five context types and ten RoboDojo simulation tasks. Across four real-world demonstration tasks, mean success rate increases from 10% without demonstrations to 80% with human videos or robot demonstrations that include action references. Videos provide procedural guidance, while action references can clarify motion details. Targeted ablations suggest that calibrated localization and action chunking improve success and execution efficiency. Across ten RoboDojo tasks, one-shot GPT-Policy achieves 52% mean success. These results suggest that general-purpose VLMs can use deployment-time context to adapt robot behavior, while reliable physical execution remains a challenge.", "，一个面向机器人上下文学习的通用智能体框架。上下文编译器组织任务信息，执行框架支持几何定位、动作分块和执行反馈驱动的闭环决策。我们评测了五类上下文下的十项真实机器人任务和十项 RoboDojo 仿真任务。在四项真实示范任务中，平均成功率从无示范时的 10% 达到有人类视频或含动作参考的机器人示范时的 80%。视频提供过程指导，动作参考补充运动细节。消融显示标定定位和动作分块有助于成功率与执行效率。单次示范下，GPT-Policy 在十项 RoboDojo 任务取得 52% 平均成功率。通用 VLM 能利用部署时上下文适应机器人行为，但可靠物理执行仍是挑战。"],
   ["How much robotic in-context learning is already accessible through general VLMs that were not trained as dedicated robot policies?", "未经专用机器人策略训练的通用视觉语言模型，已经具备多大程度的机器人上下文学习能力？"],
   ["Can a fixed general-purpose VLM learn from demonstrations, examples, and interaction feedback", "参数固定的通用 VLM 能否从示范、样例和交互反馈中学习"],
   ["Robotic ICL adapts behavior using demonstrations, examples, or interaction experience at test time, without gradient updates or persistent task-specific parameter changes. Each context family supplies information that the current instruction and observation may omit.", "机器人 ICL 利用测试时的示范、样例或交互经验调整行为，无需梯度更新或持久性的任务特定参数变更。每类上下文都能补充当前指令和观测可能遗漏的信息。"],
   ["GPT-Policy connects a general-purpose VLM to robot tools through a shared context-to-action interface. Embodiment-specific adapters translate tool requests into executable commands. Model parameters remain fixed; updated observations and execution or rejection feedback inform each subsequent decision.", "GPT-Policy 通过统一的上下文到动作接口，将通用 VLM 与机器人工具连接起来。针对不同机器人形态的适配器将工具请求转化为可执行指令。模型参数保持固定，更新后的观测以及执行或拒绝反馈用于后续决策。"],
-  ["The task instruction, current state, task references, and interaction history are combined with shared instructions and tool schemas to form the VLM input. A fixed VLM selects tool requests, which constrained robot tools execute. Returned observations and execution feedback update the context for the next decision.", "任务指令、当前状态、任务参考和交互历史与统一指令及工具模式共同组成 VLM 输入。参数固定的 VLM 选择工具请求，由受约束的机器人工具执行。返回的观测和执行反馈更新上下文，用于下一次决策。"],
+  ["A context compiler builds structured references from the task instruction and demonstrations. A frozen VLM uses these references, live observations, and history to choose one tool call per turn. Geometric grounding triangulates stationary features from calibrated wrist-camera views; action chunking plans multiple end-effector waypoints. Execution adapters validate and retime trajectories, then return feedback for the next decision.", "上下文编译器将任务指令和示范整理为结构化参考。参数冻结的 VLM 结合参考、实时观测与历史，每轮选择一个工具调用。几何定位利用标定后的腕部视角对静止特征三角化；动作分块规划多个末端路径点。执行适配器验证轨迹并调整时序，再返回反馈用于下一步决策。"],
   ["The Cartesian adapter samples poses, checks inverse-kinematics residuals, times joint references, and returns execution or rejection feedback.", "笛卡尔适配器采样位姿、检查逆运动学残差、为关节参考分配时间，并返回执行或拒绝反馈。"],
-  ["GPT-6 Astra on real robots; three trials per condition. Success requires the final scene to satisfy the task-specific geometric and semantic criteria. Decisions and time are averaged over all trials, including failures. Tic-Tac-Toe wins and draws both count as success.", "GPT-6 Astra 真实机器人实验，每种条件重复三次。只有最终场景满足任务特定的几何与语义标准才计为成功。决策次数和时间对所有试验取平均，包括失败试验。井字棋获胜与平局均计为成功。"],
+  ["Paper Table 1: ten trials per condition for demonstration tasks; three for goal images and interaction tasks. Decisions and time are mean ± sample SD, including failures. The π₀.₅ baseline is fine-tuned on 30 demonstrations per task. GPT-Policy reports action-target/chunk decisions and wall-clock time; π₀.₅ reports logged counts and top-view recording time. Tic-Tac-Toe wins and draws both count as success.", "论文表 1：示范任务每条件 10 次，目标图像与交互任务每条件 3 次。决策次数和时间为包含失败试验的均值 ± 样本标准差。π₀.₅ 基线使用每任务 30 条示范微调。GPT-Policy 统计动作目标/动作块决策及完整运行时间；π₀.₅ 使用日志计数与顶视视频时长。井字棋获胜和平局均计为成功。"],
   ["A Little Context Goes a Long Way.", "少量上下文也能发挥重要作用。"],
   ["VLM Agents are surprisingly good at learning on the fly. Human videos reveal how a task unfolds, while action references provide more precise motion cues. In these early trials, such context helps Agents step outside their usual comfort zone and tackle fine manipulation and deformable-object handling.", "VLM 智能体展现出令人惊喜的即时学习能力。人类视频展示任务如何展开，动作参考则提供更精确的运动线索。在这些早期试验中，这类上下文帮助智能体突破原有能力范围，处理精细操作与可变形物体。"],
   ["Good Plans, Tricky Execution.", "规划有效，执行仍有难度。"],
   ["Context can sharpen task understanding, planning, and adaptation. Still, knowing what to do is not the same as doing it reliably. Precise pose generation, contact execution, outcome verification, and physical safety remain challenges of their own.", "上下文能够增强任务理解、规划和适应能力。但知道该做什么，并不等于能够可靠地执行。精确位姿生成、接触执行、结果验证和物理安全仍各自面临挑战。"],
   ["Moves Take Time.", "动作执行需要时间。"],
   ["VLM Agents can already generate useful actions, but each decision can still be slow and expensive. Specialized VLA/WAM models may therefore have an edge in fast, low-level control, while VLM Agents focus on reasoning, adaptation, and replanning.", "VLM 智能体已经能够生成有效动作，但每次决策仍可能耗时且成本较高。因此，专用 VLA/WAM 模型可能更擅长快速底层控制，而 VLM 智能体则侧重推理、适应和重新规划。"],
-  ["In individual red-towel runs, human video raises GPT-6 Astra task progress from 55% to 100%, with approximately 35.6% shorter run time and 58.9% lower estimated token usage. Fable 5.1 and Kimi K3 reach 30% and 20% progress. These examples do not establish a reliable model ranking: task progress is distinct from success rate, which is 2/3 for GPT-6 Astra with human video.", "在单次红毛巾任务对比中，人类视频使 GPT-6 Astra 的任务进度从 55% 提升至 100%，运行时间约缩短 35.6%，估算 token 用量约降低 58.9%。Fable 5.1 和 Kimi K3 的任务进度分别为 30% 和 20%。这些案例不足以确立可靠的模型排名：任务进度不同于成功率，GPT-6 Astra 在人类视频条件下的成功次数为 2/3。"],
-  ["The evidence covers small task series under selected platforms, models, and context conditions. Incomplete ablations and unobserved pretraining limit causal and novel-skill claims. Context quality, observation–action alignment, execution latency, and human intervention remain constraints. Observed inter-arm collisions show that existing safeguards alone are insufficient for safe autonomous deployment.", "当前证据来自特定平台、模型和上下文条件下的小规模任务序列。不完整的消融和未知的预训练内容限制了因果推断与新技能主张。上下文质量、观测与动作对齐、执行延迟和人工干预仍是制约因素。观测到的双臂碰撞表明，仅靠现有保护措施不足以实现安全自主部署。"],
+  ["In selected red-towel runs, human video raises task progress from 55% to 100%, with 35.6% shorter run time and 58.9% lower estimated token usage. These are individual-run comparisons, not a model ranking. Across the updated evaluation, GPT-Policy with human video succeeds in 9/10 towel trials and 8/10 notebook trials.", "在选取的红毛巾执行中，人类视频使任务进度从 55% 达到 100%，运行时间缩短 35.6%，估算 token 用量降低 58.9%。这是单次执行对比，不是模型排名。更新后的整体评测中，GPT-Policy 加入人类视频后在毛巾任务成功 9/10，在笔记本任务成功 8/10。"],
+  ["The ablations test subtask/action references, calibrated localization, and action chunking. Context quality, observation–action alignment, and inference latency still constrain performance. Reactive recovery does not ensure collision avoidance; joint action validation, collision checks before execution, and independent stopping mechanisms remain necessary.", "消融实验检查了子任务与动作参考、标定定位、动作分块。上下文质量、观测动作对齐和推理延迟仍限制表现。被动恢复不能保证避免碰撞，仍需要联合动作验证、执行前碰撞检查与独立停止机制。"],
   ["Future directions", "未来方向"],
   ["Physical safety", "物理安全"],
   ["Check both arms together, monitor separation and contact, and interrupt unsafe commands independently of the VLM.", "联合检查双臂轨迹，监测间距与接触，并独立于 VLM 中止不安全指令。"],
@@ -587,6 +587,70 @@ const zhTranslations = new Map([
   ]
 ].forEach(([english, chinese]) => zhTranslations.set(english, chinese));
 
+
+[
+  [
+    "Setting",
+    "设置"
+  ],
+  [
+    "Ablations",
+    "消融实验"
+  ],
+  [
+    "What makes context executable?",
+    "什么让上下文变得可执行？"
+  ],
+  [
+    "Paper Table 3 tests how demonstration information, calibrated localization, and action chunking affect success and execution cost.",
+    "论文表 3 检查示范信息、标定定位和动作分块如何影响成功率与执行开销。"
+  ],
+  [
+    "Demonstration information",
+    "示范信息"
+  ],
+  [
+    "Subtask + action",
+    "子任务 + 动作"
+  ],
+  [
+    "Action only",
+    "仅动作"
+  ],
+  [
+    "Subtask only",
+    "仅子任务"
+  ],
+  [
+    "Neither",
+    "均不提供"
+  ],
+  [
+    "Calibrated localization",
+    "标定定位"
+  ],
+  [
+    "Without calibration / localization",
+    "无标定 / 定位"
+  ],
+  [
+    "Action chunking",
+    "动作分块"
+  ],
+  [
+    "With chunking",
+    "有动作分块"
+  ],
+  [
+    "Without chunking",
+    "无动作分块"
+  ],
+  [
+    "Mean ± sample SD over all included trials. Conditions span different batches; removing calibration also disables localization. One multi-waypoint chunk counts as one decision.",
+    "所有纳入试验的均值 ± 样本标准差。条件来自不同批次；移除标定也会关闭定位。一个多路径点动作块计作一次决策。"
+  ]
+].forEach(([english, chinese]) => zhTranslations.set(english, chinese));
+
 const originalTextNodes = new WeakMap();
 const originalAttributes = new WeakMap();
 
@@ -705,8 +769,8 @@ const demoTasks = [
       playback: "Real time"
     },
     configs: [
-      { label: "With human video", model: "GPT-6 Astra", context: "Human demonstration", success: "2 / 3", decisions: "76.7", time: "18.9 min", src: "assets/videos/towel-with-demo.mp4", poster: "assets/images/towel-with-human-poster.jpg", trial: "Success", view: "Head view", usesReference: true },
-      { label: "Without human video", model: "GPT-6 Astra", context: "No human demonstration", success: "0 / 3", decisions: "96.3", time: "24.6 min", src: "assets/videos/towel-no-demo.mp4", poster: "assets/images/towel-without-human-poster.jpg", trial: "Gave up", view: "Head view", usesReference: false }
+      { label: "With human video", model: "GPT-6 Astra", context: "Human demonstration", success: "9 / 10", decisions: "44.9", time: "11.7 min", src: "assets/videos/towel-with-demo.mp4", poster: "assets/images/towel-with-human-poster.jpg", trial: "Success", view: "Head view", usesReference: true },
+      { label: "Without human video", model: "GPT-6 Astra", context: "No human demonstration", success: "2 / 10", decisions: "82.3", time: "21.1 min", src: "assets/videos/towel-no-demo.mp4", poster: "assets/images/towel-without-human-poster.jpg", trial: "Gave up", view: "Head view", usesReference: false }
     ]
   },
   {
@@ -808,7 +872,7 @@ const demoTasks = [
       }
     ],
     configs: [
-      { label: "GPT-6 Astra", model: "GPT-6 Astra", context: "Interaction history", success: "3 / 3", decisions: "40.33", time: "25.53 min", src: "assets/videos/mobile-gpt6.mp4", trial: "Success", view: "Head view", speed: "30× robot run" }
+      { label: "GPT-6 Astra", model: "GPT-6 Astra", context: "Interaction history", success: "3 / 3", decisions: "40.3", time: "25.5 min", src: "assets/videos/mobile-gpt6.mp4", trial: "Success", view: "Head view", speed: "30× robot run" }
     ]
   },
   {
@@ -913,9 +977,9 @@ demoTasks.splice(1, 0, {
       "label": "With human video",
       "model": "GPT-6 Astra",
       "context": "Human demonstration",
-      "success": "2 / 3",
-      "decisions": "66.7",
-      "time": "16.1 min",
+      "success": "8 / 10",
+      "decisions": "53.5",
+      "time": "14.6 min",
       "src": "assets/experiments/notebook-astra-human-r1.mp4",
       "poster": "assets/experiments/notebook-astra-human-r1.jpg",
       "trial": "Success",
@@ -925,9 +989,9 @@ demoTasks.splice(1, 0, {
       "label": "Without human video",
       "model": "GPT-6 Astra",
       "context": "No human demonstration",
-      "success": "0 / 3",
-      "decisions": "94.0",
-      "time": "24.6 min",
+      "success": "2 / 10",
+      "decisions": "76.5",
+      "time": "20.8 min",
       "src": "assets/experiments/notebook-astra-none-r1.mp4",
       "poster": "assets/experiments/notebook-astra-none-r1.jpg",
       "trial": "Gave up",
@@ -990,9 +1054,9 @@ demoTasks.splice(2, 0, {
       "label": "Robot video + action",
       "model": "GPT-6 Astra",
       "context": "Robot video + action",
-      "success": "3 / 3",
-      "decisions": "54.7",
-      "time": "17.9 min",
+      "success": "8 / 10",
+      "decisions": "49.1",
+      "time": "13.0 min",
       "src": "assets/experiments/bottle-astra-action-r1.mp4",
       "poster": "assets/experiments/bottle-astra-action-r1.jpg",
       "trial": "Success",
@@ -1053,9 +1117,9 @@ demoTasks.splice(2, 0, {
       "label": "Robot video + action",
       "model": "GPT-6 Astra",
       "context": "Robot video + action",
-      "success": "2 / 3",
-      "decisions": "48.3",
-      "time": "10.8 min",
+      "success": "7 / 10",
+      "decisions": "43.5",
+      "time": "9.4 min",
       "src": "assets/experiments/plug-astra-action-r1.mp4",
       "poster": "assets/experiments/plug-astra-action-r1.jpg",
       "trial": "Success",
@@ -1071,7 +1135,7 @@ const robotComparisonConfigs = {
       "label": "No video",
       "model": "GPT-6 Astra",
       "context": "No demonstration",
-      "success": "0 / 3",
+      "success": "0 / 10",
       "decisions": "71.0",
       "time": "16.1 min",
       "src": "assets/experiments/bottle-astra-none-r3.mp4",
@@ -1083,9 +1147,9 @@ const robotComparisonConfigs = {
       "label": "Video",
       "model": "GPT-6 Astra",
       "context": "Robot video",
-      "success": "2 / 3",
-      "decisions": "74.3",
-      "time": "15.2 min",
+      "success": "7 / 10",
+      "decisions": "53.4",
+      "time": "10.6 min",
       "src": "assets/experiments/bottle-astra-video-r2.mp4",
       "poster": "assets/experiments/bottle-astra-video-r2.jpg",
       "trial": "Trial 2: Success",
@@ -1097,9 +1161,9 @@ const robotComparisonConfigs = {
       "label": "No video",
       "model": "GPT-6 Astra",
       "context": "No demonstration",
-      "success": "0 / 3",
-      "decisions": "24.0",
-      "time": "5.3 min",
+      "success": "0 / 10",
+      "decisions": "43.0",
+      "time": "9.1 min",
       "src": "assets/experiments/plug-astra-none-r1.mp4",
       "poster": "assets/experiments/plug-astra-none-r1.jpg",
       "trial": "Trial 1: Gave up",
@@ -1109,9 +1173,9 @@ const robotComparisonConfigs = {
       "label": "Video",
       "model": "GPT-6 Astra",
       "context": "Robot video",
-      "success": "0 / 3",
-      "decisions": "33.7",
-      "time": "7.9 min",
+      "success": "0 / 10",
+      "decisions": "32.0",
+      "time": "7.5 min",
       "src": "assets/experiments/plug-astra-video-r1.mp4",
       "poster": "assets/experiments/plug-astra-video-r1.jpg",
       "trial": "Trial 1: Gave up",

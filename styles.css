@@ -469,3 +469,9 @@ footer { border-top: 1px solid var(--line); background: var(--soft); }
 @media (max-width: 760px) {
   .goal-image-group .rollout-rail { grid-template-columns: 1fr; gap: 24px; }
 }
+
+.ablation-group { margin: 28px 0; }
+.ablation-group h3 { margin-bottom: 5px; font-size: 18px; }
+.ablation-group > p { margin: 0 0 10px; color: var(--muted); font-size: 13px; }
+.experiment-family .table-wrap table { min-width: 750px; }
+.experiment-family .table-wrap td:nth-last-child(-n+3), .ablation-group td:not(:first-child) { white-space: nowrap; font-variant-numeric: tabular-nums; }

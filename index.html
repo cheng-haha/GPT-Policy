@@ -10,8 +10,8 @@
     <meta name="theme-color" content="#f7f8fa" />
     <title>In-Context Robot Learning with VLM Agents</title>
     <link rel="preload" as="image" href="assets/gpt-policy-logo.png" fetchpriority="high" />
-    <link rel="stylesheet" href="styles.css?v=20260915-entry-logo" />
-    <link rel="stylesheet" href="robodojo.css?v=20261007-compact-switch-v2" />
+    <link rel="stylesheet" href="styles.css?v=20261011-paper" />
+    <link rel="stylesheet" href="robodojo.css?v=20261011-paper-heatmap" />
   </head>
   <body id="top">
     <button class="language-toggle" id="language-toggle" type="button" aria-label="Switch to Chinese" title="Switch to Chinese">
@@ -40,7 +40,7 @@
           <span>and turn it into executable, verifiable behavior from a new initial state?</span>
         </p>
         <div class="hero-actions">
-          <a class="button dark paper-button" href="paper.pdf?v=20260915-repository-rename">
+          <a class="button dark paper-button" href="paper.pdf?v=20261011">
             <svg class="arxiv-icon" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M3.842 0a1.004 1.004 0 0 0-.922.608c-.154.369-.044.627.294 1.111l6.919 8.36-1.023 1.106a1.039 1.039 0 0 0 .003 1.422l1.23 1.314-5.44 6.444c-.28.299-.453.823-.297 1.199a1.025 1.025 0 0 0 .959.635.913.913 0 0 0 .689-.341l5.783-6.126 7.49 8.005a.853.853 0 0 0 .683.26.958.958 0 0 0 .878-.614c.158-.377-.017-.75-.306-1.141l-7.052-8.342 1.063-1.13a.963.963 0 0 0 .009-1.316L4.634.464S4.26.01 3.842 0Zm14.341 1.842a.877.877 0 0 0-.655.242l-5.696 6.158 1.694 1.832 5.309-6.514c.325-.433.479-.66.325-1.029a1.12 1.12 0 0 0-.977-.689Z" />
             </svg>
@@ -63,7 +63,7 @@
         <div class="hero-figure">
           <figure class="hero-cover-figure">
             <div class="hero-cover-media">
-              <a href="assets/paper-figures/context-overview.png?v=20260915-overleaf-figures" target="_blank" rel="noopener"><img src="assets/paper-figures/context-overview.png?v=20260915-overleaf-figures" alt="In-context robot control with GPT-Policy: five context families" width="2401" height="1480" fetchpriority="high" /></a>
+              <a href="assets/paper-figures/context-overview.png?v=20261011-paper-figures" target="_blank" rel="noopener"><img src="assets/paper-figures/context-overview.png?v=20261011-paper-figures" alt="In-context robot control with GPT-Policy: five context families" width="2388" height="1578" fetchpriority="high" /></a>
             </div>
             <figcaption><b>Figure 1.</b> A general-purpose VLM combines the task instruction, initial state, and contextual information to guide robot actions. Context includes human videos, robot videos with recorded actions, goal images, human–robot interaction, and self-interaction history.</figcaption>
           </figure>
@@ -71,7 +71,7 @@
       </section>
 
       <section id="robodojo" class="benchmark" aria-label="RoboDojo benchmark results">
-        <noscript>GPT-Policy on ten RoboDojo tasks: mean score 80.20 / 100; success rate 72% (36/50). <a href="assets/benchmarks/robodojo-tasks.csv">Download task results</a>.</noscript>
+        <noscript>GPT-Policy on ten RoboDojo tasks: mean score 63.00 / 100; success rate 52% (26/50). <a href="assets/benchmarks/robodojo-tasks.csv">Download task results</a>.</noscript>
       </section>
 
       <div class="content-layout shell">
@@ -81,7 +81,8 @@
           <a href="#context">Forms of context</a>
           <a href="#method">GPT-Policy</a>
           <a href="#results">Experiments</a>
-          <a href="#findings">Findings</a>
+          <a href="#ablations">Ablations</a>
+          <a href="#findings">Takeaways</a>
           <a href="#discussion">Discussion</a>
           <a href="#citation">Citation</a>
         </aside>
@@ -93,10 +94,10 @@
             <div class="abstract-grid">
               <h3>Abstract</h3>
               <p>
-                Enabling robots to adapt to unfamiliar environments as readily as humans remains a moonshot goal of embodied AI. No finite collection of demonstrations can cover every task and situation a robot will encounter, making the ability to learn from context at deployment essential for generalization. Such in-context learning (ICL), however, remains largely beyond the reach of existing robotic policies. The broad agentic capabilities of commercial vision-language models (VLMs), such as GPT-6 Astra, raise a compelling question: can these models learn from demonstrations, examples, and interaction feedback, then translate that information into executable and verifiable robot behavior from a new initial state without gradient updates or persistent changes to task-specific parameters?
+                Enabling robots to adapt to unfamiliar environments as readily as humans remains a moonshot goal of embodied AI. No finite collection of demonstrations can cover every task and situation a robot will encounter, making the ability to learn from context at deployment essential for generalization. Such in-context learning (ICL), however, remains largely beyond the reach of existing robotic policies. The broad agentic capabilities of commercial vision-language models (VLMs), such as GPT-6 Astra, raise a compelling question: can these models learn from demonstrations and interaction feedback, then translate that information into executable robot behavior without gradient updates or persistent changes to task-specific parameters?
               </p>
               <p>
-                We introduce <b>GPT-Policy</b>, a general-agent framework for in-context robot learning. GPT-Policy integrates a context compiler that preserves task-relevant visual transitions, a VLM that proposes robot-tool actions, and a constrained controller that verifies and executes each action and reports its outcome. We evaluate its reliability and limitations through task success and efficiency metrics, matched comparisons across models, and controlled context ablations. In real-robot trials, human video demonstrations improve task completion even without robot action labels, while aligned action references yield further gains on contact-sensitive tasks. These findings position GPT-Policy as a step toward robot adaptation through in-context learning, providing an empirical foundation for translating the general-purpose capabilities of VLMs into physical behavior and clarifying the challenges that must be overcome for reliable deployment.
+                We introduce <b>GPT-Policy</b>, a general-agent framework for in-context robot learning. GPT-Policy equips a VLM agent with a context compiler that organizes task-relevant information and an execution harness that supports geometric grounding, action chunking, and closed-loop decision-making through execution feedback. We evaluate GPT-Policy on ten real-world tasks spanning five context types and ten RoboDojo simulation tasks. Across four real-world demonstration tasks, mean success rate increases from 10% without demonstrations to 80% with human videos or robot demonstrations that include action references. Videos provide procedural guidance, while action references can clarify motion details. Targeted ablations suggest that calibrated localization and action chunking improve success and execution efficiency. Across ten RoboDojo tasks, one-shot GPT-Policy achieves 52% mean success. These results suggest that general-purpose VLMs can use deployment-time context to adapt robot behavior, while reliable physical execution remains a challenge.
               </p>
             </div>
             <div class="research-question">
@@ -154,11 +155,11 @@
               GPT-Policy connects a general-purpose VLM to robot tools through a shared context-to-action interface. Embodiment-specific adapters translate tool requests into executable commands. Model parameters remain fixed; updated observations and execution or rejection feedback inform each subsequent decision.
             </p>
             <figure class="method-figure">
-              <a href="assets/method-overview.png?v=20260915-overleaf-figures" target="_blank" rel="noopener" aria-label="Open method figure at full size">
-                <img src="assets/method-overview.png?v=20260915-overleaf-figures" width="2401" height="1300" loading="lazy" decoding="async" alt="Overview of the GPT-Policy context-to-action framework" />
+              <a href="assets/method-overview.png?v=20261011-paper-figures" target="_blank" rel="noopener" aria-label="Open method figure at full size">
+                <img src="assets/method-overview.png?v=20261011-paper-figures" width="2382" height="1542" loading="lazy" decoding="async" alt="Overview of the GPT-Policy context-to-action framework" />
               </a>
               <figcaption>
-                <b>Figure 2.</b> The task instruction, current state, task references, and interaction history are combined with shared instructions and tool schemas to form the VLM input. A fixed VLM selects tool requests, which constrained robot tools execute. Returned observations and execution feedback update the context for the next decision.
+                <b>Figure 2.</b> A context compiler builds structured references from the task instruction and demonstrations. A frozen VLM uses these references, live observations, and history to choose one tool call per turn. Geometric grounding triangulates stationary features from calibrated wrist-camera views; action chunking plans multiple end-effector waypoints. Execution adapters validate and retime trajectories, then return feedback for the next decision.
               </figcaption>
             </figure>
             <div class="pipeline" aria-label="GPT-Policy pipeline">
@@ -169,10 +170,10 @@
             </div>
 
             <figure class="paper-figure" id="paper-figure-3">
-              <a href="assets/paper-figures/execution-harness.png?v=20260915-overleaf-figures" target="_blank" rel="noopener">
-                <img src="assets/paper-figures/execution-harness.png?v=20260915-overleaf-figures" alt="GPT-Policy execution harness" loading="lazy" decoding="async" width="2401" height="1270" />
+              <a href="assets/paper-figures/execution-harness.png?v=20261011-paper-figures" target="_blank" rel="noopener">
+                <img src="assets/paper-figures/execution-harness.png?v=20261011-paper-figures" alt="GPT-Policy execution harness" loading="lazy" decoding="async" width="2310" height="996" />
               </a>
-              <figcaption><b>Figure 3.</b> The VLM generates tool requests from interleaved image and text inputs. The Cartesian adapter resolves targets, samples the pose path, checks inverse-kinematics residuals, times joint references, and executes the motion. Execution or rejection feedback returns to the next decision.</figcaption>
+              <figcaption><b>Figure 3.</b> The ARX/YAM adapter samples the requested Cartesian path and solves inverse kinematics sequentially. A complete accepted plan is retimed and dispatched; a failed check returns rejection feedback before motion. The VLM observes again after completion or rejection. Adapted from paper Figure 7.</figcaption>
             </figure>
           </section>
 
@@ -183,7 +184,7 @@
             <div class="metric-row">
               <div><strong>5</strong><span>experiment families</span></div>
               <div><strong>10</strong><span>robot tasks</span></div>
-              <div><strong>3</strong><span>trials per condition</span></div>
+              <div><strong>10 / 3</strong><span>trials per condition</span></div>
             </div>
             <nav class="experiment-index" aria-label="Experiment families">
               <a href="#experiment-human-video"><span>01</span>Human video demonstrations</a>
@@ -192,7 +193,7 @@
               <a href="#experiment-self-history"><span>04</span>Self-interaction history</a>
               <a href="#experiment-human-interaction"><span>05</span>Human–robot interaction</a>
             </nav>
-            <p class="table-note">GPT-6 Astra on real robots; three trials per condition. Success requires the final scene to satisfy the task-specific geometric and semantic criteria. Decisions and time are averaged over all trials, including failures. Tic-Tac-Toe wins and draws both count as success.</p>
+            <p class="table-note">Paper Table 1: ten trials per condition for demonstration tasks; three for goal images and interaction tasks. Decisions and time are mean ± sample SD, including failures. The π₀.₅ baseline is fine-tuned on 30 demonstrations per task. GPT-Policy reports action-target/chunk decisions and wall-clock time; π₀.₅ reports logged counts and top-view recording time. Tic-Tac-Toe wins and draws both count as success.</p>
             <div id="demos" class="experiment-anchor" aria-hidden="true"></div>
             <div id="demo-grid" class="experiment-families">
               <section id="experiment-human-video" class="experiment-family" aria-labelledby="human-video-title" data-layout="comparison">
@@ -202,12 +203,14 @@
                 </header>
                 <div class="table-wrap">
                   <table aria-label="Human video demonstrations">
-                    <thead><tr><th>Task</th><th>Context condition</th><th>Success</th><th>Decisions</th><th>Time (min)</th></tr></thead>
+                    <thead><tr><th scope="col">Task</th><th scope="col">Method</th><th scope="col">Context condition</th><th scope="col">Success</th><th scope="col">Decisions</th><th scope="col">Time (min)</th></tr></thead>
                     <tbody>
-                      <tr><td>Pick Red Towel</td><td>None</td><td>0 / 3</td><td>96.3</td><td>24.6</td></tr>
-                      <tr><td>Pick Red Towel</td><td>Human video</td><td>2 / 3</td><td>76.7</td><td>18.9</td></tr>
-                      <tr><td>Pick Up Notebook</td><td>None</td><td>0 / 3</td><td>94.0</td><td>24.6</td></tr>
-                      <tr><td>Pick Up Notebook</td><td>Human video</td><td>2 / 3</td><td>66.7</td><td>16.1</td></tr>
+                      <tr><td>Pick Red Towel</td><td>π₀.₅</td><td>None</td><td>7 / 10</td><td>19.3 ± 12.8</td><td>0.94 ± 0.53</td></tr>
+                      <tr><td>Pick Red Towel</td><td>GPT-Policy (Astra)</td><td>None</td><td>2 / 10</td><td>82.3 ± 26.7</td><td>21.1 ± 7.2</td></tr>
+                      <tr><td>Pick Red Towel</td><td>GPT-Policy (Astra)</td><td>Human video</td><td>9 / 10</td><td>44.9 ± 27.7</td><td>11.7 ± 6.7</td></tr>
+                      <tr><td>Pick Up Notebook</td><td>π₀.₅</td><td>None</td><td>2 / 10</td><td>31.4 ± 16.8</td><td>1.35 ± 0.63</td></tr>
+                      <tr><td>Pick Up Notebook</td><td>GPT-Policy (Astra)</td><td>None</td><td>2 / 10</td><td>76.5 ± 15.4</td><td>20.8 ± 5.0</td></tr>
+                      <tr><td>Pick Up Notebook</td><td>GPT-Policy (Astra)</td><td>Human video</td><td>8 / 10</td><td>53.5 ± 24.0</td><td>14.6 ± 6.6</td></tr>
                     </tbody>
                   </table>
                 </div>
@@ -220,14 +223,16 @@
                 </header>
                 <div class="table-wrap">
                   <table aria-label="Robot demonstrations and actions">
-                    <thead><tr><th>Task</th><th>Context condition</th><th>Success</th><th>Decisions</th><th>Time (min)</th></tr></thead>
+                    <thead><tr><th scope="col">Task</th><th scope="col">Method</th><th scope="col">Context condition</th><th scope="col">Success</th><th scope="col">Decisions</th><th scope="col">Time (min)</th></tr></thead>
                     <tbody>
-                      <tr><td>Unscrew Bottle Cap</td><td>None</td><td>0 / 3</td><td>71.0</td><td>16.1</td></tr>
-                      <tr><td>Unscrew Bottle Cap</td><td>Robot video</td><td>2 / 3</td><td>74.3</td><td>15.2</td></tr>
-                      <tr><td>Unscrew Bottle Cap</td><td>Robot video + action</td><td>3 / 3</td><td>54.7</td><td>17.9</td></tr>
-                      <tr><td>Remove and Reinsert Plug</td><td>None</td><td>0 / 3</td><td>24.0</td><td>5.3</td></tr>
-                      <tr><td>Remove and Reinsert Plug</td><td>Robot video</td><td>0 / 3</td><td>33.7</td><td>7.9</td></tr>
-                      <tr><td>Remove and Reinsert Plug</td><td>Robot video + action</td><td>2 / 3</td><td>48.3</td><td>10.8</td></tr>
+                      <tr><td>Unscrew Bottle Cap</td><td>π₀.₅</td><td>None</td><td>2 / 10</td><td>87.4 ± 22.2</td><td>3.04 ± 0.72</td></tr>
+                      <tr><td>Unscrew Bottle Cap</td><td>GPT-Policy (Astra)</td><td>None</td><td>0 / 10</td><td>71.0 ± 50.2</td><td>16.1 ± 9.9</td></tr>
+                      <tr><td>Unscrew Bottle Cap</td><td>GPT-Policy (Astra)</td><td>Robot video</td><td>7 / 10</td><td>53.4 ± 21.0</td><td>10.6 ± 4.3</td></tr>
+                      <tr><td>Unscrew Bottle Cap</td><td>GPT-Policy (Astra)</td><td>Robot video + action</td><td>8 / 10</td><td>49.1 ± 16.6</td><td>13.0 ± 4.9</td></tr>
+                      <tr><td>Remove and Reinsert Plug</td><td>π₀.₅</td><td>None</td><td>0 / 10</td><td>65.4 ± 38.6</td><td>2.35 ± 1.28</td></tr>
+                      <tr><td>Remove and Reinsert Plug</td><td>GPT-Policy (Astra)</td><td>None</td><td>0 / 10</td><td>43.0 ± 38.5</td><td>9.1 ± 7.8</td></tr>
+                      <tr><td>Remove and Reinsert Plug</td><td>GPT-Policy (Astra)</td><td>Robot video</td><td>0 / 10</td><td>32.0 ± 9.7</td><td>7.5 ± 2.4</td></tr>
+                      <tr><td>Remove and Reinsert Plug</td><td>GPT-Policy (Astra)</td><td>Robot video + action</td><td>7 / 10</td><td>43.5 ± 7.2</td><td>9.4 ± 2.1</td></tr>
                     </tbody>
                   </table>
                 </div>
@@ -240,10 +245,10 @@
                 </header>
                 <div class="table-wrap">
                   <table aria-label="Goal-image following">
-                    <thead><tr><th>Task</th><th>Context condition</th><th>Success</th><th>Decisions</th><th>Time (min)</th></tr></thead>
+                    <thead><tr><th scope="col">Task</th><th scope="col">Method</th><th scope="col">Context condition</th><th scope="col">Success</th><th scope="col">Decisions</th><th scope="col">Time (min)</th></tr></thead>
                     <tbody>
-                      <tr><td>Arrange T Shape</td><td>Target image</td><td>3 / 3</td><td>66.7</td><td>15.8</td></tr>
-                      <tr><td>Arrange Fruit</td><td>Target image</td><td>3 / 3</td><td>49.0</td><td>12.4</td></tr>
+                      <tr><td>Arrange T Shape</td><td>GPT-Policy (Astra)</td><td>Target image</td><td>3 / 3</td><td>66.7 ± 4.0</td><td>15.8 ± 1.8</td></tr>
+                      <tr><td>Arrange Fruit</td><td>GPT-Policy (Astra)</td><td>Target image</td><td>3 / 3</td><td>49.0 ± 14.2</td><td>12.4 ± 2.9</td></tr>
                     </tbody>
                   </table>
                 </div>
@@ -256,10 +261,10 @@
                 </header>
                 <div class="table-wrap">
                   <table aria-label="Self-interaction history">
-                    <thead><tr><th>Task</th><th>Context condition</th><th>Success</th><th>Decisions</th><th>Time (min)</th></tr></thead>
+                    <thead><tr><th scope="col">Task</th><th scope="col">Method</th><th scope="col">Context condition</th><th scope="col">Success</th><th scope="col">Decisions</th><th scope="col">Time (min)</th></tr></thead>
                     <tbody>
-                      <tr><td>Lemon To Pink Plate</td><td>Self history</td><td>3 / 3</td><td>35.3</td><td>8.1</td></tr>
-                      <tr><td>Movable Exploration</td><td>Self history</td><td>3 / 3</td><td>40.33</td><td>25.53</td></tr>
+                      <tr><td>Lemon To Pink Plate</td><td>GPT-Policy (Astra)</td><td>Self history</td><td>3 / 3</td><td>35.3 ± 4.0</td><td>8.1 ± 1.0</td></tr>
+                      <tr><td>Movable Exploration</td><td>GPT-Policy (Astra)</td><td>Self history</td><td>3 / 3</td><td>40.3 ± 1.5</td><td>25.5 ± 4.0</td></tr>
                     </tbody>
                   </table>
                 </div>
@@ -272,16 +277,27 @@
                 </header>
                 <div class="table-wrap">
                   <table aria-label="Human–robot interaction">
-                    <thead><tr><th>Task</th><th>Context condition</th><th>Success</th><th>Decisions</th><th>Time (min)</th></tr></thead>
+                    <thead><tr><th scope="col">Task</th><th scope="col">Method</th><th scope="col">Context condition</th><th scope="col">Success</th><th scope="col">Decisions</th><th scope="col">Time (min)</th></tr></thead>
                     <tbody>
-                      <tr><td>Tic-Tac-Toe</td><td>Human-robot interaction</td><td>3 / 3</td><td>69.7</td><td>13.6</td></tr>
-                      <tr><td>Pointed Fruit Pickup</td><td>Human-robot interaction</td><td>3 / 3</td><td>67.3</td><td>15.0</td></tr>
+                      <tr><td>Tic-Tac-Toe</td><td>π₀.₅</td><td>None</td><td>0 / 3</td><td>18.7 ± 1.5</td><td>0.94 ± 0.03</td></tr>
+                      <tr><td>Tic-Tac-Toe</td><td>GPT-Policy (Astra)</td><td>Human-robot interaction</td><td>3 / 3</td><td>69.7 ± 13.3</td><td>13.6 ± 2.6</td></tr>
+                      <tr><td>Pointed Fruit Pickup</td><td>π₀.₅</td><td>None</td><td>1 / 3</td><td>20.0 ± 6.6</td><td>1.07 ± 0.34</td></tr>
+                      <tr><td>Pointed Fruit Pickup</td><td>GPT-Policy (Astra)</td><td>Human-robot interaction</td><td>3 / 3</td><td>67.3 ± 17.5</td><td>15.0 ± 3.4</td></tr>
                     </tbody>
                   </table>
                 </div>
                 <div class="demo-grid family-demos" data-family="Human interaction"></div>
               </section>
             </div>
+          </section>
+
+          <section id="ablations" class="section ruled">
+            <p class="section-kicker">Ablations</p><h2>What makes context executable?</h2>
+            <p class="section-intro">Paper Table 3 tests how demonstration information, calibrated localization, and action chunking affect success and execution cost.</p>
+            <article class="ablation-group"><h3>Demonstration information</h3><p>Remove and Reinsert Plug</p><div class="table-wrap"><table aria-label="Demonstration information"><thead><tr><th scope="col">Setting</th><th scope="col">Success</th><th scope="col">Decisions</th><th scope="col">Time (min)</th></tr></thead><tbody><tr><td>Subtask + action</td><td>7 / 10</td><td>43.5 ± 7.2</td><td>9.40 ± 2.12</td></tr><tr><td>Action only</td><td>4 / 10</td><td>84.3 ± 14.1</td><td>15.44 ± 3.15</td></tr><tr><td>Subtask only</td><td>0 / 10</td><td>32.0 ± 9.7</td><td>7.49 ± 2.43</td></tr><tr><td>Neither</td><td>1 / 10</td><td>91.0 ± 12.0</td><td>18.32 ± 2.24</td></tr></tbody></table></div></article>
+            <article class="ablation-group"><h3>Calibrated localization</h3><p>Pick Up Notebook</p><div class="table-wrap"><table aria-label="Calibrated localization"><thead><tr><th scope="col">Setting</th><th scope="col">Success</th><th scope="col">Decisions</th><th scope="col">Time (min)</th></tr></thead><tbody><tr><td>Calibrated localization</td><td>8 / 10</td><td>53.5 ± 24.0</td><td>14.61 ± 6.62</td></tr><tr><td>Without calibration / localization</td><td>3 / 10</td><td>78.5 ± 23.9</td><td>22.78 ± 6.88</td></tr></tbody></table></div></article>
+            <article class="ablation-group"><h3>Action chunking</h3><p>Remove and Reinsert Plug</p><div class="table-wrap"><table aria-label="Action chunking"><thead><tr><th scope="col">Setting</th><th scope="col">Success</th><th scope="col">Decisions</th><th scope="col">Time (min)</th></tr></thead><tbody><tr><td>With chunking</td><td>7 / 10</td><td>43.5 ± 7.2</td><td>9.40 ± 2.12</td></tr><tr><td>Without chunking</td><td>3 / 10</td><td>81.4 ± 24.2</td><td>16.69 ± 4.84</td></tr></tbody></table></div></article>
+            <p class="table-note">Mean ± sample SD over all included trials. Conditions span different batches; removing calibration also disables localization. One multi-waypoint chunk counts as one decision.</p>
           </section>
 
           <section id="findings" class="section ruled">
@@ -313,10 +329,10 @@
             </div>
             <div class="discussion-copy">
               <p>
-                In individual red-towel runs, human video raises GPT-6 Astra task progress from 55% to 100%, with approximately 35.6% shorter run time and 58.9% lower estimated token usage. Fable 5.1 and Kimi K3 reach 30% and 20% progress. These examples do not establish a reliable model ranking: task progress is distinct from success rate, which is 2/3 for GPT-6 Astra with human video.
+                In selected red-towel runs, human video raises task progress from 55% to 100%, with 35.6% shorter run time and 58.9% lower estimated token usage. These are individual-run comparisons, not a model ranking. Across the updated evaluation, GPT-Policy with human video succeeds in 9/10 towel trials and 8/10 notebook trials.
               </p>
               <p>
-                The evidence covers small task series under selected platforms, models, and context conditions. Incomplete ablations and unobserved pretraining limit causal and novel-skill claims. Context quality, observation–action alignment, execution latency, and human intervention remain constraints. Observed inter-arm collisions show that existing safeguards alone are insufficient for safe autonomous deployment.
+                The ablations test subtask/action references, calibrated localization, and action chunking. Context quality, observation–action alignment, and inference latency still constrain performance. Reactive recovery does not ensure collision avoidance; joint action validation, collision checks before execution, and independent stopping mechanisms remain necessary.
               </p>
 
               <h3>Future directions</h3>
@@ -354,11 +370,12 @@
       <div class="shell footer-inner">
         <a class="brand" href="#top"><span>GPT-Policy</span></a>
         <p>In-context learning for general VLM agents.</p>
-        <div><a href="paper.pdf?v=20260915-repository-rename">Paper</a><a href="#top">Back to top</a></div>
+        <div><a href="paper.pdf?v=20261011">Paper</a><a href="#top">Back to top</a></div>
       </div>
     </footer>
 
-    <script src="script.js?v=20260915-goal-neat"></script>
-    <script src="robodojo.js?v=20261011-results"></script>
+    <script src="script.js?v=20261011-paper"></script>
+    <script src="benchmark-data.js?v=20261011-paper"></script>
+    <script src="robodojo.js?v=20261011-paper-heatmap"></script>
   </body>
 </html>
