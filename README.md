@@ -30,9 +30,10 @@ with their original standard/random layout identities and outcomes.
 Three 640 × 480 camera recordings are joined left wrist → overhead → right wrist
 into one 1920 × 480 H.264 MP4. There is one frame per control step at 25 fps,
 including the initial frame. This is control-step playback, not wall-clock time.
-The synchronized panel shows public numerical EEF requests and native evaluation
-scores; it does not reproduce model reasoning. Native scores were not provided
-to the policy. No new evaluation is run to build the gallery.
+The synchronized panel shows recorded tool-call `note` arguments, numerical EEF
+requests, localization results and native evaluation scores. Notes are explicit
+tool arguments, not hidden model reasoning. Native scores were not provided to
+the policy. No new evaluation is run to build the gallery.
 
 Build with Python 3.11+ and FFmpeg, using a local copy of the public release:
 
@@ -45,8 +46,30 @@ The builder expects `tasks/`, `LICENSE.txt`, `THIRD_PARTY.md`, and
 control/frame alignment, and verifies 36/50 successes and a mean score of 80.20.
 Source hashes and original case identities are in the generated manifest.
 The original release must remain separate from the output directory.
-Non-motion calls and rejected motions do not advance the recorded video; the
-panel displays executed numerical targets, with the original decision index.
+Non-motion calls and rejected motions do not advance the recorded video. The
+tool-call selector and arrow buttons pause at a call's original control-step
+boundary, so every call remains inspectable even when several share a frame.
+Playback starts paused and displays the first call. During playback the note
+follows the executed motion, without adding artificial durations for tool calls.
+
+The public release alone contains tool names but omits notes and localization
+arguments. `tool-calls.json` is an allowlisted supplement from the selected run
+records: it contains only call indices, native control steps, tool names, notes,
+localization inputs/results and source hashes. `export_simulation_tool_calls.py`
+reads `FINAL_SUMMARY.json` to select the correct attempt (including the imitation
+layout 0 recovery), verifies result hashes, and requires every call and control
+boundary to match the public release. It does not export transcripts, raw
+observations, provider identifiers, credentials, or private reasoning. For an
+authorized run directory, generate this supplement on the server to stdout:
+
+```bash
+python3 scripts/export_simulation_tool_calls.py /path/to/selected-runs /path/to/public-release > tool-calls.json
+```
+
+Keep the supplement in `assets/robodojo-rollouts/tool-calls.json` before building,
+or pass `--tool-calls /path/to/tool-calls.json`. Existing matching MP4 files are
+reused. Generated traces retain the complete tool-call sequence, including
+`locate_point`, `done`, `give_up`, and motions with no acknowledged controls.
 
 `manifest.js` and per-case `trace.js` support both direct file opening and HTTP.
 Task links in the heatmap open the corresponding video. Query parameters

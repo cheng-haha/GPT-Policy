@@ -50,7 +50,7 @@ def probe(path):
     return data["streams"][0]
 
 
-def make_trace(folder, result):
+def make_trace(folder, result, supplement=None):
     actions = read_jsonl(folder / "actions.jsonl")
     segments = read_jsonl(folder / "execution_segments.jsonl")
     scores = read_jsonl(folder / "native_score_trace.jsonl")
@@ -59,6 +59,18 @@ def make_trace(folder, result):
     assert [s["native_control_step"] for s in scores] == list(range(controls + 1))
     assert scores[-1]["score_100"] == result["score_100"]
     assert scores[-1]["native_complete"]
+    calls, step = [], 0
+    for segment in segments:
+        calls.append({"decision": segment["decision_index"] + 1, "tool": segment["tool"],
+                      "step": step, "controls": segment["acknowledged_controls"]})
+        step += segment["acknowledged_controls"]
+    assert step == controls
+    if supplement is not None:
+        assert supplement["source_hashes"]["execution_segments"] == digest(folder / "execution_segments.jsonl")
+        assert len(supplement["calls"]) == len(calls)
+        for call, recorded in zip(calls, supplement["calls"]):
+            assert all(call[k] == recorded[k] for k in ("decision", "tool", "step"))
+            call.update({k: recorded[k] for k in ("note", "points", "localization") if k in recorded})
     executed = [s for s in segments if s["acknowledged_controls"] > 0]
     assert sum(s["acknowledged_controls"] for s in executed) == controls
     trace, previous, segment_index = [], None, 0
@@ -85,10 +97,10 @@ def make_trace(folder, result):
         value = sample["score_100"]
         if not score_changes or value != score_changes[-1][1]:
             score_changes.append([sample["native_control_step"], value])
-    return {"actions": trace, "scores": score_changes}
+    return {"actions": trace, "scores": score_changes, "calls": calls}
 
 
-def build_case(result_path, source, output):
+def build_case(result_path, source, output, supplements):
     result = json.loads(result_path.read_text())
     assert result["task"] in TASKS
     assert result["native_complete"] and result["native_valid_for_success_rate"]
@@ -123,7 +135,7 @@ def build_case(result_path, source, output):
     if not poster.exists() or not reuse:
         subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", str(video),
                         "-frames:v", "1", "-q:v", "3", str(poster)], check=True)
-    trace = make_trace(result_path.parent, result)
+    trace = make_trace(result_path.parent, result, supplements.get(result["episode_id"]))
     trace_path = destination / "trace.js"
     trace_path.write_text("window.gptPolicySimulationTraces ??= {};\nwindow.gptPolicySimulationTraces["
                           + json.dumps(result["episode_id"]) + "]="
@@ -145,15 +157,23 @@ def main():
     parser.add_argument("source", type=Path)
     parser.add_argument("output", type=Path)
     parser.add_argument("--workers", type=int, default=2)
+    parser.add_argument("--tool-calls", type=Path, help="Allowlisted tool-note supplement; defaults to output/tool-calls.json if present")
     args = parser.parse_args()
     source, output = args.source.resolve(), args.output.resolve()
     assert source != output and source not in output.parents, "Write outside the public release"
     results = sorted(source.glob("tasks/*/seed_*/*/result.json"))
     assert len(results) == 50, f"Expected all 50 selected cases, got {len(results)}"
     output.mkdir(parents=True, exist_ok=True)
+    supplement_path = args.tool_calls or output / "tool-calls.json"
+    if args.tool_calls:
+        assert supplement_path.is_file(), f"Missing tool-call supplement: {supplement_path}"
+    supplements = json.loads(supplement_path.read_text())["episodes"] if supplement_path.exists() else {}
+    if supplements:
+        assert len(supplements) == 50
+        assert set(supplements) == {json.loads(p.read_text())["episode_id"] for p in results}
     tasks = {key: {"id": key, "en": name, "cases": []} for key, name in TASKS.items()}
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
-        for task_id, chinese, case in pool.map(lambda p: build_case(p, source, output), results):
+        for task_id, chinese, case in pool.map(lambda p: build_case(p, source, output, supplements), results):
             tasks[task_id]["zh"] = chinese
             tasks[task_id]["cases"].append(case)
     for task in tasks.values():
