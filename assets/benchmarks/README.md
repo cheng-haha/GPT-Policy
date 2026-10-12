@@ -28,11 +28,25 @@ GPT-Policy: **80.20 / 100**, **36/50 successes (72%)**. Per-task score / success
 | Make Kong | 80 | 80 |
 | Classify objects | 100 | 100 |
 
-The displayed G0.5, OpenWAM-α, π₀.₅, GPT-as-Policy Direct and Hybrid results also follow this confirmed Table 2. In particular, the reported means are G0.5 **38.78 / 31.33%**, OpenWAM-α **33.57 / 23.80%**, π₀.₅ **24.90 / 16%**, Direct **38.50 / 26%**, and Hybrid **62.60 / 48%**. Keep reported mean precision rather than recomputing it from rounded cells.
+## Baseline alignment (2026-10-11)
 
-## Additional published references
+All baseline cells and aggregate values now reproduce the [GPT-as-Policy reference report](https://anonymous-report-421.github.io/public-website/?view=1). This supersedes baseline values in the earlier owner-supplied Table 2; **the confirmed GPT-Policy column remains unchanged**.
 
-Source: [GPT 6 Astra as an Embodied Policy](https://anonymous-report-421.github.io/public-website/?view=1), retrieved 2026-10-11. DM0.5, Xiaomi R1 and the additional official models in the aggregate bar chart retain the report's ten-task subset results. These are published results, not local reruns; each baseline retains its evaluation protocol.
+`gpt-as-policy-reference.json` preserves the exact model/task values, scene mixtures and upstream provenance hashes used for the update. The original report data were read directly from the page's embedded JSON. Only relevant result data are retained here.
+
+| Baseline | Reported Score | Reported SR (%) |
+| --- | ---: | ---: |
+| Galaxea G0.5 | 38.2608 | 30.9464 |
+| OpenWAM-α | 32.7322 | 23.0662 |
+| π₀.₅ | 24.4300 | 15.6666 |
+| GPT 6 Astra (direct) | 37.8125 | 26 |
+| π₀.₅ + GPT 6 Astra (hybrid) | 62.6000 | 48 |
+
+For official models, arrange-largest-number, pack-objects-into-box and fold-clothes combine two standard and three randomized scenes, matching the scene mixture in our release. Other tasks use five standard scenes. The report then averages the ten tasks equally.
+
+Direct's reported Score is the mean of its 48 available score records (37.8125), rather than the unweighted mean of its ten task means (38.5). Its success rate is 13/50. We retain the original reported aggregate rather than silently recomputing it. Hybrid uses its 50 score records. GPT-Policy uses ten equally weighted tasks with five scenes per task (80.20 Score; 36/50 successes, 72%).
+
+Other baseline models also use the reference report's exact values. These are published results, not reruns under our evaluation protocol. Only presentation is rounded to two decimals; all calculations retain the source precision.
 
 ## Reference Table 1 implementation
 
@@ -43,10 +57,10 @@ Column order is the reference's original seven models, followed by GPT-Policy: D
 `benchmark-data.js` is the single source shared by the bar chart, heatmap and per-task details. `robodojo.js` supports EN/ZH and synchronizes both metric switches. The heatmap has 10 task rows, eight model columns and one mean row.
 
 - `robodojo-tasks.csv`: the confirmed GPT-Policy task data and aggregate.
-- `robodojo-comparison.csv`: both metrics and provenance for all displayed methods.
+- `robodojo-comparison.csv`: both metrics and provenance for all displayed methods, with explicitly labeled reported aggregates.
 - `paper-real-robot-results.json`: the earlier PDF's real-robot Tables 1 and 3, unchanged by this simulation correction.
 
-No timeout/native-failure fields are displayed. The aggregate bar chart stays beneath Figure 1; the heatmap and per-task details are in the Experiments section, before the five real-world experiment families. The bar background is white and GPT-Policy's bar is charcoal (#202124). The bar-chart model logos and font subsets were extracted from the reference page on 2026-10-07; ownership remains with their respective owners. MORPHI's logo is the user-provided image.
+No timeout/native-failure fields are displayed. The aggregate bar chart stays beneath Figure 1; the heatmap and per-task details are in the Simulation experiments section. The bar background is white and GPT-Policy's bar is charcoal (#202124). The bar-chart model logos and font subsets were extracted from the reference page on 2026-10-07; ownership remains with their respective owners. MORPHI's logo is the user-provided image.
 
 ## Figure refresh
 

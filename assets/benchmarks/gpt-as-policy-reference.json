@@ -1,0 +1,488 @@
+{
+  "source": "https://anonymous-report-421.github.io/public-website/?view=1",
+  "retrieved_date": "2026-10-11",
+  "models": [
+    {
+      "name": "DM0.5",
+      "display": "DM0.5",
+      "origin": "official",
+      "overall_score": 24.9,
+      "score": 31.8206,
+      "sr": 22.0404,
+      "score_n": null
+    },
+    {
+      "name": "GalaxeaVLA (G0.5)",
+      "display": "GalaxeaVLA (G0.5)",
+      "origin": "official",
+      "overall_score": 20.23,
+      "score": 38.2608,
+      "sr": 30.9464,
+      "score_n": null
+    },
+    {
+      "name": "Xiaomi-Robotics-1",
+      "display": "Xiaomi-Robotics-1",
+      "origin": "official",
+      "overall_score": 20.07,
+      "score": 33.9746,
+      "sr": 25.5072,
+      "score_n": null
+    },
+    {
+      "name": "OpenWAM-α",
+      "display": "OpenWAM-α",
+      "origin": "official",
+      "overall_score": 17.18,
+      "score": 32.7322,
+      "sr": 23.0662,
+      "score_n": null
+    },
+    {
+      "name": "Meituan-Robotics-0",
+      "display": "Meituan-Robotics-0",
+      "origin": "official",
+      "overall_score": 14.95,
+      "score": 28.328599999999998,
+      "sr": 17.8796,
+      "score_n": null
+    },
+    {
+      "name": "Hy-Embodied-0.5-VLA",
+      "display": "Hy-Embodied-0.5-VLA",
+      "origin": "official",
+      "overall_score": 13.07,
+      "score": 21.1594,
+      "sr": 13.935,
+      "score_n": null
+    },
+    {
+      "name": "Spatial Forcing",
+      "display": "Spatial Forcing",
+      "origin": "official",
+      "overall_score": 12.38,
+      "score": 24.9644,
+      "sr": 17.1458,
+      "score_n": null
+    },
+    {
+      "name": "Pi-05",
+      "display": "π0.5",
+      "origin": "official",
+      "overall_score": 11.41,
+      "score": 24.43,
+      "sr": 15.6666,
+      "score_n": null
+    },
+    {
+      "name": "InternVLA-A1.5",
+      "display": "InternVLA-A1.5",
+      "origin": "official",
+      "overall_score": 11.15,
+      "score": 21.7398,
+      "sr": 15.0268,
+      "score_n": null
+    },
+    {
+      "name": "StarVLA-PI_v3",
+      "display": "StarVLA-PI_v3",
+      "origin": "official",
+      "overall_score": 10.81,
+      "score": 22.3636,
+      "sr": 16.1734,
+      "score_n": null
+    },
+    {
+      "name": "mix",
+      "display": "π0.5 + GPT",
+      "origin": "local",
+      "score": 62.6,
+      "sr": 48,
+      "score_n": 50
+    },
+    {
+      "name": "gpt",
+      "display": "GPT-only",
+      "origin": "local",
+      "score": 37.8125,
+      "sr": 26,
+      "score_n": 48
+    }
+  ],
+  "tasks": [
+    {
+      "id": "organize_table",
+      "scores": {
+        "DM0.5": 44.0,
+        "GalaxeaVLA (G0.5)": 46.33,
+        "Xiaomi-Robotics-1": 57.67,
+        "OpenWAM-α": 62.5,
+        "Meituan-Robotics-0": 43.67,
+        "Hy-Embodied-0.5-VLA": 42.0,
+        "Spatial Forcing": 31.670000000000005,
+        "Pi-05": 23.33,
+        "InternVLA-A1.5": 35.67,
+        "StarVLA-PI_v3": 25.17,
+        "mix": 60.0,
+        "gpt": 30.0
+      },
+      "rates": {
+        "DM0.5": 4.0,
+        "GalaxeaVLA (G0.5)": 11.33,
+        "Xiaomi-Robotics-1": 14.669999999999998,
+        "OpenWAM-α": 13.330000000000002,
+        "Meituan-Robotics-0": 4.0,
+        "Hy-Embodied-0.5-VLA": 4.67,
+        "Spatial Forcing": 5.33,
+        "Pi-05": 0.0,
+        "InternVLA-A1.5": 2.67,
+        "StarVLA-PI_v3": 2.0,
+        "mix": 0,
+        "gpt": 0
+      },
+      "gpt_score_n": 5,
+      "variants": {
+        "standard": 5
+      }
+    },
+    {
+      "id": "classify_objects_by_language",
+      "scores": {
+        "DM0.5": 0.4699999999999999,
+        "GalaxeaVLA (G0.5)": 1.07,
+        "Xiaomi-Robotics-1": 2.0,
+        "OpenWAM-α": 1.33,
+        "Meituan-Robotics-0": 2.47,
+        "Hy-Embodied-0.5-VLA": 0.53,
+        "Spatial Forcing": 0.6,
+        "Pi-05": 0.6,
+        "InternVLA-A1.5": 0.13,
+        "StarVLA-PI_v3": 0.27,
+        "mix": 38.0,
+        "gpt": 60.0
+      },
+      "rates": {
+        "DM0.5": 0.0,
+        "GalaxeaVLA (G0.5)": 0.0,
+        "Xiaomi-Robotics-1": 0.67,
+        "OpenWAM-α": 0.0,
+        "Meituan-Robotics-0": 0.67,
+        "Hy-Embodied-0.5-VLA": 0.0,
+        "Spatial Forcing": 0.0,
+        "Pi-05": 0.0,
+        "InternVLA-A1.5": 0.0,
+        "StarVLA-PI_v3": 0.0,
+        "mix": 20,
+        "gpt": 40
+      },
+      "gpt_score_n": 4,
+      "variants": {
+        "standard": 5
+      }
+    },
+    {
+      "id": "imitate_sorting_sequence",
+      "scores": {
+        "DM0.5": 1.8,
+        "GalaxeaVLA (G0.5)": 1.67,
+        "Xiaomi-Robotics-1": 2.5,
+        "OpenWAM-α": 2.9,
+        "Meituan-Robotics-0": 1.53,
+        "Hy-Embodied-0.5-VLA": 0.9,
+        "Spatial Forcing": 1.3,
+        "Pi-05": 1.6,
+        "InternVLA-A1.5": 0.6,
+        "StarVLA-PI_v3": 0.73,
+        "mix": 53.0,
+        "gpt": 0.0
+      },
+      "rates": {
+        "DM0.5": 0.0,
+        "GalaxeaVLA (G0.5)": 0.0,
+        "Xiaomi-Robotics-1": 0.67,
+        "OpenWAM-α": 0.67,
+        "Meituan-Robotics-0": 0.0,
+        "Hy-Embodied-0.5-VLA": 0.0,
+        "Spatial Forcing": 0.0,
+        "Pi-05": 0.0,
+        "InternVLA-A1.5": 0.0,
+        "StarVLA-PI_v3": 0.0,
+        "mix": 40,
+        "gpt": 0
+      },
+      "gpt_score_n": 5,
+      "variants": {
+        "standard": 5
+      }
+    },
+    {
+      "id": "arrange_largest_number",
+      "scores": {
+        "DM0.5": 7.853999999999999,
+        "GalaxeaVLA (G0.5)": 4.106,
+        "Xiaomi-Robotics-1": 8.562,
+        "OpenWAM-α": 4.362,
+        "Meituan-Robotics-0": 6.414000000000001,
+        "Hy-Embodied-0.5-VLA": 0.852,
+        "Spatial Forcing": 2.158,
+        "Pi-05": 2.2920000000000003,
+        "InternVLA-A1.5": 0.5740000000000001,
+        "StarVLA-PI_v3": 1.762,
+        "mix": 50.0,
+        "gpt": 57.0
+      },
+      "rates": {
+        "DM0.5": 3.2,
+        "GalaxeaVLA (G0.5)": 0.532,
+        "Xiaomi-Robotics-1": 3.732,
+        "OpenWAM-α": 0.532,
+        "Meituan-Robotics-0": 2.668,
+        "Hy-Embodied-0.5-VLA": 0.0,
+        "Spatial Forcing": 0.532,
+        "Pi-05": 0.532,
+        "InternVLA-A1.5": 0.0,
+        "StarVLA-PI_v3": 0.0,
+        "mix": 40,
+        "gpt": 40
+      },
+      "gpt_score_n": 5,
+      "variants": {
+        "standard": 2,
+        "random": 3
+      }
+    },
+    {
+      "id": "pack_objects_into_box",
+      "scores": {
+        "DM0.5": 14.719999999999999,
+        "GalaxeaVLA (G0.5)": 17.122,
+        "Xiaomi-Robotics-1": 18.694,
+        "OpenWAM-α": 20.830000000000002,
+        "Meituan-Robotics-0": 13.614,
+        "Hy-Embodied-0.5-VLA": 12.533999999999999,
+        "Spatial Forcing": 14.346,
+        "Pi-05": 18.36,
+        "InternVLA-A1.5": 8.931999999999999,
+        "StarVLA-PI_v3": 7.69,
+        "mix": 50.0,
+        "gpt": 50.0
+      },
+      "rates": {
+        "DM0.5": 1.33,
+        "GalaxeaVLA (G0.5)": 2.93,
+        "Xiaomi-Robotics-1": 2.398,
+        "OpenWAM-α": 3.732,
+        "Meituan-Robotics-0": 3.198,
+        "Hy-Embodied-0.5-VLA": 1.068,
+        "Spatial Forcing": 1.866,
+        "Pi-05": 2.398,
+        "InternVLA-A1.5": 0.0,
+        "StarVLA-PI_v3": 0.532,
+        "mix": 20,
+        "gpt": 20
+      },
+      "gpt_score_n": 4,
+      "variants": {
+        "standard": 2,
+        "random": 3
+      }
+    },
+    {
+      "id": "classify_objects",
+      "scores": {
+        "DM0.5": 26.829999999999995,
+        "GalaxeaVLA (G0.5)": 10.33,
+        "Xiaomi-Robotics-1": 17.2,
+        "OpenWAM-α": 5.53,
+        "Meituan-Robotics-0": 24.57,
+        "Hy-Embodied-0.5-VLA": 5.13,
+        "Spatial Forcing": 21.67,
+        "Pi-05": 24.67,
+        "InternVLA-A1.5": 5.7,
+        "StarVLA-PI_v3": 5.93,
+        "mix": 71.0,
+        "gpt": 100.0
+      },
+      "rates": {
+        "DM0.5": 16.67,
+        "GalaxeaVLA (G0.5)": 4.0,
+        "Xiaomi-Robotics-1": 8.67,
+        "OpenWAM-α": 1.33,
+        "Meituan-Robotics-0": 13.330000000000002,
+        "Hy-Embodied-0.5-VLA": 0.67,
+        "Spatial Forcing": 9.33,
+        "Pi-05": 12.67,
+        "InternVLA-A1.5": 0.0,
+        "StarVLA-PI_v3": 0.67,
+        "mix": 60,
+        "gpt": 100
+      },
+      "gpt_score_n": 5,
+      "variants": {
+        "standard": 5
+      }
+    },
+    {
+      "id": "build_tower",
+      "scores": {
+        "DM0.5": 55.2,
+        "GalaxeaVLA (G0.5)": 82.93,
+        "Xiaomi-Robotics-1": 52.6,
+        "OpenWAM-α": 52.529999999999994,
+        "Meituan-Robotics-0": 32.73,
+        "Hy-Embodied-0.5-VLA": 20.87,
+        "Spatial Forcing": 43.93,
+        "Pi-05": 37.73,
+        "InternVLA-A1.5": 37.4,
+        "StarVLA-PI_v3": 63.2,
+        "mix": 64.0,
+        "gpt": 12.0
+      },
+      "rates": {
+        "DM0.5": 42.0,
+        "GalaxeaVLA (G0.5)": 78.67,
+        "Xiaomi-Robotics-1": 47.33,
+        "OpenWAM-α": 38.67,
+        "Meituan-Robotics-0": 11.33,
+        "Hy-Embodied-0.5-VLA": 12.0,
+        "Spatial Forcing": 32.67,
+        "Pi-05": 24.0,
+        "InternVLA-A1.5": 28.670000000000005,
+        "StarVLA-PI_v3": 55.33,
+        "mix": 60,
+        "gpt": 0
+      },
+      "gpt_score_n": 5,
+      "variants": {
+        "standard": 5
+      }
+    },
+    {
+      "id": "make_kong",
+      "scores": {
+        "DM0.5": 56.67,
+        "GalaxeaVLA (G0.5)": 90.0,
+        "Xiaomi-Robotics-1": 41.33,
+        "OpenWAM-α": 32.0,
+        "Meituan-Robotics-0": 56.0,
+        "Hy-Embodied-0.5-VLA": 18.67,
+        "Spatial Forcing": 12.0,
+        "Pi-05": 26.670000000000005,
+        "InternVLA-A1.5": 26.0,
+        "StarVLA-PI_v3": 18.0,
+        "mix": 40.0,
+        "gpt": 0.0
+      },
+      "rates": {
+        "DM0.5": 56.67,
+        "GalaxeaVLA (G0.5)": 90.0,
+        "Xiaomi-Robotics-1": 41.33,
+        "OpenWAM-α": 32.0,
+        "Meituan-Robotics-0": 56.0,
+        "Hy-Embodied-0.5-VLA": 18.67,
+        "Spatial Forcing": 12.0,
+        "Pi-05": 26.670000000000005,
+        "InternVLA-A1.5": 26.0,
+        "StarVLA-PI_v3": 18.0,
+        "mix": 40,
+        "gpt": 0
+      },
+      "gpt_score_n": 5,
+      "variants": {
+        "standard": 5
+      }
+    },
+    {
+      "id": "fold_clothes",
+      "scores": {
+        "DM0.5": 28.962,
+        "GalaxeaVLA (G0.5)": 32.75,
+        "Xiaomi-Robotics-1": 41.49,
+        "OpenWAM-α": 51.31,
+        "Meituan-Robotics-0": 19.787999999999997,
+        "Hy-Embodied-0.5-VLA": 20.108,
+        "Spatial Forcing": 36.37,
+        "Pi-05": 29.118000000000002,
+        "InternVLA-A1.5": 16.162000000000003,
+        "StarVLA-PI_v3": 32.214,
+        "mix": 100.0,
+        "gpt": 40.0
+      },
+      "rates": {
+        "DM0.5": 24.534,
+        "GalaxeaVLA (G0.5)": 28.002,
+        "Xiaomi-Robotics-1": 38.932,
+        "OpenWAM-α": 49.068,
+        "Meituan-Robotics-0": 14.929999999999998,
+        "Hy-Embodied-0.5-VLA": 17.602,
+        "Spatial Forcing": 31.729999999999997,
+        "Pi-05": 21.066000000000003,
+        "InternVLA-A1.5": 13.598,
+        "StarVLA-PI_v3": 28.532,
+        "mix": 100,
+        "gpt": 40
+      },
+      "gpt_score_n": 5,
+      "variants": {
+        "standard": 2,
+        "random": 3
+      }
+    },
+    {
+      "id": "put_bottles_into_dustbin",
+      "scores": {
+        "DM0.5": 81.7,
+        "GalaxeaVLA (G0.5)": 96.3,
+        "Xiaomi-Robotics-1": 97.7,
+        "OpenWAM-α": 94.03,
+        "Meituan-Robotics-0": 82.5,
+        "Hy-Embodied-0.5-VLA": 90.0,
+        "Spatial Forcing": 85.6,
+        "Pi-05": 79.93,
+        "InternVLA-A1.5": 86.23,
+        "StarVLA-PI_v3": 68.67,
+        "mix": 100.0,
+        "gpt": 36.0
+      },
+      "rates": {
+        "DM0.5": 72.0,
+        "GalaxeaVLA (G0.5)": 94.0,
+        "Xiaomi-Robotics-1": 96.67,
+        "OpenWAM-α": 91.33,
+        "Meituan-Robotics-0": 72.67,
+        "Hy-Embodied-0.5-VLA": 84.67,
+        "Spatial Forcing": 78.0,
+        "Pi-05": 69.33,
+        "InternVLA-A1.5": 79.33,
+        "StarVLA-PI_v3": 56.67,
+        "mix": 100,
+        "gpt": 20
+      },
+      "gpt_score_n": 5,
+      "variants": {
+        "standard": 5
+      }
+    }
+  ],
+  "provenance": {
+    "label": "RoboDojo · frozen evaluation and public leaderboard",
+    "files": [
+      "data.json",
+      "provenance.json",
+      "scores.csv"
+    ],
+    "results_sha256": "a200ce90aa19ee13ab83794f6b7885190dbfb3c87f0ebfe628156d4f8c7207d6",
+    "official_sha256": "364aadb9777d369084348b4eca462d77f7f86712f02dbb1eba63b430eb4eea20",
+    "tables": [
+      {
+        "name": "RoboDojo official scores",
+        "href": "https://robodojo-benchmark.com/"
+      }
+    ]
+  },
+  "aggregation": {
+    "official": "Ten-task mean; generalization tasks weighted 2 standard : 3 randomized.",
+    "gpt": "Reported mean over 48 available score records (37.8125); success rate 13/50 (26%).",
+    "mix": "Reported mean 62.6; success rate 24/50 (48%)."
+  }
+}

@@ -1,144 +1,144 @@
 task,model,mean_score,success_rate_percent,score_source,success_source
-Organize table,DM0.5,44.00,4.00,reference_table_1,reference_table_1
-Organize table,Galaxea G0.5,46.33,11.33,confirmed_paper_table_2,confirmed_paper_table_2
-Organize table,Xiaomi R1,57.67,14.67,reference_table_1,reference_table_1
-Organize table,OpenWAM-α,62.50,13.33,confirmed_paper_table_2,confirmed_paper_table_2
-Organize table,Meituan R0,43.67,4.00,reference_table_1,reference_table_1
-Organize table,Hy-VLA 0.5,42.00,4.67,reference_table_1,reference_table_1
-Organize table,Spatial Forcing,31.67,5.33,reference_table_1,reference_table_1
-Organize table,π₀.₅,23.30,0.00,confirmed_paper_table_2,confirmed_paper_table_2
-Organize table,InternVLA A1.5,35.67,2.67,reference_table_1,reference_table_1
-Organize table,StarVLA-PI,25.17,2.00,reference_table_1,reference_table_1
-Organize table,π₀.₅ + GPT 6 Astra,60.00,0.00,confirmed_paper_table_2,confirmed_paper_table_2
-Organize table,GPT 6 Astra (direct),30.00,0.00,confirmed_paper_table_2,confirmed_paper_table_2
+Organize table,DM0.5,44.00,4.00,gpt_as_policy_report,gpt_as_policy_report
+Organize table,Galaxea G0.5,46.33,11.33,gpt_as_policy_report,gpt_as_policy_report
+Organize table,Xiaomi R1,57.67,14.67,gpt_as_policy_report,gpt_as_policy_report
+Organize table,OpenWAM-α,62.50,13.33,gpt_as_policy_report,gpt_as_policy_report
+Organize table,Meituan R0,43.67,4.00,gpt_as_policy_report,gpt_as_policy_report
+Organize table,Hy-VLA 0.5,42.00,4.67,gpt_as_policy_report,gpt_as_policy_report
+Organize table,Spatial Forcing,31.67,5.33,gpt_as_policy_report,gpt_as_policy_report
+Organize table,π₀.₅,23.33,0.00,gpt_as_policy_report,gpt_as_policy_report
+Organize table,InternVLA A1.5,35.67,2.67,gpt_as_policy_report,gpt_as_policy_report
+Organize table,StarVLA-PI,25.17,2.00,gpt_as_policy_report,gpt_as_policy_report
+Organize table,π₀.₅ + GPT 6 Astra,60.00,0.00,gpt_as_policy_report,gpt_as_policy_report
+Organize table,GPT 6 Astra (direct),30.00,0.00,gpt_as_policy_report,gpt_as_policy_report
 Organize table,GPT-Policy,65.00,20.00,confirmed_paper_table_2,confirmed_paper_table_2
-Classify by language,DM0.5,0.47,0.00,reference_table_1,reference_table_1
-Classify by language,Galaxea G0.5,1.07,0.00,confirmed_paper_table_2,confirmed_paper_table_2
-Classify by language,Xiaomi R1,2.00,0.67,reference_table_1,reference_table_1
-Classify by language,OpenWAM-α,1.33,0.00,confirmed_paper_table_2,confirmed_paper_table_2
-Classify by language,Meituan R0,2.47,0.67,reference_table_1,reference_table_1
-Classify by language,Hy-VLA 0.5,0.53,0.00,reference_table_1,reference_table_1
-Classify by language,Spatial Forcing,0.60,0.00,reference_table_1,reference_table_1
-Classify by language,π₀.₅,0.60,0.00,confirmed_paper_table_2,confirmed_paper_table_2
-Classify by language,InternVLA A1.5,0.13,0.00,reference_table_1,reference_table_1
-Classify by language,StarVLA-PI,0.27,0.00,reference_table_1,reference_table_1
-Classify by language,π₀.₅ + GPT 6 Astra,38.00,20.00,confirmed_paper_table_2,confirmed_paper_table_2
-Classify by language,GPT 6 Astra (direct),60.00,40.00,confirmed_paper_table_2,confirmed_paper_table_2
+Classify by language,DM0.5,0.47,0.00,gpt_as_policy_report,gpt_as_policy_report
+Classify by language,Galaxea G0.5,1.07,0.00,gpt_as_policy_report,gpt_as_policy_report
+Classify by language,Xiaomi R1,2.00,0.67,gpt_as_policy_report,gpt_as_policy_report
+Classify by language,OpenWAM-α,1.33,0.00,gpt_as_policy_report,gpt_as_policy_report
+Classify by language,Meituan R0,2.47,0.67,gpt_as_policy_report,gpt_as_policy_report
+Classify by language,Hy-VLA 0.5,0.53,0.00,gpt_as_policy_report,gpt_as_policy_report
+Classify by language,Spatial Forcing,0.60,0.00,gpt_as_policy_report,gpt_as_policy_report
+Classify by language,π₀.₅,0.60,0.00,gpt_as_policy_report,gpt_as_policy_report
+Classify by language,InternVLA A1.5,0.13,0.00,gpt_as_policy_report,gpt_as_policy_report
+Classify by language,StarVLA-PI,0.27,0.00,gpt_as_policy_report,gpt_as_policy_report
+Classify by language,π₀.₅ + GPT 6 Astra,38.00,20.00,gpt_as_policy_report,gpt_as_policy_report
+Classify by language,GPT 6 Astra (direct),60.00,40.00,gpt_as_policy_report,gpt_as_policy_report
 Classify by language,GPT-Policy,88.00,80.00,confirmed_paper_table_2,confirmed_paper_table_2
-Imitate sorting sequence,DM0.5,1.80,0.00,reference_table_1,reference_table_1
-Imitate sorting sequence,Galaxea G0.5,1.67,0.00,confirmed_paper_table_2,confirmed_paper_table_2
-Imitate sorting sequence,Xiaomi R1,2.50,0.67,reference_table_1,reference_table_1
-Imitate sorting sequence,OpenWAM-α,2.90,0.67,confirmed_paper_table_2,confirmed_paper_table_2
-Imitate sorting sequence,Meituan R0,1.53,0.00,reference_table_1,reference_table_1
-Imitate sorting sequence,Hy-VLA 0.5,0.90,0.00,reference_table_1,reference_table_1
-Imitate sorting sequence,Spatial Forcing,1.30,0.00,reference_table_1,reference_table_1
-Imitate sorting sequence,π₀.₅,1.60,0.00,confirmed_paper_table_2,confirmed_paper_table_2
-Imitate sorting sequence,InternVLA A1.5,0.60,0.00,reference_table_1,reference_table_1
-Imitate sorting sequence,StarVLA-PI,0.73,0.00,reference_table_1,reference_table_1
-Imitate sorting sequence,π₀.₅ + GPT 6 Astra,53.00,40.00,confirmed_paper_table_2,confirmed_paper_table_2
-Imitate sorting sequence,GPT 6 Astra (direct),0.00,0.00,confirmed_paper_table_2,confirmed_paper_table_2
+Imitate sorting sequence,DM0.5,1.80,0.00,gpt_as_policy_report,gpt_as_policy_report
+Imitate sorting sequence,Galaxea G0.5,1.67,0.00,gpt_as_policy_report,gpt_as_policy_report
+Imitate sorting sequence,Xiaomi R1,2.50,0.67,gpt_as_policy_report,gpt_as_policy_report
+Imitate sorting sequence,OpenWAM-α,2.90,0.67,gpt_as_policy_report,gpt_as_policy_report
+Imitate sorting sequence,Meituan R0,1.53,0.00,gpt_as_policy_report,gpt_as_policy_report
+Imitate sorting sequence,Hy-VLA 0.5,0.90,0.00,gpt_as_policy_report,gpt_as_policy_report
+Imitate sorting sequence,Spatial Forcing,1.30,0.00,gpt_as_policy_report,gpt_as_policy_report
+Imitate sorting sequence,π₀.₅,1.60,0.00,gpt_as_policy_report,gpt_as_policy_report
+Imitate sorting sequence,InternVLA A1.5,0.60,0.00,gpt_as_policy_report,gpt_as_policy_report
+Imitate sorting sequence,StarVLA-PI,0.73,0.00,gpt_as_policy_report,gpt_as_policy_report
+Imitate sorting sequence,π₀.₅ + GPT 6 Astra,53.00,40.00,gpt_as_policy_report,gpt_as_policy_report
+Imitate sorting sequence,GPT 6 Astra (direct),0.00,0.00,gpt_as_policy_report,gpt_as_policy_report
 Imitate sorting sequence,GPT-Policy,100.00,100.00,confirmed_paper_table_2,confirmed_paper_table_2
-Arrange largest number,DM0.5,7.85,3.20,reference_table_1,reference_table_1
-Arrange largest number,Galaxea G0.5,4.70,0.67,confirmed_paper_table_2,confirmed_paper_table_2
-Arrange largest number,Xiaomi R1,8.56,3.73,reference_table_1,reference_table_1
-Arrange largest number,OpenWAM-α,4.94,0.67,confirmed_paper_table_2,confirmed_paper_table_2
-Arrange largest number,Meituan R0,6.41,2.67,reference_table_1,reference_table_1
-Arrange largest number,Hy-VLA 0.5,0.85,0.00,reference_table_1,reference_table_1
-Arrange largest number,Spatial Forcing,2.16,0.53,reference_table_1,reference_table_1
-Arrange largest number,π₀.₅,2.80,0.70,confirmed_paper_table_2,confirmed_paper_table_2
-Arrange largest number,InternVLA A1.5,0.57,0.00,reference_table_1,reference_table_1
-Arrange largest number,StarVLA-PI,1.76,0.00,reference_table_1,reference_table_1
-Arrange largest number,π₀.₅ + GPT 6 Astra,50.00,40.00,confirmed_paper_table_2,confirmed_paper_table_2
-Arrange largest number,GPT 6 Astra (direct),57.00,40.00,confirmed_paper_table_2,confirmed_paper_table_2
+Arrange largest number,DM0.5,7.85,3.20,gpt_as_policy_report,gpt_as_policy_report
+Arrange largest number,Galaxea G0.5,4.11,0.53,gpt_as_policy_report,gpt_as_policy_report
+Arrange largest number,Xiaomi R1,8.56,3.73,gpt_as_policy_report,gpt_as_policy_report
+Arrange largest number,OpenWAM-α,4.36,0.53,gpt_as_policy_report,gpt_as_policy_report
+Arrange largest number,Meituan R0,6.41,2.67,gpt_as_policy_report,gpt_as_policy_report
+Arrange largest number,Hy-VLA 0.5,0.85,0.00,gpt_as_policy_report,gpt_as_policy_report
+Arrange largest number,Spatial Forcing,2.16,0.53,gpt_as_policy_report,gpt_as_policy_report
+Arrange largest number,π₀.₅,2.29,0.53,gpt_as_policy_report,gpt_as_policy_report
+Arrange largest number,InternVLA A1.5,0.57,0.00,gpt_as_policy_report,gpt_as_policy_report
+Arrange largest number,StarVLA-PI,1.76,0.00,gpt_as_policy_report,gpt_as_policy_report
+Arrange largest number,π₀.₅ + GPT 6 Astra,50.00,40.00,gpt_as_policy_report,gpt_as_policy_report
+Arrange largest number,GPT 6 Astra (direct),57.00,40.00,gpt_as_policy_report,gpt_as_policy_report
 Arrange largest number,GPT-Policy,100.00,100.00,confirmed_paper_table_2,confirmed_paper_table_2
-Build tower,DM0.5,55.20,42.00,reference_table_1,reference_table_1
-Build tower,Galaxea G0.5,82.93,78.67,confirmed_paper_table_2,confirmed_paper_table_2
-Build tower,Xiaomi R1,52.60,47.33,reference_table_1,reference_table_1
-Build tower,OpenWAM-α,52.53,38.67,confirmed_paper_table_2,confirmed_paper_table_2
-Build tower,Meituan R0,32.73,11.33,reference_table_1,reference_table_1
-Build tower,Hy-VLA 0.5,20.87,12.00,reference_table_1,reference_table_1
-Build tower,Spatial Forcing,43.93,32.67,reference_table_1,reference_table_1
-Build tower,π₀.₅,37.70,24.00,confirmed_paper_table_2,confirmed_paper_table_2
-Build tower,InternVLA A1.5,37.40,28.67,reference_table_1,reference_table_1
-Build tower,StarVLA-PI,63.20,55.33,reference_table_1,reference_table_1
-Build tower,π₀.₅ + GPT 6 Astra,64.00,60.00,confirmed_paper_table_2,confirmed_paper_table_2
-Build tower,GPT 6 Astra (direct),12.00,0.00,confirmed_paper_table_2,confirmed_paper_table_2
+Build tower,DM0.5,55.20,42.00,gpt_as_policy_report,gpt_as_policy_report
+Build tower,Galaxea G0.5,82.93,78.67,gpt_as_policy_report,gpt_as_policy_report
+Build tower,Xiaomi R1,52.60,47.33,gpt_as_policy_report,gpt_as_policy_report
+Build tower,OpenWAM-α,52.53,38.67,gpt_as_policy_report,gpt_as_policy_report
+Build tower,Meituan R0,32.73,11.33,gpt_as_policy_report,gpt_as_policy_report
+Build tower,Hy-VLA 0.5,20.87,12.00,gpt_as_policy_report,gpt_as_policy_report
+Build tower,Spatial Forcing,43.93,32.67,gpt_as_policy_report,gpt_as_policy_report
+Build tower,π₀.₅,37.73,24.00,gpt_as_policy_report,gpt_as_policy_report
+Build tower,InternVLA A1.5,37.40,28.67,gpt_as_policy_report,gpt_as_policy_report
+Build tower,StarVLA-PI,63.20,55.33,gpt_as_policy_report,gpt_as_policy_report
+Build tower,π₀.₅ + GPT 6 Astra,64.00,60.00,gpt_as_policy_report,gpt_as_policy_report
+Build tower,GPT 6 Astra (direct),12.00,0.00,gpt_as_policy_report,gpt_as_policy_report
 Build tower,GPT-Policy,46.00,40.00,confirmed_paper_table_2,confirmed_paper_table_2
-Fold clothes,DM0.5,28.96,24.53,reference_table_1,reference_table_1
-Fold clothes,Galaxea G0.5,36.27,31.34,confirmed_paper_table_2,confirmed_paper_table_2
-Fold clothes,Xiaomi R1,41.49,38.93,reference_table_1,reference_table_1
-Fold clothes,OpenWAM-α,57.47,55.34,confirmed_paper_table_2,confirmed_paper_table_2
-Fold clothes,Meituan R0,19.79,14.93,reference_table_1,reference_table_1
-Fold clothes,Hy-VLA 0.5,20.11,17.60,reference_table_1,reference_table_1
-Fold clothes,Spatial Forcing,36.37,31.73,reference_table_1,reference_table_1
-Fold clothes,π₀.₅,32.30,24.00,confirmed_paper_table_2,confirmed_paper_table_2
-Fold clothes,InternVLA A1.5,16.16,13.60,reference_table_1,reference_table_1
-Fold clothes,StarVLA-PI,32.21,28.53,reference_table_1,reference_table_1
-Fold clothes,π₀.₅ + GPT 6 Astra,100.00,100.00,confirmed_paper_table_2,confirmed_paper_table_2
-Fold clothes,GPT 6 Astra (direct),40.00,40.00,confirmed_paper_table_2,confirmed_paper_table_2
+Fold clothes,DM0.5,28.96,24.53,gpt_as_policy_report,gpt_as_policy_report
+Fold clothes,Galaxea G0.5,32.75,28.00,gpt_as_policy_report,gpt_as_policy_report
+Fold clothes,Xiaomi R1,41.49,38.93,gpt_as_policy_report,gpt_as_policy_report
+Fold clothes,OpenWAM-α,51.31,49.07,gpt_as_policy_report,gpt_as_policy_report
+Fold clothes,Meituan R0,19.79,14.93,gpt_as_policy_report,gpt_as_policy_report
+Fold clothes,Hy-VLA 0.5,20.11,17.60,gpt_as_policy_report,gpt_as_policy_report
+Fold clothes,Spatial Forcing,36.37,31.73,gpt_as_policy_report,gpt_as_policy_report
+Fold clothes,π₀.₅,29.12,21.07,gpt_as_policy_report,gpt_as_policy_report
+Fold clothes,InternVLA A1.5,16.16,13.60,gpt_as_policy_report,gpt_as_policy_report
+Fold clothes,StarVLA-PI,32.21,28.53,gpt_as_policy_report,gpt_as_policy_report
+Fold clothes,π₀.₅ + GPT 6 Astra,100.00,100.00,gpt_as_policy_report,gpt_as_policy_report
+Fold clothes,GPT 6 Astra (direct),40.00,40.00,gpt_as_policy_report,gpt_as_policy_report
 Fold clothes,GPT-Policy,80.00,80.00,confirmed_paper_table_2,confirmed_paper_table_2
-Put bottles into dustbin,DM0.5,81.70,72.00,reference_table_1,reference_table_1
-Put bottles into dustbin,Galaxea G0.5,96.30,94.00,confirmed_paper_table_2,confirmed_paper_table_2
-Put bottles into dustbin,Xiaomi R1,97.70,96.67,reference_table_1,reference_table_1
-Put bottles into dustbin,OpenWAM-α,94.03,91.33,confirmed_paper_table_2,confirmed_paper_table_2
-Put bottles into dustbin,Meituan R0,82.50,72.67,reference_table_1,reference_table_1
-Put bottles into dustbin,Hy-VLA 0.5,90.00,84.67,reference_table_1,reference_table_1
-Put bottles into dustbin,Spatial Forcing,85.60,78.00,reference_table_1,reference_table_1
-Put bottles into dustbin,π₀.₅,79.90,69.30,confirmed_paper_table_2,confirmed_paper_table_2
-Put bottles into dustbin,InternVLA A1.5,86.23,79.33,reference_table_1,reference_table_1
-Put bottles into dustbin,StarVLA-PI,68.67,56.67,reference_table_1,reference_table_1
-Put bottles into dustbin,π₀.₅ + GPT 6 Astra,100.00,100.00,confirmed_paper_table_2,confirmed_paper_table_2
-Put bottles into dustbin,GPT 6 Astra (direct),36.00,20.00,confirmed_paper_table_2,confirmed_paper_table_2
+Put bottles into dustbin,DM0.5,81.70,72.00,gpt_as_policy_report,gpt_as_policy_report
+Put bottles into dustbin,Galaxea G0.5,96.30,94.00,gpt_as_policy_report,gpt_as_policy_report
+Put bottles into dustbin,Xiaomi R1,97.70,96.67,gpt_as_policy_report,gpt_as_policy_report
+Put bottles into dustbin,OpenWAM-α,94.03,91.33,gpt_as_policy_report,gpt_as_policy_report
+Put bottles into dustbin,Meituan R0,82.50,72.67,gpt_as_policy_report,gpt_as_policy_report
+Put bottles into dustbin,Hy-VLA 0.5,90.00,84.67,gpt_as_policy_report,gpt_as_policy_report
+Put bottles into dustbin,Spatial Forcing,85.60,78.00,gpt_as_policy_report,gpt_as_policy_report
+Put bottles into dustbin,π₀.₅,79.93,69.33,gpt_as_policy_report,gpt_as_policy_report
+Put bottles into dustbin,InternVLA A1.5,86.23,79.33,gpt_as_policy_report,gpt_as_policy_report
+Put bottles into dustbin,StarVLA-PI,68.67,56.67,gpt_as_policy_report,gpt_as_policy_report
+Put bottles into dustbin,π₀.₅ + GPT 6 Astra,100.00,100.00,gpt_as_policy_report,gpt_as_policy_report
+Put bottles into dustbin,GPT 6 Astra (direct),36.00,20.00,gpt_as_policy_report,gpt_as_policy_report
 Put bottles into dustbin,GPT-Policy,73.00,60.00,confirmed_paper_table_2,confirmed_paper_table_2
-Pack objects into box,DM0.5,14.72,1.33,reference_table_1,reference_table_1
-Pack objects into box,Galaxea G0.5,18.24,3.33,confirmed_paper_table_2,confirmed_paper_table_2
-Pack objects into box,Xiaomi R1,18.69,2.40,reference_table_1,reference_table_1
-Pack objects into box,OpenWAM-α,22.47,4.67,confirmed_paper_table_2,confirmed_paper_table_2
-Pack objects into box,Meituan R0,13.61,3.20,reference_table_1,reference_table_1
-Pack objects into box,Hy-VLA 0.5,12.53,1.07,reference_table_1,reference_table_1
-Pack objects into box,Spatial Forcing,14.35,1.87,reference_table_1,reference_table_1
-Pack objects into box,π₀.₅,19.10,2.70,confirmed_paper_table_2,confirmed_paper_table_2
-Pack objects into box,InternVLA A1.5,8.93,0.00,reference_table_1,reference_table_1
-Pack objects into box,StarVLA-PI,7.69,0.53,reference_table_1,reference_table_1
-Pack objects into box,π₀.₅ + GPT 6 Astra,50.00,20.00,confirmed_paper_table_2,confirmed_paper_table_2
-Pack objects into box,GPT 6 Astra (direct),50.00,20.00,confirmed_paper_table_2,confirmed_paper_table_2
+Pack objects into box,DM0.5,14.72,1.33,gpt_as_policy_report,gpt_as_policy_report
+Pack objects into box,Galaxea G0.5,17.12,2.93,gpt_as_policy_report,gpt_as_policy_report
+Pack objects into box,Xiaomi R1,18.69,2.40,gpt_as_policy_report,gpt_as_policy_report
+Pack objects into box,OpenWAM-α,20.83,3.73,gpt_as_policy_report,gpt_as_policy_report
+Pack objects into box,Meituan R0,13.61,3.20,gpt_as_policy_report,gpt_as_policy_report
+Pack objects into box,Hy-VLA 0.5,12.53,1.07,gpt_as_policy_report,gpt_as_policy_report
+Pack objects into box,Spatial Forcing,14.35,1.87,gpt_as_policy_report,gpt_as_policy_report
+Pack objects into box,π₀.₅,18.36,2.40,gpt_as_policy_report,gpt_as_policy_report
+Pack objects into box,InternVLA A1.5,8.93,0.00,gpt_as_policy_report,gpt_as_policy_report
+Pack objects into box,StarVLA-PI,7.69,0.53,gpt_as_policy_report,gpt_as_policy_report
+Pack objects into box,π₀.₅ + GPT 6 Astra,50.00,20.00,gpt_as_policy_report,gpt_as_policy_report
+Pack objects into box,GPT 6 Astra (direct),50.00,20.00,gpt_as_policy_report,gpt_as_policy_report
 Pack objects into box,GPT-Policy,70.00,60.00,confirmed_paper_table_2,confirmed_paper_table_2
-Make Kong,DM0.5,56.67,56.67,reference_table_1,reference_table_1
-Make Kong,Galaxea G0.5,90.00,90.00,confirmed_paper_table_2,confirmed_paper_table_2
-Make Kong,Xiaomi R1,41.33,41.33,reference_table_1,reference_table_1
-Make Kong,OpenWAM-α,32.00,32.00,confirmed_paper_table_2,confirmed_paper_table_2
-Make Kong,Meituan R0,56.00,56.00,reference_table_1,reference_table_1
-Make Kong,Hy-VLA 0.5,18.67,18.67,reference_table_1,reference_table_1
-Make Kong,Spatial Forcing,12.00,12.00,reference_table_1,reference_table_1
-Make Kong,π₀.₅,26.70,26.70,confirmed_paper_table_2,confirmed_paper_table_2
-Make Kong,InternVLA A1.5,26.00,26.00,reference_table_1,reference_table_1
-Make Kong,StarVLA-PI,18.00,18.00,reference_table_1,reference_table_1
-Make Kong,π₀.₅ + GPT 6 Astra,40.00,40.00,confirmed_paper_table_2,confirmed_paper_table_2
-Make Kong,GPT 6 Astra (direct),0.00,0.00,confirmed_paper_table_2,confirmed_paper_table_2
+Make Kong,DM0.5,56.67,56.67,gpt_as_policy_report,gpt_as_policy_report
+Make Kong,Galaxea G0.5,90.00,90.00,gpt_as_policy_report,gpt_as_policy_report
+Make Kong,Xiaomi R1,41.33,41.33,gpt_as_policy_report,gpt_as_policy_report
+Make Kong,OpenWAM-α,32.00,32.00,gpt_as_policy_report,gpt_as_policy_report
+Make Kong,Meituan R0,56.00,56.00,gpt_as_policy_report,gpt_as_policy_report
+Make Kong,Hy-VLA 0.5,18.67,18.67,gpt_as_policy_report,gpt_as_policy_report
+Make Kong,Spatial Forcing,12.00,12.00,gpt_as_policy_report,gpt_as_policy_report
+Make Kong,π₀.₅,26.67,26.67,gpt_as_policy_report,gpt_as_policy_report
+Make Kong,InternVLA A1.5,26.00,26.00,gpt_as_policy_report,gpt_as_policy_report
+Make Kong,StarVLA-PI,18.00,18.00,gpt_as_policy_report,gpt_as_policy_report
+Make Kong,π₀.₅ + GPT 6 Astra,40.00,40.00,gpt_as_policy_report,gpt_as_policy_report
+Make Kong,GPT 6 Astra (direct),0.00,0.00,gpt_as_policy_report,gpt_as_policy_report
 Make Kong,GPT-Policy,80.00,80.00,confirmed_paper_table_2,confirmed_paper_table_2
-Classify objects,DM0.5,26.83,16.67,reference_table_1,reference_table_1
-Classify objects,Galaxea G0.5,10.33,4.00,confirmed_paper_table_2,confirmed_paper_table_2
-Classify objects,Xiaomi R1,17.20,8.67,reference_table_1,reference_table_1
-Classify objects,OpenWAM-α,5.53,1.33,confirmed_paper_table_2,confirmed_paper_table_2
-Classify objects,Meituan R0,24.57,13.33,reference_table_1,reference_table_1
-Classify objects,Hy-VLA 0.5,5.13,0.67,reference_table_1,reference_table_1
-Classify objects,Spatial Forcing,21.67,9.33,reference_table_1,reference_table_1
-Classify objects,π₀.₅,24.70,12.70,confirmed_paper_table_2,confirmed_paper_table_2
-Classify objects,InternVLA A1.5,5.70,0.00,reference_table_1,reference_table_1
-Classify objects,StarVLA-PI,5.93,0.67,reference_table_1,reference_table_1
-Classify objects,π₀.₅ + GPT 6 Astra,71.00,60.00,confirmed_paper_table_2,confirmed_paper_table_2
-Classify objects,GPT 6 Astra (direct),100.00,100.00,confirmed_paper_table_2,confirmed_paper_table_2
+Classify objects,DM0.5,26.83,16.67,gpt_as_policy_report,gpt_as_policy_report
+Classify objects,Galaxea G0.5,10.33,4.00,gpt_as_policy_report,gpt_as_policy_report
+Classify objects,Xiaomi R1,17.20,8.67,gpt_as_policy_report,gpt_as_policy_report
+Classify objects,OpenWAM-α,5.53,1.33,gpt_as_policy_report,gpt_as_policy_report
+Classify objects,Meituan R0,24.57,13.33,gpt_as_policy_report,gpt_as_policy_report
+Classify objects,Hy-VLA 0.5,5.13,0.67,gpt_as_policy_report,gpt_as_policy_report
+Classify objects,Spatial Forcing,21.67,9.33,gpt_as_policy_report,gpt_as_policy_report
+Classify objects,π₀.₅,24.67,12.67,gpt_as_policy_report,gpt_as_policy_report
+Classify objects,InternVLA A1.5,5.70,0.00,gpt_as_policy_report,gpt_as_policy_report
+Classify objects,StarVLA-PI,5.93,0.67,gpt_as_policy_report,gpt_as_policy_report
+Classify objects,π₀.₅ + GPT 6 Astra,71.00,60.00,gpt_as_policy_report,gpt_as_policy_report
+Classify objects,GPT 6 Astra (direct),100.00,100.00,gpt_as_policy_report,gpt_as_policy_report
 Classify objects,GPT-Policy,100.00,100.00,confirmed_paper_table_2,confirmed_paper_table_2
-Overall,DM0.5,31.82,22.04,reference_table_1,reference_table_1
-Overall,Galaxea G0.5,38.78,31.33,confirmed_paper_table_2,confirmed_paper_table_2
-Overall,Xiaomi R1,33.97,25.51,reference_table_1,reference_table_1
-Overall,OpenWAM-α,33.57,23.80,confirmed_paper_table_2,confirmed_paper_table_2
-Overall,Meituan R0,28.33,17.88,reference_table_1,reference_table_1
-Overall,Hy-VLA 0.5,21.16,13.94,reference_table_1,reference_table_1
-Overall,Spatial Forcing,24.96,17.15,reference_table_1,reference_table_1
-Overall,π₀.₅,24.90,16.00,confirmed_paper_table_2,confirmed_paper_table_2
-Overall,InternVLA A1.5,21.74,15.03,reference_table_1,reference_table_1
-Overall,StarVLA-PI,22.36,16.17,reference_table_1,reference_table_1
-Overall,π₀.₅ + GPT 6 Astra,62.60,48.00,confirmed_paper_table_2,confirmed_paper_table_2
-Overall,GPT 6 Astra (direct),38.50,26.00,confirmed_paper_table_2,confirmed_paper_table_2
-Overall,GPT-Policy,80.20,72.00,confirmed_paper_table_2,confirmed_paper_table_2
+Reported aggregate,DM0.5,31.82,22.04,gpt_as_policy_report,gpt_as_policy_report
+Reported aggregate,Galaxea G0.5,38.26,30.95,gpt_as_policy_report,gpt_as_policy_report
+Reported aggregate,Xiaomi R1,33.97,25.51,gpt_as_policy_report,gpt_as_policy_report
+Reported aggregate,OpenWAM-α,32.73,23.07,gpt_as_policy_report,gpt_as_policy_report
+Reported aggregate,Meituan R0,28.33,17.88,gpt_as_policy_report,gpt_as_policy_report
+Reported aggregate,Hy-VLA 0.5,21.16,13.94,gpt_as_policy_report,gpt_as_policy_report
+Reported aggregate,Spatial Forcing,24.96,17.15,gpt_as_policy_report,gpt_as_policy_report
+Reported aggregate,π₀.₅,24.43,15.67,gpt_as_policy_report,gpt_as_policy_report
+Reported aggregate,InternVLA A1.5,21.74,15.03,gpt_as_policy_report,gpt_as_policy_report
+Reported aggregate,StarVLA-PI,22.36,16.17,gpt_as_policy_report,gpt_as_policy_report
+Reported aggregate,π₀.₅ + GPT 6 Astra,62.60,48.00,gpt_as_policy_report,gpt_as_policy_report
+Reported aggregate,GPT 6 Astra (direct),37.81,26.00,gpt_as_policy_report,gpt_as_policy_report
+Mean (10 tasks),GPT-Policy,80.20,72.00,confirmed_paper_table_2,confirmed_paper_table_2

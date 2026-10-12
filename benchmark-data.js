@@ -1,5 +1,5 @@
-// Confirmed paper Table 2 supplied by the user; supplementary references from GPT-as-Policy.
-// The confirmed table takes precedence over the older local PDF. See assets/benchmarks/README.md.
+// Baselines reproduce GPT-as-Policy's published per-task values and reported aggregates.
+// GPT-Policy results follow the owner-confirmed paper Table 2. See assets/benchmarks/README.md.
 const benchmarkData = {
   "version": "2026-10-11",
   "paper": "paper.pdf",
@@ -17,19 +17,19 @@ const benchmarkData = {
         "assets/benchmarks/logos/dm.png"
       ],
       "kind": "reference",
-      "source": "reference"
+      "source": "gpt-as-policy-report"
     },
     {
       "id": "GalaxeaVLA (G0.5)",
       "name": "Galaxea G0.5",
       "header": "GalaxeaVLA (G0.5)",
-      "score": 38.78,
-      "success": 31.33,
+      "score": 38.2608,
+      "success": 30.9464,
       "logos": [
         "assets/benchmarks/logos/galaxea.png"
       ],
       "kind": "reference",
-      "source": "confirmed-paper-table-2"
+      "source": "gpt-as-policy-report"
     },
     {
       "id": "Xiaomi-Robotics-1",
@@ -41,19 +41,19 @@ const benchmarkData = {
         "assets/benchmarks/logos/xiaomi.png"
       ],
       "kind": "reference",
-      "source": "reference"
+      "source": "gpt-as-policy-report"
     },
     {
       "id": "OpenWAM-α",
       "name": "OpenWAM-α",
       "header": "OpenWAM-α",
-      "score": 33.57,
-      "success": 23.8,
+      "score": 32.7322,
+      "success": 23.0662,
       "logos": [
         "assets/benchmarks/logos/openwam.png"
       ],
       "kind": "reference",
-      "source": "confirmed-paper-table-2"
+      "source": "gpt-as-policy-report"
     },
     {
       "id": "Meituan-Robotics-0",
@@ -65,7 +65,7 @@ const benchmarkData = {
         "assets/benchmarks/logos/meituan.png"
       ],
       "kind": "reference",
-      "source": "reference"
+      "source": "gpt-as-policy-report"
     },
     {
       "id": "Hy-Embodied-0.5-VLA",
@@ -77,7 +77,7 @@ const benchmarkData = {
         "assets/benchmarks/logos/hunyuan.svg"
       ],
       "kind": "reference",
-      "source": "reference"
+      "source": "gpt-as-policy-report"
     },
     {
       "id": "Spatial Forcing",
@@ -89,19 +89,19 @@ const benchmarkData = {
         "assets/benchmarks/logos/spatial.png"
       ],
       "kind": "reference",
-      "source": "reference"
+      "source": "gpt-as-policy-report"
     },
     {
       "id": "Pi-05",
       "name": "π₀.₅",
       "header": "π₀.₅",
-      "score": 24.9,
-      "success": 16,
+      "score": 24.43,
+      "success": 15.6666,
       "logos": [
         "assets/benchmarks/logos/pi.png"
       ],
       "kind": "pi",
-      "source": "confirmed-paper-table-2"
+      "source": "gpt-as-policy-report"
     },
     {
       "id": "InternVLA-A1.5",
@@ -113,7 +113,7 @@ const benchmarkData = {
         "assets/benchmarks/logos/internvla.png"
       ],
       "kind": "reference",
-      "source": "reference"
+      "source": "gpt-as-policy-report"
     },
     {
       "id": "StarVLA-PI_v3",
@@ -125,7 +125,7 @@ const benchmarkData = {
         "assets/benchmarks/logos/starvla.png"
       ],
       "kind": "reference",
-      "source": "reference"
+      "source": "gpt-as-policy-report"
     },
     {
       "id": "mix",
@@ -138,19 +138,19 @@ const benchmarkData = {
         "assets/benchmarks/logos/openai.ico"
       ],
       "kind": "hybrid",
-      "source": "confirmed-paper-table-2"
+      "source": "gpt-as-policy-report"
     },
     {
       "id": "gpt",
       "name": "GPT 6 Astra (direct)",
       "header": "GPT 6 Astra (direct)",
-      "score": 38.5,
+      "score": 37.8125,
       "success": 26,
       "logos": [
         "assets/benchmarks/logos/openai.ico"
       ],
       "kind": "direct",
-      "source": "confirmed-paper-table-2"
+      "source": "gpt-as-policy-report"
     },
     {
       "id": "ours",
@@ -188,7 +188,7 @@ const benchmarkData = {
         },
         "OpenWAM-α": {
           "score": 62.5,
-          "success": 13.33
+          "success": 13.330000000000002
         },
         "Meituan-Robotics-0": {
           "score": 43.67,
@@ -203,8 +203,8 @@ const benchmarkData = {
           "success": 5.33
         },
         "Pi-05": {
-          "score": 23.3,
-          "success": 0
+          "score": 23.33,
+          "success": 0.0
         },
         "InternVLA-A1.5": {
           "score": 35.67,
@@ -215,11 +215,11 @@ const benchmarkData = {
           "success": 2.0
         },
         "mix": {
-          "score": 60,
+          "score": 60.0,
           "success": 0
         },
         "gpt": {
-          "score": 30,
+          "score": 30.0,
           "success": 0
         },
         "ours": {
@@ -241,7 +241,7 @@ const benchmarkData = {
         },
         "GalaxeaVLA (G0.5)": {
           "score": 1.07,
-          "success": 0
+          "success": 0.0
         },
         "Xiaomi-Robotics-1": {
           "score": 2.0,
@@ -249,7 +249,7 @@ const benchmarkData = {
         },
         "OpenWAM-α": {
           "score": 1.33,
-          "success": 0
+          "success": 0.0
         },
         "Meituan-Robotics-0": {
           "score": 2.47,
@@ -265,7 +265,7 @@ const benchmarkData = {
         },
         "Pi-05": {
           "score": 0.6,
-          "success": 0
+          "success": 0.0
         },
         "InternVLA-A1.5": {
           "score": 0.13,
@@ -276,11 +276,11 @@ const benchmarkData = {
           "success": 0.0
         },
         "mix": {
-          "score": 38,
+          "score": 38.0,
           "success": 20
         },
         "gpt": {
-          "score": 60,
+          "score": 60.0,
           "success": 40
         },
         "ours": {
@@ -302,7 +302,7 @@ const benchmarkData = {
         },
         "GalaxeaVLA (G0.5)": {
           "score": 1.67,
-          "success": 0
+          "success": 0.0
         },
         "Xiaomi-Robotics-1": {
           "score": 2.5,
@@ -326,7 +326,7 @@ const benchmarkData = {
         },
         "Pi-05": {
           "score": 1.6,
-          "success": 0
+          "success": 0.0
         },
         "InternVLA-A1.5": {
           "score": 0.6,
@@ -337,11 +337,11 @@ const benchmarkData = {
           "success": 0.0
         },
         "mix": {
-          "score": 53,
+          "score": 53.0,
           "success": 40
         },
         "gpt": {
-          "score": 0,
+          "score": 0.0,
           "success": 0
         },
         "ours": {
@@ -362,16 +362,16 @@ const benchmarkData = {
           "success": 3.2
         },
         "GalaxeaVLA (G0.5)": {
-          "score": 4.7,
-          "success": 0.67
+          "score": 4.106,
+          "success": 0.532
         },
         "Xiaomi-Robotics-1": {
           "score": 8.562,
           "success": 3.732
         },
         "OpenWAM-α": {
-          "score": 4.94,
-          "success": 0.67
+          "score": 4.362,
+          "success": 0.532
         },
         "Meituan-Robotics-0": {
           "score": 6.414000000000001,
@@ -386,8 +386,8 @@ const benchmarkData = {
           "success": 0.532
         },
         "Pi-05": {
-          "score": 2.8,
-          "success": 0.7
+          "score": 2.2920000000000003,
+          "success": 0.532
         },
         "InternVLA-A1.5": {
           "score": 0.5740000000000001,
@@ -398,11 +398,11 @@ const benchmarkData = {
           "success": 0.0
         },
         "mix": {
-          "score": 50,
+          "score": 50.0,
           "success": 40
         },
         "gpt": {
-          "score": 57,
+          "score": 57.0,
           "success": 40
         },
         "ours": {
@@ -431,7 +431,7 @@ const benchmarkData = {
           "success": 47.33
         },
         "OpenWAM-α": {
-          "score": 52.53,
+          "score": 52.529999999999994,
           "success": 38.67
         },
         "Meituan-Robotics-0": {
@@ -447,8 +447,8 @@ const benchmarkData = {
           "success": 32.67
         },
         "Pi-05": {
-          "score": 37.7,
-          "success": 24
+          "score": 37.73,
+          "success": 24.0
         },
         "InternVLA-A1.5": {
           "score": 37.4,
@@ -459,11 +459,11 @@ const benchmarkData = {
           "success": 55.33
         },
         "mix": {
-          "score": 64,
+          "score": 64.0,
           "success": 60
         },
         "gpt": {
-          "score": 12,
+          "score": 12.0,
           "success": 0
         },
         "ours": {
@@ -484,16 +484,16 @@ const benchmarkData = {
           "success": 24.534
         },
         "GalaxeaVLA (G0.5)": {
-          "score": 36.27,
-          "success": 31.34
+          "score": 32.75,
+          "success": 28.002
         },
         "Xiaomi-Robotics-1": {
           "score": 41.49,
           "success": 38.932
         },
         "OpenWAM-α": {
-          "score": 57.47,
-          "success": 55.34
+          "score": 51.31,
+          "success": 49.068
         },
         "Meituan-Robotics-0": {
           "score": 19.787999999999997,
@@ -508,8 +508,8 @@ const benchmarkData = {
           "success": 31.729999999999997
         },
         "Pi-05": {
-          "score": 32.3,
-          "success": 24
+          "score": 29.118000000000002,
+          "success": 21.066000000000003
         },
         "InternVLA-A1.5": {
           "score": 16.162000000000003,
@@ -520,11 +520,11 @@ const benchmarkData = {
           "success": 28.532
         },
         "mix": {
-          "score": 100,
+          "score": 100.0,
           "success": 100
         },
         "gpt": {
-          "score": 40,
+          "score": 40.0,
           "success": 40
         },
         "ours": {
@@ -546,7 +546,7 @@ const benchmarkData = {
         },
         "GalaxeaVLA (G0.5)": {
           "score": 96.3,
-          "success": 94
+          "success": 94.0
         },
         "Xiaomi-Robotics-1": {
           "score": 97.7,
@@ -569,8 +569,8 @@ const benchmarkData = {
           "success": 78.0
         },
         "Pi-05": {
-          "score": 79.9,
-          "success": 69.3
+          "score": 79.93,
+          "success": 69.33
         },
         "InternVLA-A1.5": {
           "score": 86.23,
@@ -581,11 +581,11 @@ const benchmarkData = {
           "success": 56.67
         },
         "mix": {
-          "score": 100,
+          "score": 100.0,
           "success": 100
         },
         "gpt": {
-          "score": 36,
+          "score": 36.0,
           "success": 20
         },
         "ours": {
@@ -606,16 +606,16 @@ const benchmarkData = {
           "success": 1.33
         },
         "GalaxeaVLA (G0.5)": {
-          "score": 18.24,
-          "success": 3.33
+          "score": 17.122,
+          "success": 2.93
         },
         "Xiaomi-Robotics-1": {
           "score": 18.694,
           "success": 2.398
         },
         "OpenWAM-α": {
-          "score": 22.47,
-          "success": 4.67
+          "score": 20.830000000000002,
+          "success": 3.732
         },
         "Meituan-Robotics-0": {
           "score": 13.614,
@@ -630,8 +630,8 @@ const benchmarkData = {
           "success": 1.866
         },
         "Pi-05": {
-          "score": 19.1,
-          "success": 2.7
+          "score": 18.36,
+          "success": 2.398
         },
         "InternVLA-A1.5": {
           "score": 8.931999999999999,
@@ -642,11 +642,11 @@ const benchmarkData = {
           "success": 0.532
         },
         "mix": {
-          "score": 50,
+          "score": 50.0,
           "success": 20
         },
         "gpt": {
-          "score": 50,
+          "score": 50.0,
           "success": 20
         },
         "ours": {
@@ -667,16 +667,16 @@ const benchmarkData = {
           "success": 56.67
         },
         "GalaxeaVLA (G0.5)": {
-          "score": 90,
-          "success": 90
+          "score": 90.0,
+          "success": 90.0
         },
         "Xiaomi-Robotics-1": {
           "score": 41.33,
           "success": 41.33
         },
         "OpenWAM-α": {
-          "score": 32,
-          "success": 32
+          "score": 32.0,
+          "success": 32.0
         },
         "Meituan-Robotics-0": {
           "score": 56.0,
@@ -691,8 +691,8 @@ const benchmarkData = {
           "success": 12.0
         },
         "Pi-05": {
-          "score": 26.7,
-          "success": 26.7
+          "score": 26.670000000000005,
+          "success": 26.670000000000005
         },
         "InternVLA-A1.5": {
           "score": 26.0,
@@ -703,11 +703,11 @@ const benchmarkData = {
           "success": 18.0
         },
         "mix": {
-          "score": 40,
+          "score": 40.0,
           "success": 40
         },
         "gpt": {
-          "score": 0,
+          "score": 0.0,
           "success": 0
         },
         "ours": {
@@ -729,7 +729,7 @@ const benchmarkData = {
         },
         "GalaxeaVLA (G0.5)": {
           "score": 10.33,
-          "success": 4
+          "success": 4.0
         },
         "Xiaomi-Robotics-1": {
           "score": 17.2,
@@ -752,8 +752,8 @@ const benchmarkData = {
           "success": 9.33
         },
         "Pi-05": {
-          "score": 24.7,
-          "success": 12.7
+          "score": 24.67,
+          "success": 12.67
         },
         "InternVLA-A1.5": {
           "score": 5.7,
@@ -764,11 +764,11 @@ const benchmarkData = {
           "success": 0.67
         },
         "mix": {
-          "score": 71,
+          "score": 71.0,
           "success": 60
         },
         "gpt": {
-          "score": 100,
+          "score": 100.0,
           "success": 100
         },
         "ours": {

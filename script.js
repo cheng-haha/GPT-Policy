@@ -47,7 +47,7 @@ const zhTranslations = new Map([
   ["Control steps", "控制步数"],
   ["Executed action segments", "实际执行的动作片段"],
   ["Mean physical duration (s)", "平均物理执行时长（秒）"],
-  ["Recorded tokens (incl. cached input)", "记录的 Token（含缓存输入）"],
+  ["Total tokens (including cached input)", "总 Token 数（含缓存输入）"],
   ["Cached input tokens", "缓存输入 Token"],
   ["Uncached input tokens", "未缓存输入 Token"],
   ["Output tokens", "输出 Token"],
