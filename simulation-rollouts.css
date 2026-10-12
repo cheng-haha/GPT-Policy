@@ -1,0 +1,57 @@
+/* A single synchronized triptych, inspired by RoboICL's rollout explorer. */
+.simulation-rollouts { margin-top: 48px; scroll-margin-top: 36px; min-width: 0; }
+.simulation-rollouts h4 { margin: 0 0 10px; font-size: 23px; font-weight: 620; letter-spacing: -.025em; }
+.sim-intro, .sim-note { color: var(--muted); font-size: 13px; line-height: 1.6; }
+.sim-intro { margin: 0 0 22px; }
+.sim-player { border: 1px solid #dce1e8; background: white; }
+.sim-selectors { padding: 15px 18px; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) auto; gap: 18px; align-items: end; border-bottom: 1px solid var(--line); }
+.sim-selectors label { display: grid; gap: 6px; min-width: 0; }
+.sim-selectors label > span, .sim-execution-head { color: #6c747e; font-size: 11px; }
+.sim-selectors select { width: 100%; height: 38px; padding: 0 28px 0 10px; background: white; border: 1px solid #cbd1d9; border-radius: 3px; font: inherit; font-size: 12px; color: var(--ink); }
+.sim-result { min-height: 38px; display: grid; align-content: center; gap: 4px; padding-left: 2px; font-size: 12px; white-space: nowrap; }
+.sim-result strong { font-weight: 550; }
+#sim-outcome { color: #737780; }
+#sim-outcome[data-success="true"] { color: #237444; }
+.sim-execution { padding: 16px 18px 13px; }
+.sim-execution-head, .sim-action { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.sim-execution-head { font-variant-numeric: tabular-nums; }
+.sim-action { margin: 11px 0 9px; }
+#sim-tool { font: 600 18px/1.3 "Geist", sans-serif; }
+#sim-live-score { font-size: 12px; color: #737780; white-space: nowrap; }
+.sim-targets { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 20px; font: 10px/1.5 ui-monospace, monospace; color: #535b68; }
+.sim-action-details { margin-top: 10px; font-size: 10px; color: #7a818c; }
+.sim-action-details summary { cursor: pointer; }
+.sim-action-details pre { margin-top: 10px; max-height: 200px; padding: 14px; background: #f8f9fa; font-size: 11px; }
+.sim-camera-scroll { overflow-x: auto; scrollbar-width: thin; }
+.sim-camera-strip { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); background: #f6f7f9; font-size: 10px; color: #646d79; text-align: center; }
+.sim-camera-strip span { padding: 7px 0; border-right: 1px solid white; }
+#sim-video { display: block; width: 100%; height: auto; aspect-ratio: 4 / 1; object-fit: contain; background: #11151b; }
+.sim-transport { display: flex; align-items: center; gap: 10px; padding: 13px 18px; border-top: 1px solid var(--line); }
+.sim-player button { height: 30px; padding: 0 10px; border: 1px solid #cbd1d9; border-radius: 3px; background: white; color: var(--ink); font: 12px "Geist", sans-serif; cursor: pointer; }
+.sim-player button:hover { background: #f3f4f6; }
+.sim-player button:focus-visible, .sim-player select:focus-visible, .sim-player input:focus-visible { outline: 2px solid #45709b; outline-offset: 3px; }
+#sim-play { min-width: 57px; background: #222833; color: white; border-color: #222833; }
+#sim-seek { flex: 1; min-width: 50px; accent-color: #283c52; cursor: pointer; }
+#sim-time { font: 11px ui-monospace, monospace; white-space: nowrap; }
+.sim-speeds { display: flex; margin-left: 8px; }
+.sim-speeds button { padding: 0 8px; border-radius: 0; margin-left: -1px; }
+.sim-speeds button[aria-pressed="true"] { background: #222833; border-color: #222833; color: white; z-index: 1; }
+.sim-footer { display: flex; justify-content: space-between; gap: 12px; padding: 10px 18px; border-top: 1px solid var(--line); color: #737780; font-size: 11px; }
+.sim-note { margin: 14px 0 0; font-size: 12px; }
+.sim-note a, .sim-footer a { text-decoration: underline; text-underline-offset: 3px; }
+.sim-error { padding: 8px 18px; color: #963b31; font-size: 13px; }
+.sim-error[hidden] { display: none; }
+.rr-report button[data-sim-task] { padding: 0; border: 0; background: none; font: inherit; color: inherit; text-align: left; cursor: pointer; text-decoration: underline; text-decoration-color: #aeb8c7; text-underline-offset: 3px; }
+.rr-report button[data-sim-task]:hover { color: #245fa1; }
+@media (max-width: 760px) {
+  .sim-selectors { grid-template-columns: 1fr 1fr; gap: 12px; padding: 14px; }
+  .sim-result { grid-column: 1 / -1; min-height: auto; display: flex; justify-content: space-between; }
+  .sim-execution { padding: 14px; }
+  .sim-execution-head { flex-wrap: wrap; font-size: 10px; }
+  .sim-targets { grid-template-columns: 1fr; gap: 4px; }
+  .sim-transport { flex-wrap: wrap; gap: 10px; padding: 12px 14px; }
+  #sim-seek { order: 1; flex-basis: calc(100% - 110px); }
+  #sim-time { order: 2; }
+  .sim-speeds { margin-left: auto; }
+  .sim-camera-strip, #sim-video { min-width: 720px; }
+}

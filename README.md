@@ -11,6 +11,48 @@ A second interactive comparison covers four Kimi K3 runs under text-only, no-dem
 ## Preview
 
 Open `index.html` directly, or serve the folder with any static web server.
+For local video seeking, use the included server with byte-range support:
+
+```bash
+python3 scripts/serve_preview.py --port 8766
+```
+
+Open http://127.0.0.1:8766/#simulation-rollouts.
+
+## RoboDojo simulation videos
+
+The simulation section includes a task/layout explorer inspired by
+[RoboICL's rollout explorer](https://mosi-ai.github.io/RoboICL-GPT6-Astra.github.io/).
+Its implementation is in `simulation-rollouts.js` and `simulation-rollouts.css`.
+All 50 selected episodes from `gpt-policy-robodojo-10tasks-20261011` are included,
+with their original standard/random layout identities and outcomes.
+
+Three 640 × 480 camera recordings are joined left wrist → overhead → right wrist
+into one 1920 × 480 H.264 MP4. There is one frame per control step at 25 fps,
+including the initial frame. This is control-step playback, not wall-clock time.
+The synchronized panel shows public numerical EEF requests and native evaluation
+scores; it does not reproduce model reasoning. Native scores were not provided
+to the policy. No new evaluation is run to build the gallery.
+
+Build with Python 3.11+ and FFmpeg, using a local copy of the public release:
+
+```bash
+python3 scripts/build_simulation_gallery.py /path/to/public-release assets/robodojo-rollouts
+```
+
+The builder expects `tasks/`, `LICENSE.txt`, `THIRD_PARTY.md`, and
+`protocol/EVALUATION.md` (or a root-level `EVALUATION.md`). It retains every selected outcome, checks
+control/frame alignment, and verifies 36/50 successes and a mean score of 80.20.
+Source hashes and original case identities are in the generated manifest.
+The original release must remain separate from the output directory.
+Non-motion calls and rejected motions do not advance the recorded video; the
+panel displays executed numerical targets, with the original decision index.
+
+`manifest.js` and per-case `trace.js` support both direct file opening and HTTP.
+Task links in the heatmap open the corresponding video. Query parameters
+`task`, `layout`, `variant`, and `speed` preserve a selected example.
+The release's evaluation protocol and attribution files are retained in
+`assets/robodojo-rollouts/`; their terms are unchanged.
 
 ## Deploy
 

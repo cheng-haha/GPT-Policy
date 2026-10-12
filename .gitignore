@@ -4,3 +4,4 @@ public/
 .openwam-src/
 *.crdownload
 assets/videos/source/
+__pycache__/

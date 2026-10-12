@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="robodojo.css?v=20261011-experiment-sections" />
     <link rel="stylesheet" href="assets/benchmarks/gpt-as-policy-heatmap.css?v=20261011-layout" />
     <link rel="stylesheet" href="policy-comparison.css?v=20261011-comparison" />
+    <link rel="stylesheet" href="simulation-rollouts.css?v=20261011" />
   </head>
   <body id="top">
     <button class="language-toggle" id="language-toggle" type="button" aria-label="Switch to Chinese" title="Switch to Chinese">
@@ -342,6 +343,7 @@
                 <noscript>GPT-Policy on RoboDojo: mean score 80.20 / 100 and success rate 72%. <a href="assets/benchmarks/robodojo-tasks.csv">Download task results</a>.</noscript>
               </div>
               <p class="table-note">Results combine recorded versions and explicitly selected replacement attempts. These task/layout families informed development; the panel is not a held-out evaluation. Baselines retain their published protocols.</p>
+              <div id="simulation-rollouts" class="simulation-rollouts" role="region" aria-labelledby="simulation-rollouts-title"></div>
             </section>
 
             <section id="ablations" class="experiment-part" aria-labelledby="ablations-title">
@@ -431,5 +433,7 @@
     <script src="script.js?v=20261011-experiment-sections"></script>
     <script src="benchmark-data.js?v=20261011-layout"></script>
     <script src="robodojo.js?v=20261011-experiment-sections"></script>
+    <script src="assets/robodojo-rollouts/manifest.js?v=20261011"></script>
+    <script src="simulation-rollouts.js?v=20261011"></script>
   </body>
 </html>

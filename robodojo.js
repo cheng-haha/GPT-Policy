@@ -70,7 +70,7 @@
         <table class="rr-table rr-heat-table" aria-describedby="heatmap-description">
           <caption class="benchmark-sr-only">${title}</caption>
           <thead><tr><th scope="col">${t.task}</th>${columns.map(model => `<th scope="col" data-model="${model.id}">${modelName(model.header).replace("(Ours)", `(${t.ours})`)}</th>`).join("")}</tr></thead>
-          <tbody>${rows.map(task => `<tr data-task="${task.id}"><th scope="row">${task[chinese ? "zh" : "en"]}</th>${columns.map(model => {
+          <tbody>${rows.map(task => `<tr data-task="${task.id}"><th scope="row"><button type="button" data-sim-task="${task.id}">${task[chinese ? "zh" : "en"]}</button></th>${columns.map(model => {
             const value = task.values[model.id][metric];
             return `<td data-model="${model.id}" data-value="${value}" style="${heatStyle(value)}">${format(value, metric, true)}</td>`;
           }).join("")}</tr>`).join("")}</tbody>

@@ -1,0 +1,5 @@
+This source distribution is published for review and evaluation.
+
+No license has been selected for redistribution or commercial use yet.
+Until a project license is added, copyright remains with the copyright holder.
+Third-party components retain their own licenses; see THIRD_PARTY.md.
