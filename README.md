@@ -202,6 +202,12 @@ This is a research control loop. The integrator must verify calibration, workspa
 
 See [THIRD_PARTY.md](THIRD_PARTY.md) for third-party notices and optional SDK sources.
 
+## Community
+
+Scan the QR code to join the GPT-Policy WeChat group (交流群).
+
+<a href="docs/assets/wechat-group.png"><img src="docs/assets/wechat-group.png" alt="GPT-Policy WeChat group QR code" width="320" /></a>
+
 ## Citation
 
 ```bibtex
