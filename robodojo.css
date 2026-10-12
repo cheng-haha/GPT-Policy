@@ -119,7 +119,7 @@
   color: #242b38;
   font: 17px/1.85 "Benchmark Latin", "Benchmark Song", Georgia, serif;
 }
-.benchmark-heatmap.rr-report h3 {
+.benchmark-heatmap.rr-report h4 {
   margin: 0 0 22px;
   color: inherit;
   font: 650 25px/1.5 "Benchmark Latin", "Benchmark Song", Georgia, serif;
@@ -151,5 +151,4 @@
 .benchmark-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 .benchmark-results { max-width: 760px; margin: 36px auto 0; color: #242b38; font-family: "Benchmark Latin", "Benchmark Song", Georgia, serif; }
-.benchmark-results-label { margin: 0; color: #627087; font: 600 12px/1.5 "Geist", sans-serif; }
 .benchmark-results .benchmark-heatmap { margin-top: 14px; }

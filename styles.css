@@ -174,11 +174,6 @@ h1 span { display: block; white-space: nowrap; }
 .pipeline h3 { margin: 26px 0 8px; font-size: 15px; }
 .pipeline p { margin: 0; color: #6a707b; font-size: 12px; line-height: 1.55; }
 
-.metric-row { display: grid; grid-template-columns: repeat(3, 1fr); margin: 45px 0 34px; border-block: 1px solid var(--line); }
-.metric-row div { display: flex; flex-direction: column; gap: 4px; padding: 28px 24px; border-right: 1px solid var(--line); }
-.metric-row div:last-child { border-right: 0; }
-.metric-row strong { font-size: 38px; font-weight: 590; letter-spacing: -.05em; }
-.metric-row span { color: var(--muted); font: 10px ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; }
 .table-wrap { overflow-x: auto; }
 table { width: 100%; min-width: 700px; border-collapse: collapse; font-size: 12px; }
 th { padding: 13px 12px; border-bottom: 1px solid var(--ink); color: #7a808b; font: 700 9px ui-monospace, monospace; letter-spacing: .08em; text-align: left; text-transform: uppercase; }
@@ -247,7 +242,7 @@ html[lang="zh-CN"] .rollout-media.video-load-failed::after { content: "视频无
 .history-summary { position: relative; display: grid; grid-template-rows: auto minmax(0, 1fr); min-width: 0; min-height: 0; padding: 2px 0 0; overflow: hidden; }
 .history-summary-heading { position: relative; z-index: 2; display: flex; align-items: end; justify-content: space-between; gap: 18px; padding: 0 10px 13px 0; border-bottom: 1px solid var(--line); background: #fff; }
 .history-summary-heading p { margin: 0; color: var(--blue); font-size: 10px; font-weight: 650; }
-.history-summary-heading h4 { margin: 0; font-size: 16px; font-weight: 650; letter-spacing: -.025em; }
+.history-summary-heading h4, .history-summary-heading h6 { margin: 0; font-size: 16px; font-weight: 650; letter-spacing: -.025em; }
 .history-summary ol { min-height: 0; margin: 0; padding: 0 8px 0 0; overflow-y: auto; overscroll-behavior: contain; scroll-behavior: smooth; scrollbar-color: #c8d2df transparent; scrollbar-width: thin; list-style: none; }
 .history-summary ol::-webkit-scrollbar { width: 5px; }
 .history-summary ol::-webkit-scrollbar-track { background: transparent; }
@@ -314,7 +309,6 @@ pre { margin: 0; padding: 32px; overflow-x: auto; font: 12px/1.7 ui-monospace, "
 .abstract-grid h3,
 .research-question span,
 .card-label,
-.metric-row span,
 th,
 .demo-legend,
 .video-overlay span,
@@ -382,7 +376,7 @@ footer { border-top: 1px solid var(--line); background: var(--soft); }
   h1 { font-size: clamp(27px, 7.2vw, 44px); }
   .hero-lead span { display: inline; white-space: normal; }
   .hero-cover-media { border-radius: 12px; }
-  .pipeline, .metric-row, .split-section, .footer-inner { grid-template-columns: 1fr; }
+  .pipeline, .split-section, .footer-inner { grid-template-columns: 1fr; }
   .comparison-heading, .comparison-grid { grid-template-columns: 1fr; }
   .demo-rollout-group { padding: 28px 0 34px; }
   .rollout-group-head { grid-template-columns: 1fr; gap: 8px; margin-bottom: 18px; }
@@ -395,8 +389,8 @@ footer { border-top: 1px solid var(--line); background: var(--soft); }
   .abstract-grid h3 { grid-row: auto; }
   .research-question { grid-template-columns: 1fr; gap: 10px; padding: 24px 22px; }
   .research-question span { padding-top: 0; }
-  .pipeline article, .metric-row div { border-right: 0; border-bottom: 1px solid var(--line); }
-  .pipeline article:last-child, .metric-row div:last-child { border-bottom: 0; }
+  .pipeline article { border-right: 0; border-bottom: 1px solid var(--line); }
+  .pipeline article:last-child { border-bottom: 0; }
   .finding-list article { padding-right: 60px; }
   .footer-inner { gap: 22px; padding: 35px 0; text-align: center; }
   .footer-inner .brand, .footer-inner p, .footer-inner > div { justify-self: center; }
@@ -416,25 +410,20 @@ footer { border-top: 1px solid var(--line); background: var(--soft); }
 .paper-figure img { display: block; width: 100%; height: auto; }
 .paper-figure figcaption b { color: #4f5968; }
 .paper-figure figcaption { font-family: "Geist", Inter, ui-sans-serif, sans-serif; }
-.method-detail-title, .real-world-title { margin: 48px 0 0; color: var(--ink); font-size: 25px; font-weight: 630; line-height: 1.35; letter-spacing: -.025em; }
+.method-detail-title { margin: 48px 0 0; color: var(--ink); font-size: 25px; font-weight: 630; line-height: 1.35; letter-spacing: -.025em; }
 .method-detail-title + .paper-figure { margin-top: 22px; }
-#results .real-world-title { padding-top: 36px; border-top: 1px solid var(--line); }
 
 /* Keep each experiment family's results and demonstrations together. */
-.experiment-index { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 24px 0; }
-.experiment-index a { display: flex; align-items: center; gap: 10px; padding: 15px 12px; border: 1px solid var(--line); border-radius: 6px; color: var(--ink); font-size: 12px; line-height: 1.45; }
-.experiment-index a:hover { border-color: var(--blue); background: #f5f8fd; }
-.experiment-index span { color: var(--blue); font: 600 11px ui-monospace, monospace; }
 .experiment-anchor, .experiment-family { scroll-margin-top: 32px; }
-.experiment-family { padding-top: 48px; margin-top: 48px; border-top: 2px solid var(--ink); min-width: 0; }
+.experiment-family { padding-top: 32px; margin-top: 42px; border-top: 1px solid var(--line); min-width: 0; }
+.experiment-family:first-child { border-top: 0; padding-top: 0; }
 .experiment-family-heading { display: flex; align-items: flex-start; gap: 18px; margin-bottom: 26px; }
-.experiment-number { display: grid; place-items: center; flex: 0 0 38px; height: 38px; border-radius: 50%; color: white; background: var(--blue); font: 600 12px ui-monospace, monospace; }
-.experiment-family-heading h3 { margin: 1px 0 10px; font-size: clamp(24px, 3vw, 32px); line-height: 1.2; letter-spacing: -.035em; }
+.experiment-family-heading h4 { margin: 0 0 10px; font-size: 23px; font-weight: 620; line-height: 1.3; letter-spacing: -.025em; }
 .experiment-family-heading p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.65; }
 .family-demos { gap: 26px; margin-top: 30px; }
 .family-demos .demo-rollout-group { padding: 24px 0 10px; }
-.family-demos .rollout-group-title h4 { margin: 0; font-size: 22px; line-height: 1.3; font-weight: 620; letter-spacing: -.03em; }
-.family-demos .rollout-caption-head h5 { margin: 0; font-size: 14px; font-weight: 620; }
+.family-demos .rollout-group-title h5 { margin: 0; font-size: 19px; line-height: 1.3; font-weight: 620; letter-spacing: -.03em; }
+.family-demos .rollout-caption-head h6 { margin: 0; font-size: 14px; font-weight: 620; }
 .family-demos .rollout-group-head { grid-template-columns: 1fr; margin-bottom: 18px; }
 .experiment-family[data-layout="paired"] .demo-rollout-group { grid-column: auto; border-top: 0; padding-top: 4px; }
 .experiment-family[data-layout="paired"] .rollout-card { flex-basis: 100%; }
@@ -444,7 +433,6 @@ footer { border-top: 1px solid var(--line); background: var(--soft); }
   .experiment-family[data-layout="paired"] .demo-rollout-group[data-clips="1"] .rollout-card { flex-basis: 100%; }
 }
 @media (max-width: 760px) {
-  .experiment-index { grid-template-columns: 1fr 1fr; }
   .experiment-family { padding-top: 30px; margin-top: 34px; }
   .experiment-family-heading { gap: 12px; }
   .experiment-family[data-layout="paired"] .rollout-group-head { min-height: 0; }
@@ -475,7 +463,19 @@ footer { border-top: 1px solid var(--line); background: var(--soft); }
 }
 
 .ablation-group { margin: 28px 0; }
-.ablation-group h3 { margin-bottom: 5px; font-size: 18px; }
+.ablation-group h4 { margin-bottom: 5px; font-size: 18px; }
 .ablation-group > p { margin: 0 0 10px; color: var(--muted); font-size: 13px; }
 .experiment-family .table-wrap table { min-width: 750px; }
 .experiment-family .table-wrap td:nth-last-child(-n+3), .ablation-group td:not(:first-child) { white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* Paper results: real robots, simulation, and ablations. */
+.contents .contents-subsection { padding-left: 12px; font-size: 11px; }
+.experiment-part { margin-top: 64px; padding-top: 44px; border-top: 1px solid var(--line); scroll-margin-top: 36px; }
+.experiment-part:first-of-type { margin-top: 38px; padding-top: 0; border-top: 0; }
+.experiment-part-title { margin: 0; color: var(--ink); font-size: clamp(26px, 3.4cqi, 32px); font-weight: 630; line-height: 1.2; letter-spacing: -.035em; }
+.experiment-part > .section-intro { margin-top: 18px; font-size: 15px; }
+.experiment-part .table-note { font-family: inherit; font-size: 12px; line-height: 1.6; }
+@media (max-width: 760px) {
+  .experiment-part { margin-top: 48px; padding-top: 32px; }
+  .experiment-family-heading h4 { font-size: 21px; }
+}

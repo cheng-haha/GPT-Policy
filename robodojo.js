@@ -21,8 +21,8 @@
       task: "Task", successes: "Successes", total: "Mean (10 tasks)",
       heatScore: "Score heatmap", heatSuccess: "Success-rate heatmap",
       heatScoreTitle: "Per-task Score (0–100)", heatSuccessTitle: "Per-task success rate (%)",
-      tableCaption: "Table 1. Per-task Score and success rate.", overall: "Overall",
-      heatDescription: "Switch between metrics; darker colors indicate higher values. The official references include the top four models on the overall leaderboard and π₀.₅.",
+      tableCaption: "RoboDojo per-task results.", overall: "Overall",
+      heatDescription: "Darker colors indicate higher scores or success rates. Baseline results are from the reference report.",
       heatRegion: "Per-task heatmap; scroll horizontally on small screens", missing: "Not reported", scale: "Color scale (0–100)",
     },
     "zh-CN": {
@@ -36,8 +36,8 @@
       task: "任务", successes: "成功数", total: "平均（10 项任务）",
       heatScore: "Score 热力表", heatSuccess: "成功率热力表",
       heatScoreTitle: "逐任务 Score（0–100）", heatSuccessTitle: "逐任务成功率（%）",
-      tableCaption: "表 1. 各任务得分与成功率。", overall: "总体",
-      heatDescription: "切换指标；颜色越深，数值越高。官方参考包含总榜前四模型和 π₀.₅。",
+      tableCaption: "RoboDojo 各任务结果。", overall: "总体",
+      heatDescription: "颜色越深，得分或成功率越高。基线数据来自参考报告。",
       heatRegion: "逐任务热力图；小屏可横向滑动", missing: "未报告", scale: "色阶（0–100）",
     },
   };
@@ -64,7 +64,7 @@
         <button type="button" data-metric="score" aria-pressed="${metric === "score"}">${t.heatScore}</button>
         <button type="button" data-metric="success" aria-pressed="${metric === "success"}">${t.heatSuccess}</button>
       </div>
-      <h3>${title}</h3>
+      <h4>${title}</h4>
       <div class="rr-heat-legend" aria-label="${t.scale}"><span>${metric === "score" ? "Score" : t.axisSuccess}</span>${[0,20,40,60,80,100].map(value => `<span style="${heatStyle(value)}">${value}</span>`).join("")}</div>
       <div class="rr-table-scroll" role="region" aria-label="${t.heatRegion}" tabindex="0">
         <table class="rr-table rr-heat-table" aria-describedby="heatmap-description">
@@ -108,8 +108,7 @@
         <p class="benchmark-axis-label">${metric === "score" ? t.axisScore : t.axisSuccess}</p>
       </div>
       <div class="benchmark-caption"><p>${t.note} <a href="${source}" target="_blank" rel="noopener noreferrer">${t.source} ↗</a></p></div>`;
-    results.innerHTML = `<p class="benchmark-results-label">RoboDojo-Sim</p>
-      ${heatmap(t, chinese)}
+    results.innerHTML = `${heatmap(t, chinese)}
       <details class="benchmark-details"${detailsOpen ? " open" : ""}>
         <summary>${t.details}<span aria-hidden="true">+</span></summary>
         <div class="benchmark-table-scroll" role="region" aria-label="${t.details}" tabindex="0">

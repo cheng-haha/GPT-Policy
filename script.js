@@ -23,8 +23,11 @@ const sectionObserver = new IntersectionObserver(
       .filter((entryItem) => entryItem.isIntersecting)
       .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
     if (!visible) return;
+    const part = visible.target.closest(".experiment-part");
+    const targetId = part?.id || visible.target.id;
     navLinks.forEach((link) => {
-      link.classList.toggle("active", link.getAttribute("href") === `#${visible.target.closest("#results") ? "results" : visible.target.id}`);
+      const anchor = link.getAttribute("href");
+      link.classList.toggle("active", anchor === `#${targetId}` || (part && anchor === "#results"));
     });
   },
   { rootMargin: "-20% 0px -65%", threshold: [0, 0.2, 0.5] }
@@ -35,6 +38,24 @@ pageSections.forEach((section) => sectionObserver.observe(section));
 let currentLanguage = "en";
 
 const zhTranslations = new Map([
+  ["Real-world experiments", "真机实验"],
+  ["Simulation experiments", "仿真实验"],
+  ["Ablation studies", "消融实验"],
+  ["We evaluate a frozen GPT-6 Astra on ten real-robot tasks spanning five forms of context. The π₀.₅ baseline is fine-tuned on 30 demonstrations per task.", "我们使用参数冻结的 GPT-6 Astra，在涵盖五类上下文的十项真机任务上进行实验。π₀.₅ 基线使用每项任务的 30 条示范进行微调。"],
+  ["Success is reported as successful/total trials. Decisions and time are mean ± sample SD, including failures. GPT-Policy reports action-target/chunk decisions and wall-clock time; π₀.₅ uses logged counts and top-view recording time. Human demonstrations play in real time; robot playback speeds are labeled.", "成功数以成功次数/总试验次数表示。决策次数和时间为包含失败试验的均值 ± 样本标准差。GPT-Policy 统计动作目标/动作块决策与完整运行时间；π₀.₅ 使用日志计数和顶视视频时长。人类示范按原速播放，机器人视频标注播放倍速。"],
+  ["Robot video and action references", "机器人视频与动作参考"],
+  ["Online human–robot interaction", "在线人机交互"],
+  ["On RoboDojo, GPT-Policy uses one fixed demonstration per task across ten tasks and five scenes per task. The released results achieve a mean score of 80.20/100 and a success rate of 72%.", "在 RoboDojo 中，GPT-Policy 为每项任务使用一份固定示范，覆盖十项任务、每任务五个场景。发布结果的平均得分为 80.20/100，成功率为 72%。"],
+  ["Results combine recorded versions and explicitly selected replacement attempts. These task/layout families informed development; the panel is not a held-out evaluation. Baselines retain their published protocols.", "结果汇总了不同记录版本及明确选定的替换试验。这些任务和场景用于过开发，不能视为独立留出的测试集。各基线沿用其原始评测方案。"],
+  ["Real-robot ablations examine context composition, calibrated localization, and EEF chunking.", "真机消融实验检验上下文组成、标定定位和末端动作分块的作用。"],
+  ["Context composition", "上下文组成"],
+  ["EEF chunking", "末端动作分块"],
+  ["These comparisons span prompt and demonstration revisions.", "这些对比包含不同版本的提示词和示范。"],
+  ["A human demonstration raises success from 20% to 90% on towel pickup and from 20% to 80% on notebook pickup, without robot action labels.", "无需机器人动作标签，一次人类示范使毛巾拾取的成功率从 20% 达到 90%，笔记本拾取从 20% 达到 80%。"],
+  ["Robot video alone achieves 70% success on bottle opening but 0% on plug reinsertion. Adding aligned action references brings success to 80% and 70%, respectively.", "仅使用机器人视频时，开瓶盖成功率为 70%，插头回插为 0%。加入对齐的动作参考后，两者分别达到 80% 和 70%。"],
+  ["Goal images specify the desired arrangement without a demonstrated procedure. Both block and fruit arrangement succeed in all reported trials.", "目标图像给出期望布局，无需示范操作过程。积木与水果摆放在报告的试验中均成功。"],
+  ["Earlier observations and execution feedback support search and recovery. Both tasks succeed, although mobile exploration takes 25.5 minutes on average.", "先前的观测与执行反馈支持搜索和恢复。两项任务均成功，但移动探索平均仍需 25.5 分钟。"],
+  ["Live human moves and pointing gestures guide action selection. Wins and draws both count as success in tic-tac-toe.", "人类的实时落子与指向手势引导动作选择。井字棋获胜与平局均计为成功。"],
   ["GPT 6 Astra (direct)", "GPT 6 Astra（direct）"],
   ["GPT-Policy (Ours)", "GPT-Policy（我们的方法）"],
   ["Images · Proprioception · Instruction", "图像 · 本体状态 · 指令"],
@@ -1553,13 +1574,19 @@ demoTasks.forEach((task, index) => {
       ? renderGoalImageTask(task, index)
       : renderContextFamilyGroup([task], index);
   const title = card.querySelector('.rollout-group-title h3');
-  const taskHeading = document.createElement('h4');
+  const taskHeading = document.createElement('h5');
   taskHeading.textContent = title.textContent;
   title.replaceWith(taskHeading);
   card.querySelector('.rollout-kicker').remove();
   card.querySelector('.clip-count').remove();
   card.querySelectorAll('figcaption h4').forEach(heading => {
-    const label = document.createElement('h5');
+    const label = document.createElement('h6');
+    label.textContent = heading.textContent;
+    heading.replaceWith(label);
+  });
+  card.querySelectorAll('.history-summary-heading h4').forEach(heading => {
+    const label = document.createElement('h6');
+    label.id = heading.id;
     label.textContent = heading.textContent;
     heading.replaceWith(label);
   });
