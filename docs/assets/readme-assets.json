@@ -1,17 +1,24 @@
 {
-  "source": "Local GPT-Policy project page, 2026-10-11",
+  "source": "https://cheng-haha.github.io/GPT-Policy/",
   "benchmark_reference": "https://anonymous-report-421.github.io/public-website/?view=1",
-  "benchmark_data_sha256": "1ef1802bf73e8d3fc11d6f3e0f1ae83ca7223a89b468bd92dfc552709efd3c1e",
+  "benchmark_data_sha256": "3b94c56d3d71271119c8536158318286f235a019776629647665fc0006e564b5",
   "baselines": [
     {
       "name": "GPT-Policy",
       "score": 80.2,
-      "success_rate": 72
+      "success_rate": 72,
+      "setting": "1-shot"
     },
     {
       "name": "π₀.₅ + GPT 6 Astra",
       "score": 62.6,
       "success_rate": 48
+    },
+    {
+      "name": "RoboICL (1-shot)",
+      "score": 60.6,
+      "success_rate": null,
+      "setting": "1-shot"
     },
     {
       "name": "Galaxea G0.5",
@@ -111,5 +118,11 @@
         404.0
       ]
     }
+  ],
+  "source_revision": "3063f363d70b9d604c35a226986a7f5802b5cf45",
+  "updated_date": "2026-10-12",
+  "benchmark_references": [
+    "https://anonymous-report-421.github.io/public-website/?view=1",
+    "https://mosi-ai.github.io/RoboICL-GPT6-Astra.github.io/#results-and-episodes"
   ]
 }
