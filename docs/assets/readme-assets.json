@@ -1,0 +1,115 @@
+{
+  "source": "Local GPT-Policy project page, 2026-10-11",
+  "benchmark_reference": "https://anonymous-report-421.github.io/public-website/?view=1",
+  "benchmark_data_sha256": "1ef1802bf73e8d3fc11d6f3e0f1ae83ca7223a89b468bd92dfc552709efd3c1e",
+  "baselines": [
+    {
+      "name": "GPT-Policy",
+      "score": 80.2,
+      "success_rate": 72
+    },
+    {
+      "name": "π₀.₅ + GPT 6 Astra",
+      "score": 62.6,
+      "success_rate": 48
+    },
+    {
+      "name": "Galaxea G0.5",
+      "score": 38.2608,
+      "success_rate": 30.9464
+    },
+    {
+      "name": "GPT 6 Astra (direct)",
+      "score": 37.8125,
+      "success_rate": 26
+    },
+    {
+      "name": "Xiaomi R1",
+      "score": 33.9746,
+      "success_rate": 25.5072
+    },
+    {
+      "name": "OpenWAM-α",
+      "score": 32.7322,
+      "success_rate": 23.0662
+    },
+    {
+      "name": "DM0.5",
+      "score": 31.8206,
+      "success_rate": 22.0404
+    },
+    {
+      "name": "Meituan R0",
+      "score": 28.328599999999998,
+      "success_rate": 17.8796
+    },
+    {
+      "name": "Spatial Forcing",
+      "score": 24.9644,
+      "success_rate": 17.1458
+    },
+    {
+      "name": "π₀.₅",
+      "score": 24.43,
+      "success_rate": 15.6666
+    },
+    {
+      "name": "StarVLA-PI",
+      "score": 22.3636,
+      "success_rate": 16.1734
+    },
+    {
+      "name": "InternVLA A1.5",
+      "score": 21.7398,
+      "success_rate": 15.0268
+    },
+    {
+      "name": "Hy-VLA 0.5",
+      "score": 21.1594,
+      "success_rate": 13.935
+    }
+  ],
+  "figures": {
+    "gpt-policy-teaser.png": "assets/paper-figures/context-overview.png",
+    "gpt-policy-overview.png": "assets/method-overview.png",
+    "gpt-policy-context-compiler.png": "assets/paper-figures/context-compiler.png"
+  },
+  "paper_figures": [
+    {
+      "figure": 1,
+      "source_page": 2,
+      "file": "assets/paper-figures/context-overview.png",
+      "width": 2388,
+      "height": 1578,
+      "source": "Paper PDF export; source file identified by pdf_sha256.",
+      "pdf_sha256": "7f423f44d4d4fcdaa690adc09d41b9af8aa5d91f96a9d3117953d8f3d7e09134",
+      "source_figure": 1
+    },
+    {
+      "figure": 2,
+      "source_page": 4,
+      "file": "assets/method-overview.png",
+      "width": 2382,
+      "height": 1542,
+      "source": "Paper PDF export; source file identified by pdf_sha256.",
+      "pdf_sha256": "7f423f44d4d4fcdaa690adc09d41b9af8aa5d91f96a9d3117953d8f3d7e09134",
+      "source_figure": 2
+    },
+    {
+      "figure": 3,
+      "source_page": 15,
+      "file": "assets/paper-figures/context-compiler.png",
+      "width": 2328,
+      "height": 1044,
+      "source": "Paper PDF export; source file identified by pdf_sha256.",
+      "pdf_sha256": "7f423f44d4d4fcdaa690adc09d41b9af8aa5d91f96a9d3117953d8f3d7e09134",
+      "source_figure": 6,
+      "crop_points": [
+        112.0,
+        230.0,
+        500.0,
+        404.0
+      ]
+    }
+  ]
+}

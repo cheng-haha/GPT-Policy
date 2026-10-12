@@ -53,6 +53,14 @@ Four synchronized views of three GPT-6 Astra robot runs. Click any preview to op
 
 The [full experiment gallery](https://cheng-haha.github.io/GPT-Policy/#results) includes the other tasks and context comparisons.
 
+### RoboDojo results
+
+[![RoboDojo mean score: GPT-Policy 80.20 out of 100](docs/assets/robodojo-results.png)](https://cheng-haha.github.io/GPT-Policy/#robodojo)
+
+**80.20 / 100 mean score · 72% success rate.**
+
+[Interactive chart](https://cheng-haha.github.io/GPT-Policy/#robodojo) · [Simulation videos](https://cheng-haha.github.io/GPT-Policy/#simulation-rollouts) · [Reproduce the evaluation](docs/robodojo.md)
+
 ## Method overview
 
 <div align="center">
@@ -60,6 +68,10 @@ The [full experiment gallery](https://cheng-haha.github.io/GPT-Policy/#results) 
 </div>
 
 GPT-Policy builds one model input from the task, live camera/state observations, task references, and the previous tool result. The VLM emits one structured request; the selected adapter validates and executes it, then returns fresh observations and feedback for the next decision. Adapters support Cartesian targets and waypoint sequences, sequential IK checks, backend-specific timing, gripper control, and append-only run recording.
+
+<div align="center">
+  <img src="docs/assets/gpt-policy-context-compiler.png" alt="Context construction from keyframes, subtasks, and aligned action records" width="100%" />
+</div>
 
 The available context types are:
 
@@ -151,14 +163,8 @@ Task requests live in `request_json/`; generated context, images and recordings 
 ## Real-world results from the paper
 
 <p>🎯 <b>Target Image / Self History / Human–Robot Interaction:</b> 100% success on each of the six tasks evaluated under these conditions.</p>
-<p>👀 <b>Human Video:</b> Success rate improves from 0% to 67% on both towel and notebook pickup.</p>
-<p>🤖 <b>Robot Video + Action:</b> Success rate improves from 0% to 100% on bottle opening and from 0% to 67% on plug reinsertion.</p>
-
-## RoboDojo results
-
-[![Mean score across ten RoboDojo tasks](docs/assets/robodojo-results.png)](https://cheng-haha.github.io/GPT-Policy/#robodojo)
-
-[Interactive chart](https://cheng-haha.github.io/GPT-Policy/#robodojo) · [Reproduce the evaluation](docs/robodojo.md)
+<p>👀 <b>Human Video:</b> Success rate increases from 20% to 90% on towel pickup and from 20% to 80% on notebook pickup.</p>
+<p>🤖 <b>Robot Video + Action:</b> Success rate increases from 0% to 80% on bottle opening and from 0% to 70% on plug reinsertion.</p>
 
 ## Repository layout
 
