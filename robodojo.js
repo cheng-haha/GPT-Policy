@@ -112,7 +112,7 @@
       <div class="benchmark-toolbar">${controls(t, "bars")}</div>
       <div class="benchmark-plot" role="group" aria-label="${t.chart}">
         <ol class="benchmark-bars">${ranked.map(model => `<li class="benchmark-row ${model.kind}${model[metric] == null ? " unavailable" : ""}" data-model="${model.id}">
-          <span class="benchmark-model"><span class="benchmark-icons">${icons(model)}</span><span>${modelName(model.name)}${model.kind === "ours" ? ` <span class="benchmark-ours-label">(${t.ours})</span>` : ""}</span></span>
+          <span class="benchmark-model"><span class="benchmark-icons">${icons(model)}</span><span>${modelName(model.barLabel || model.name)}${model.kind === "ours" ? ` <span class="benchmark-ours-label">(${t.ours})</span>` : ""}${model.setting ? `<span class="benchmark-setting">${model.setting}</span>` : ""}</span></span>
           <span class="benchmark-track">${model[metric] == null ? `<span class="benchmark-value" title="${t.missing}" style="left:8px">—</span>` : `<span class="benchmark-bar" aria-hidden="true" style="--bar-value:${model[metric]}%"></span><span class="benchmark-value" style="left:calc(${model[metric]}% + 8px)">${format(model[metric], metric)}</span>`}</span><span aria-hidden="true"></span>
         </li>`).join("")}</ol>
         <div class="benchmark-axis" aria-hidden="true"><span></span><div>${[0, 20, 40, 60, 80, 100].map(value => `<span>${value}${metric === "success" ? "%" : ""}</span>`).join("")}</div><span></span></div>

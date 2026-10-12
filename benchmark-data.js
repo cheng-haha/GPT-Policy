@@ -156,6 +156,8 @@ const benchmarkData = {
     {
       "id": "roboicl",
       "name": "RoboICL (1-shot)",
+      "barLabel": "RoboICL",
+      "setting": "1-shot",
       "header": "RoboICL<br>1-shot",
       "score": 60.6,
       "success": null,
@@ -168,7 +170,8 @@ const benchmarkData = {
     {
       "id": "ours",
       "name": "GPT-Policy",
-      "header": "GPT-Policy<br>(Ours)",
+      "setting": "1-shot",
+      "header": "GPT-Policy<br>1-shot (Ours)",
       "score": 80.2,
       "success": 72,
       "logos": [
