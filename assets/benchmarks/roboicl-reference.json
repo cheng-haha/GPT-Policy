@@ -1,0 +1,302 @@
+{
+  "source": "https://mosi-ai.github.io/RoboICL-GPT6-Astra.github.io/#results-and-episodes",
+  "paper": "https://arxiv.org/abs/2609.34261",
+  "rolloutSource": "https://mosi-ai.github.io/RoboICL-GPT6-Astra.github.io/assets/data/benchmark-rollouts.json?v=20260928-rollouts-v9",
+  "retrievedDate": "2026-10-12",
+  "rolloutSourceSha256": "94e0afb5fe1f1dfc1a63e17f86feeda85c0bbbdf735811e30a7666e76b8cfe1a",
+  "score": 60.6,
+  "success": null,
+  "tasks": [
+    {
+      "id": "organize_table",
+      "score": 50,
+      "success": 0,
+      "successEstimated": true,
+      "zeroShot": false
+    },
+    {
+      "id": "classify_objects_by_language",
+      "score": 44,
+      "success": 40,
+      "successEstimated": true,
+      "zeroShot": true
+    },
+    {
+      "id": "imitate_sorting_sequence",
+      "score": 90,
+      "success": 80,
+      "successEstimated": true,
+      "zeroShot": false
+    },
+    {
+      "id": "arrange_largest_number",
+      "score": 58,
+      "success": null,
+      "successEstimated": false,
+      "zeroShot": false
+    },
+    {
+      "id": "build_tower",
+      "score": 100,
+      "success": 100,
+      "successEstimated": true,
+      "zeroShot": false
+    },
+    {
+      "id": "fold_clothes",
+      "score": 84,
+      "success": null,
+      "successEstimated": false,
+      "zeroShot": false
+    },
+    {
+      "id": "put_bottles_into_dustbin",
+      "score": 73,
+      "success": 60,
+      "successEstimated": true,
+      "zeroShot": false
+    },
+    {
+      "id": "pack_objects_into_box",
+      "score": 36,
+      "success": null,
+      "successEstimated": false,
+      "zeroShot": false
+    },
+    {
+      "id": "make_kong",
+      "score": 0,
+      "success": 0,
+      "successEstimated": true,
+      "zeroShot": false
+    },
+    {
+      "id": "classify_objects",
+      "score": 71,
+      "success": 60,
+      "successEstimated": true,
+      "zeroShot": false
+    }
+  ],
+  "successRateEvidence": [
+    {
+      "task": "organize_table",
+      "shots": 1,
+      "layouts": [
+        {
+          "id": 0,
+          "score": 50.0,
+          "success": false
+        },
+        {
+          "id": 1,
+          "score": 50.0,
+          "success": false
+        },
+        {
+          "id": 2,
+          "score": 50.0,
+          "success": false
+        },
+        {
+          "id": 3,
+          "score": 50.0,
+          "success": false
+        },
+        {
+          "id": 4,
+          "score": 50.0,
+          "success": false
+        }
+      ]
+    },
+    {
+      "task": "classify_objects_by_language",
+      "shots": 0,
+      "layouts": [
+        {
+          "id": 0,
+          "score": 100.0,
+          "success": true
+        },
+        {
+          "id": 1,
+          "score": 10.0,
+          "success": false
+        },
+        {
+          "id": 2,
+          "score": 10.0,
+          "success": false
+        },
+        {
+          "id": 3,
+          "score": 0.0,
+          "success": false
+        },
+        {
+          "id": 4,
+          "score": 100.0,
+          "success": true
+        }
+      ]
+    },
+    {
+      "task": "imitate_sorting_sequence",
+      "shots": 1,
+      "layouts": [
+        {
+          "id": 0,
+          "score": 100.0,
+          "success": true
+        },
+        {
+          "id": 1,
+          "score": 100.0,
+          "success": true
+        },
+        {
+          "id": 2,
+          "score": 50.0,
+          "success": false
+        },
+        {
+          "id": 3,
+          "score": 100.0,
+          "success": true
+        },
+        {
+          "id": 5,
+          "score": 100.0,
+          "success": true
+        }
+      ]
+    },
+    {
+      "task": "build_tower",
+      "shots": 1,
+      "layouts": [
+        {
+          "id": 0,
+          "score": 100.0,
+          "success": true
+        },
+        {
+          "id": 1,
+          "score": 100.0,
+          "success": true
+        },
+        {
+          "id": 2,
+          "score": 100.0,
+          "success": true
+        },
+        {
+          "id": 3,
+          "score": 100.0,
+          "success": true
+        },
+        {
+          "id": 4,
+          "score": 100.0,
+          "success": true
+        }
+      ]
+    },
+    {
+      "task": "put_bottles_into_dustbin",
+      "shots": 1,
+      "layouts": [
+        {
+          "id": 0,
+          "score": 100.0,
+          "success": true
+        },
+        {
+          "id": 1,
+          "score": 100.0,
+          "success": true
+        },
+        {
+          "id": 2,
+          "score": 40.0,
+          "success": false
+        },
+        {
+          "id": 3,
+          "score": 100.0,
+          "success": true
+        },
+        {
+          "id": 4,
+          "score": 25.0,
+          "success": false
+        }
+      ]
+    },
+    {
+      "task": "make_kong",
+      "shots": 1,
+      "layouts": [
+        {
+          "id": 0,
+          "score": 0.0,
+          "success": false
+        },
+        {
+          "id": 1,
+          "score": 0.0,
+          "success": false
+        },
+        {
+          "id": 3,
+          "score": 0.0,
+          "success": false
+        },
+        {
+          "id": 4,
+          "score": 0.0,
+          "success": false
+        }
+      ]
+    },
+    {
+      "task": "classify_objects",
+      "shots": 1,
+      "layouts": [
+        {
+          "id": 0,
+          "score": 15.0,
+          "success": false
+        },
+        {
+          "id": 1,
+          "score": 100.0,
+          "success": true
+        },
+        {
+          "id": 2,
+          "score": 40.0,
+          "success": false
+        },
+        {
+          "id": 3,
+          "score": 100.0,
+          "success": true
+        },
+        {
+          "id": 4,
+          "score": 100.0,
+          "success": true
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "Scores are the ten-task 1-shot panel, not the separate 30-task aggregate.",
+    "Language-guided classification reuses the zero-shot result.",
+    "SR estimates use the first five available public rollouts in layout-ID order (four for Mahjong); selected means match the ten-task panel.",
+    "The public release does not explicitly map these subsets to the ten-task panel. SR values are reconstructed estimates, not officially reported panel SRs.",
+    "The three unmatched task SRs and overall SR remain null."
+  ]
+}

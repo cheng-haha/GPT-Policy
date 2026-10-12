@@ -30,7 +30,7 @@ GPT-Policy: **80.20 / 100**, **36/50 successes (72%)**. Per-task score / success
 
 ## Baseline alignment (2026-10-11)
 
-All baseline cells and aggregate values now reproduce the [GPT-as-Policy reference report](https://anonymous-report-421.github.io/public-website/?view=1). This supersedes baseline values in the earlier owner-supplied Table 2; **the confirmed GPT-Policy column remains unchanged**.
+The original baseline cells and aggregate values reproduce the [GPT-as-Policy reference report](https://anonymous-report-421.github.io/public-website/?view=1). This supersedes those baseline values in the earlier owner-supplied Table 2; **the confirmed GPT-Policy column remains unchanged**. RoboICL is sourced separately below.
 
 `gpt-as-policy-reference.json` preserves the exact model/task values, scene mixtures and upstream provenance hashes used for the update. The original report data were read directly from the page's embedded JSON. Only relevant result data are retained here.
 
@@ -48,13 +48,21 @@ Direct's reported Score is the mean of its 48 available score records (37.8125),
 
 Other baseline models also use the reference report's exact values. These are published results, not reruns under our evaluation protocol. Only presentation is rounded to two decimals; all calculations retain the source precision.
 
+## RoboICL comparison (2026-10-12)
+
+The [RoboICL ten-task panel](https://mosi-ai.github.io/RoboICL-GPT6-Astra.github.io/#results-and-episodes) reports a one-shot mean score of **60.60**. Its language-classification score reuses the zero-shot result, marked †. This is distinct from the source's 30-task aggregate.
+
+`roboicl-reference.json` records all ten scores and the public rollout evidence for seven reconstructed success-rate estimates, matching our paper Table 2. Estimates are marked ≈ in the heatmap. They use the first five available layouts in ID order (four for Mahjong), whose means match the ten-task scores. The source does not explicitly identify the ten-task panel's rollout subset; these are estimates, not officially reported panel SRs. Number arrangement, clothes folding, packing, and the overall SR remain unavailable (null in data, — on the page). The missing overall SR gets no bar and is not treated as zero.
+
+The CSV distinguishes reported scores, estimated SRs, and unavailable values. The chart uses the existing OpenAI icon to identify RoboICL's GPT-6 Astra backbone, not as a RoboICL organization logo.
+
 ## Reference Table 1 implementation
 
-`assets/benchmarks/gpt-as-policy-heatmap.css` copies the actual table, legend and metric-switch declarations from the reference page's inline stylesheet. `robodojo.js` ports the reference's Table 1 DOM structure and its `X9` color function into the site's vanilla JavaScript renderer. The React data-report wrapper is not needed here. `robodojo.css` isolates the copied styles from this site's global table typography and constrains the component to the reference's 760 px width.
+`assets/benchmarks/gpt-as-policy-heatmap.css` copies the actual table, legend and metric-switch declarations from the reference page's inline stylesheet. `robodojo.js` ports the reference's Table 1 DOM structure and its `X9` color function into the site's vanilla JavaScript renderer. The React data-report wrapper is not needed here. `robodojo.css` isolates the copied styles from this site's global table typography and adjusts the width for the added RoboICL column.
 
-Column order is the reference's original seven models, followed by GPT-Policy: DM0.5, GalaxeaVLA (G0.5), Xiaomi-Robotics-1, OpenWAM-α, π₀.₅, Hybrid, Direct, **GPT-Policy**. The task order also follows the reference. No additional model families, header logos, highlighted column borders or custom legend treatment are added. The color scale remains 0–100 for both metrics. Small screens scroll within the table, retaining a sticky task column.
+Column order is the reference's original seven models, followed by RoboICL and GPT-Policy: DM0.5, GalaxeaVLA (G0.5), Xiaomi-Robotics-1, OpenWAM-α, π₀.₅, Hybrid, Direct, RoboICL (1-shot), **GPT-Policy**. The task order also follows the reference. There are no header logos, highlighted column borders or custom legend treatment. The color scale remains 0–100 for both metrics. The table now spans 840 px to accommodate the added column; small screens scroll within the table, retaining a sticky task column.
 
-`benchmark-data.js` is the single source shared by the bar chart, heatmap and per-task details. `robodojo.js` supports EN/ZH and synchronizes both metric switches. The heatmap has 10 task rows, eight model columns and one mean row.
+`benchmark-data.js` is the single source shared by the bar chart, heatmap and per-task details. `robodojo.js` supports EN/ZH and synchronizes both metric switches. The heatmap has 10 task rows, nine model columns and one overall row.
 
 - `robodojo-tasks.csv`: the confirmed GPT-Policy task data and aggregate.
 - `robodojo-comparison.csv`: both metrics and provenance for all displayed methods, with explicitly labeled reported aggregates.

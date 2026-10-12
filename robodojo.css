@@ -53,6 +53,8 @@
 .benchmark-row.hybrid .benchmark-bar { background: #3478f6; }
 .benchmark-row.direct .benchmark-bar { background: #56b5a4; }
 .benchmark-row.pi .benchmark-bar { background: #e9a150; }
+.benchmark-row.roboicl .benchmark-bar { background: #9298bc; }
+.benchmark-row.unavailable .benchmark-track { background: none; border-color: transparent; }
 .benchmark-row.ours .benchmark-model { color: #202124; font-weight: 700; }
 .benchmark-row.hybrid .benchmark-model { color: #2463ce; font-weight: 700; }
 .benchmark-value { position: absolute; color: #48617e; font-size: 15px; font-weight: 400; line-height: 1; white-space: nowrap; }
@@ -113,7 +115,7 @@
 
 /* Integration for the reference Table 1; its table rules live in the copied stylesheet. */
 .benchmark-heatmap.rr-report {
-  max-width: 760px;
+  max-width: 840px;
   margin: 36px auto 28px;
   scroll-margin-top: 28px;
   background: #fff;
@@ -126,7 +128,7 @@
   font: 650 25px/1.5 "Benchmark Latin", "Benchmark Song", Georgia, serif;
   letter-spacing: 0;
 }
-.benchmark-heatmap.rr-report .rr-table { min-width: 760px; color: inherit; }
+.benchmark-heatmap.rr-report .rr-table { min-width: 840px; color: inherit; }
 .benchmark-heatmap.rr-report .rr-table th,
 .benchmark-heatmap.rr-report .rr-table td {
   font-family: inherit;
@@ -149,7 +151,8 @@
   outline-offset: 3px;
 }
 .benchmark-heatmap.rr-report .rr-prose p { margin: 14px 0; line-height: 1.9; }
+.benchmark-heatmap.rr-report .rr-prose a { text-decoration: underline; text-underline-offset: 3px; }
 .benchmark-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
-.benchmark-results { max-width: 760px; margin: 36px auto 0; color: #242b38; font-family: "Benchmark Latin", "Benchmark Song", Georgia, serif; }
+.benchmark-results { max-width: 840px; margin: 36px auto 0; color: #242b38; font-family: "Benchmark Latin", "Benchmark Song", Georgia, serif; }
 .benchmark-results .benchmark-heatmap { margin-top: 14px; }

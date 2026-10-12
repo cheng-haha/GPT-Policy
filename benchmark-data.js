@@ -1,7 +1,8 @@
-// Baselines reproduce GPT-as-Policy's published per-task values and reported aggregates.
-// GPT-Policy results follow the owner-confirmed paper Table 2. See assets/benchmarks/README.md.
+// GPT-as-Policy baselines retain their published values and aggregation.
+// RoboICL: ten-task panel scores and separately marked reconstructed SR estimates.
+// GPT-Policy: owner-confirmed paper Table 2. See assets/benchmarks/README.md.
 const benchmarkData = {
-  "version": "2026-10-11",
+  "version": "2026-10-12",
   "paper": "paper.pdf",
   "paperCompiledAt": "2026-10-11T14:51:05-07:00",
   "paperSha256": "7f423f44d4d4fcdaa690adc09d41b9af8aa5d91f96a9d3117953d8f3d7e09134",
@@ -153,6 +154,18 @@ const benchmarkData = {
       "source": "gpt-as-policy-report"
     },
     {
+      "id": "roboicl",
+      "name": "RoboICL (1-shot)",
+      "header": "RoboICL<br>1-shot",
+      "score": 60.6,
+      "success": null,
+      "logos": [
+        "assets/benchmarks/logos/openai.ico"
+      ],
+      "kind": "roboicl",
+      "source": "roboicl-ten-task-panel"
+    },
+    {
       "id": "ours",
       "name": "GPT-Policy",
       "header": "GPT-Policy<br>(Ours)",
@@ -225,6 +238,12 @@ const benchmarkData = {
         "ours": {
           "score": 65,
           "success": 20
+        },
+        "roboicl": {
+          "score": 50,
+          "success": 0,
+          "successEstimated": true,
+          "zeroShot": false
         }
       }
     },
@@ -286,6 +305,12 @@ const benchmarkData = {
         "ours": {
           "score": 88,
           "success": 80
+        },
+        "roboicl": {
+          "score": 44,
+          "success": 40,
+          "successEstimated": true,
+          "zeroShot": true
         }
       }
     },
@@ -347,6 +372,12 @@ const benchmarkData = {
         "ours": {
           "score": 100,
           "success": 100
+        },
+        "roboicl": {
+          "score": 90,
+          "success": 80,
+          "successEstimated": true,
+          "zeroShot": false
         }
       }
     },
@@ -408,6 +439,12 @@ const benchmarkData = {
         "ours": {
           "score": 100,
           "success": 100
+        },
+        "roboicl": {
+          "score": 58,
+          "success": null,
+          "successEstimated": false,
+          "zeroShot": false
         }
       }
     },
@@ -469,6 +506,12 @@ const benchmarkData = {
         "ours": {
           "score": 46,
           "success": 40
+        },
+        "roboicl": {
+          "score": 100,
+          "success": 100,
+          "successEstimated": true,
+          "zeroShot": false
         }
       }
     },
@@ -530,6 +573,12 @@ const benchmarkData = {
         "ours": {
           "score": 80,
           "success": 80
+        },
+        "roboicl": {
+          "score": 84,
+          "success": null,
+          "successEstimated": false,
+          "zeroShot": false
         }
       }
     },
@@ -591,6 +640,12 @@ const benchmarkData = {
         "ours": {
           "score": 73,
           "success": 60
+        },
+        "roboicl": {
+          "score": 73,
+          "success": 60,
+          "successEstimated": true,
+          "zeroShot": false
         }
       }
     },
@@ -652,6 +707,12 @@ const benchmarkData = {
         "ours": {
           "score": 70,
           "success": 60
+        },
+        "roboicl": {
+          "score": 36,
+          "success": null,
+          "successEstimated": false,
+          "zeroShot": false
         }
       }
     },
@@ -713,6 +774,12 @@ const benchmarkData = {
         "ours": {
           "score": 80,
           "success": 80
+        },
+        "roboicl": {
+          "score": 0,
+          "success": 0,
+          "successEstimated": true,
+          "zeroShot": false
         }
       }
     },
@@ -774,6 +841,12 @@ const benchmarkData = {
         "ours": {
           "score": 100,
           "success": 100
+        },
+        "roboicl": {
+          "score": 71,
+          "success": 60,
+          "successEstimated": true,
+          "zeroShot": false
         }
       }
     }
@@ -786,6 +859,7 @@ const benchmarkData = {
     "Pi-05",
     "mix",
     "gpt",
+    "roboicl",
     "ours"
   ],
   "resultsSource": "User-confirmed Table 2 screenshot, 2026-10-11; supersedes simulation results in the local PDF export.",
@@ -800,5 +874,6 @@ const benchmarkData = {
     "make_kong",
     "fold_clothes",
     "put_bottles_into_dustbin"
-  ]
+  ],
+  "roboiclReference": "https://mosi-ai.github.io/RoboICL-GPT6-Astra.github.io/#results-and-episodes"
 };

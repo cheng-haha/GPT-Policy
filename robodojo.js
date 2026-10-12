@@ -2,7 +2,7 @@
   const section = document.querySelector("#robodojo");
   const results = document.querySelector("#robodojo-results");
   if (!section || !results) return;
-  const { tasks, models, heatmapModels, heatmapTasks, reference: source } = benchmarkData;
+  const { tasks, models, heatmapModels, heatmapTasks, reference: source, roboiclReference } = benchmarkData;
   const ours = models.find(model => model.id === "ours");
   const totalTrials = tasks.reduce((sum, task) => sum + task.trials, 0);
   const totalSuccesses = tasks.reduce((sum, task) => sum + task.successes, 0);
@@ -15,14 +15,18 @@
       subtitle: "RoboDojo-Sim · 10 tasks · one-shot GPT-Policy",
       score: "Mean score", success: "Success rate", ours: "Ours",
       chart: "Results by model", metric: "Chart metric", axisScore: "Mean score (0–100)",
-      axisSuccess: "Success rate (%)", source: "Reference report",
-      note: "GPT-Policy: ten-task mean, one demonstration per task. Baselines retain the reference report’s values and aggregation.",
+      axisSuccess: "Success rate (%)", source: "GPT-as-Policy",
+      note: "GPT-Policy: ten-task mean, one demonstration per task. Baselines retain their source values and aggregation.",
+      roboiclUnavailable: "RoboICL’s overall success rate is unavailable.",
+      zeroShot: "Reuses the zero-shot result", estimated: "Estimated from public rollouts",
+      roboiclScoreNote: "† RoboICL reuses its zero-shot result for language classification.",
+      roboiclSuccessNote: "≈ RoboICL SRs are reconstructed estimates from public rollouts; — unavailable. † Language classification uses zero-shot.",
       details: "GPT-Policy · Per-task results", download: "Download CSV",
       task: "Task", successes: "Successes", total: "Mean (10 tasks)",
       heatScore: "Score heatmap", heatSuccess: "Success-rate heatmap",
       heatScoreTitle: "Per-task Score (0–100)", heatSuccessTitle: "Per-task success rate (%)",
       tableCaption: "RoboDojo per-task results.", overall: "Overall",
-      heatDescription: "Darker colors indicate higher scores or success rates. Baseline cells and overall values follow the reference report; GPT-Policy averages tasks equally.",
+      heatDescription: "Darker colors indicate higher scores or success rates. Baselines retain their source aggregation; GPT-Policy averages tasks equally.",
       heatRegion: "Per-task heatmap; scroll horizontally on small screens", missing: "Not reported", scale: "Color scale (0–100)",
     },
     "zh-CN": {
@@ -30,14 +34,18 @@
       subtitle: "RoboDojo-Sim · 10 项任务 · GPT-Policy 单次示范",
       score: "平均得分", success: "成功率", ours: "我们的方法",
       chart: "各模型评测结果", metric: "图表指标", axisScore: "平均得分（0–100）",
-      axisSuccess: "成功率（%）", source: "参考报告",
-      note: "GPT-Policy 每项任务使用一次示范，十项任务等权平均；基线数值与汇总口径沿用参考报告。",
+      axisSuccess: "成功率（%）", source: "GPT-as-Policy",
+      note: "GPT-Policy 每项任务使用一次示范，十项任务等权平均；基线数值与汇总口径沿用各自来源。",
+      roboiclUnavailable: "RoboICL 总体成功率不可用。",
+      zeroShot: "复用零次示范结果", estimated: "根据公开运行记录重建的估算值",
+      roboiclScoreNote: "† RoboICL 的语言分类复用零次示范结果。",
+      roboiclSuccessNote: "≈ RoboICL 成功率为公开运行记录的重建估算值；— 表示缺失。† 语言分类使用零次示范。",
       details: "GPT-Policy · 各任务明细", download: "下载 CSV",
       task: "任务", successes: "成功数", total: "平均（10 项任务）",
       heatScore: "Score 热力表", heatSuccess: "成功率热力表",
       heatScoreTitle: "逐任务 Score（0–100）", heatSuccessTitle: "逐任务成功率（%）",
       tableCaption: "RoboDojo 各任务结果。", overall: "总体",
-      heatDescription: "颜色越深，得分或成功率越高。基线逐任务与总体数值沿用参考报告；GPT-Policy 按任务等权平均。",
+      heatDescription: "颜色越深，得分或成功率越高。基线沿用各自来源的汇总口径；GPT-Policy 按任务等权平均。",
       heatRegion: "逐任务热力图；小屏可横向滑动", missing: "未报告", scale: "色阶（0–100）",
     },
   };
@@ -56,7 +64,7 @@
     return `background-color:rgb(${rgb.join(",")});color:${1.05 / (luminance + .05) >= 4.5 ? "#fff" : "#000"}`;
   }
   // Preserve the reference's column order, markup, legend, and metric switch.
-  // GPT-Policy is the only appended column; no special cell outline or logos.
+  // Append RoboICL and GPT-Policy without special cell outlines or logos.
   function heatmap(t, chinese) {
     const title = metric === "score" ? t.heatScoreTitle : t.heatSuccessTitle;
     return `<div class="benchmark-heatmap rr-report" id="robodojo-heatmap" lang="${chinese ? "zh-CN" : "en"}">
@@ -71,13 +79,16 @@
           <caption class="benchmark-sr-only">${title}</caption>
           <thead><tr><th scope="col">${t.task}</th>${columns.map(model => `<th scope="col" data-model="${model.id}">${modelName(model.header).replace("(Ours)", `(${t.ours})`)}</th>`).join("")}</tr></thead>
           <tbody>${rows.map(task => `<tr data-task="${task.id}"><th scope="row"><button type="button" data-sim-task="${task.id}">${task[chinese ? "zh" : "en"]}</button></th>${columns.map(model => {
-            const value = task.values[model.id][metric];
-            return `<td data-model="${model.id}" data-value="${value}" style="${heatStyle(value)}">${format(value, metric, true)}</td>`;
+            const record = task.values[model.id];
+            const value = record[metric];
+            const estimated = metric === "success" && record.successEstimated;
+            const suffix = record.zeroShot ? `<sup title="${t.zeroShot}">†</sup>` : "";
+            return `<td data-model="${model.id}" data-value="${value}"${estimated ? ` title="${t.estimated}"` : ""} style="${heatStyle(value)}">${estimated ? "≈" : ""}${format(value, metric, true)}${suffix}</td>`;
           }).join("")}</tr>`).join("")}</tbody>
           <tfoot><tr><th scope="row">${t.overall}</th>${columns.map(model => `<td data-model="${model.id}" data-value="${model[metric]}" style="${heatStyle(model[metric])}">${format(model[metric], metric, true)}</td>`).join("")}</tr></tfoot>
         </table>
       </div>
-      <div class="rr-prose"><p id="heatmap-description"><b>${t.tableCaption}</b> ${modelName(t.heatDescription)}</p></div>
+      <div class="rr-prose"><p id="heatmap-description"><b>${t.tableCaption}</b> ${modelName(t.heatDescription)} ${metric === "score" ? t.roboiclScoreNote : t.roboiclSuccessNote} <a href="${roboiclReference}" target="_blank" rel="noopener noreferrer">RoboICL ↗</a></p></div>
     </div>`;
   }
   function controls(t, location) {
@@ -91,7 +102,7 @@
     const t = labels[chinese ? "zh-CN" : "en"];
     const detailsOpen = results.querySelector(".benchmark-details")?.open;
     const scrollLeft = results.querySelector(".rr-table-scroll")?.scrollLeft || 0;
-    const ranked = models.filter(model => model[metric] != null).sort((a, b) => b[metric] - a[metric]);
+    const ranked = [...models].sort((a, b) => (b[metric] ?? -1) - (a[metric] ?? -1));
     section.setAttribute("aria-label", `RoboDojo · ${metric === "score" ? t.title : t.successTitle}`);
     section.innerHTML = `
       <header class="benchmark-header">
@@ -100,14 +111,14 @@
       </header>
       <div class="benchmark-toolbar">${controls(t, "bars")}</div>
       <div class="benchmark-plot" role="group" aria-label="${t.chart}">
-        <ol class="benchmark-bars">${ranked.map(model => `<li class="benchmark-row ${model.kind}" data-model="${model.id}">
+        <ol class="benchmark-bars">${ranked.map(model => `<li class="benchmark-row ${model.kind}${model[metric] == null ? " unavailable" : ""}" data-model="${model.id}">
           <span class="benchmark-model"><span class="benchmark-icons">${icons(model)}</span><span>${modelName(model.name)}${model.kind === "ours" ? ` <span class="benchmark-ours-label">(${t.ours})</span>` : ""}</span></span>
-          <span class="benchmark-track"><span class="benchmark-bar" aria-hidden="true" style="--bar-value:${model[metric]}%"></span><span class="benchmark-value" style="left:calc(${model[metric]}% + 8px)">${format(model[metric], metric)}</span></span><span aria-hidden="true"></span>
+          <span class="benchmark-track">${model[metric] == null ? `<span class="benchmark-value" title="${t.missing}" style="left:8px">—</span>` : `<span class="benchmark-bar" aria-hidden="true" style="--bar-value:${model[metric]}%"></span><span class="benchmark-value" style="left:calc(${model[metric]}% + 8px)">${format(model[metric], metric)}</span>`}</span><span aria-hidden="true"></span>
         </li>`).join("")}</ol>
         <div class="benchmark-axis" aria-hidden="true"><span></span><div>${[0, 20, 40, 60, 80, 100].map(value => `<span>${value}${metric === "success" ? "%" : ""}</span>`).join("")}</div><span></span></div>
         <p class="benchmark-axis-label">${metric === "score" ? t.axisScore : t.axisSuccess}</p>
       </div>
-      <div class="benchmark-caption"><p>${t.note} <a href="${source}" target="_blank" rel="noopener noreferrer">${t.source} ↗</a></p></div>`;
+      <div class="benchmark-caption"><p>${t.note} ${metric === "success" ? t.roboiclUnavailable : ""} <a href="${source}" target="_blank" rel="noopener noreferrer">${t.source} ↗</a> · <a href="${roboiclReference}" target="_blank" rel="noopener noreferrer">RoboICL ↗</a></p></div>`;
     results.innerHTML = `${heatmap(t, chinese)}
       <details class="benchmark-details"${detailsOpen ? " open" : ""}>
         <summary>${t.details}<span aria-hidden="true">+</span></summary>

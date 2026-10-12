@@ -11,6 +11,7 @@ Organize table,InternVLA A1.5,35.67,2.67,gpt_as_policy_report,gpt_as_policy_repo
 Organize table,StarVLA-PI,25.17,2.00,gpt_as_policy_report,gpt_as_policy_report
 Organize table,π₀.₅ + GPT 6 Astra,60.00,0.00,gpt_as_policy_report,gpt_as_policy_report
 Organize table,GPT 6 Astra (direct),30.00,0.00,gpt_as_policy_report,gpt_as_policy_report
+Organize table,RoboICL (1-shot),50.00,0.00,roboicl_ten_task_panel,roboicl_public_rollout_estimate
 Organize table,GPT-Policy,65.00,20.00,confirmed_paper_table_2,confirmed_paper_table_2
 Classify by language,DM0.5,0.47,0.00,gpt_as_policy_report,gpt_as_policy_report
 Classify by language,Galaxea G0.5,1.07,0.00,gpt_as_policy_report,gpt_as_policy_report
@@ -24,6 +25,7 @@ Classify by language,InternVLA A1.5,0.13,0.00,gpt_as_policy_report,gpt_as_policy
 Classify by language,StarVLA-PI,0.27,0.00,gpt_as_policy_report,gpt_as_policy_report
 Classify by language,π₀.₅ + GPT 6 Astra,38.00,20.00,gpt_as_policy_report,gpt_as_policy_report
 Classify by language,GPT 6 Astra (direct),60.00,40.00,gpt_as_policy_report,gpt_as_policy_report
+Classify by language,RoboICL (1-shot),44.00,40.00,roboicl_ten_task_panel,roboicl_public_rollout_estimate
 Classify by language,GPT-Policy,88.00,80.00,confirmed_paper_table_2,confirmed_paper_table_2
 Imitate sorting sequence,DM0.5,1.80,0.00,gpt_as_policy_report,gpt_as_policy_report
 Imitate sorting sequence,Galaxea G0.5,1.67,0.00,gpt_as_policy_report,gpt_as_policy_report
@@ -37,6 +39,7 @@ Imitate sorting sequence,InternVLA A1.5,0.60,0.00,gpt_as_policy_report,gpt_as_po
 Imitate sorting sequence,StarVLA-PI,0.73,0.00,gpt_as_policy_report,gpt_as_policy_report
 Imitate sorting sequence,π₀.₅ + GPT 6 Astra,53.00,40.00,gpt_as_policy_report,gpt_as_policy_report
 Imitate sorting sequence,GPT 6 Astra (direct),0.00,0.00,gpt_as_policy_report,gpt_as_policy_report
+Imitate sorting sequence,RoboICL (1-shot),90.00,80.00,roboicl_ten_task_panel,roboicl_public_rollout_estimate
 Imitate sorting sequence,GPT-Policy,100.00,100.00,confirmed_paper_table_2,confirmed_paper_table_2
 Arrange largest number,DM0.5,7.85,3.20,gpt_as_policy_report,gpt_as_policy_report
 Arrange largest number,Galaxea G0.5,4.11,0.53,gpt_as_policy_report,gpt_as_policy_report
@@ -50,6 +53,7 @@ Arrange largest number,InternVLA A1.5,0.57,0.00,gpt_as_policy_report,gpt_as_poli
 Arrange largest number,StarVLA-PI,1.76,0.00,gpt_as_policy_report,gpt_as_policy_report
 Arrange largest number,π₀.₅ + GPT 6 Astra,50.00,40.00,gpt_as_policy_report,gpt_as_policy_report
 Arrange largest number,GPT 6 Astra (direct),57.00,40.00,gpt_as_policy_report,gpt_as_policy_report
+Arrange largest number,RoboICL (1-shot),58.00,,roboicl_ten_task_panel,unavailable
 Arrange largest number,GPT-Policy,100.00,100.00,confirmed_paper_table_2,confirmed_paper_table_2
 Build tower,DM0.5,55.20,42.00,gpt_as_policy_report,gpt_as_policy_report
 Build tower,Galaxea G0.5,82.93,78.67,gpt_as_policy_report,gpt_as_policy_report
@@ -63,6 +67,7 @@ Build tower,InternVLA A1.5,37.40,28.67,gpt_as_policy_report,gpt_as_policy_report
 Build tower,StarVLA-PI,63.20,55.33,gpt_as_policy_report,gpt_as_policy_report
 Build tower,π₀.₅ + GPT 6 Astra,64.00,60.00,gpt_as_policy_report,gpt_as_policy_report
 Build tower,GPT 6 Astra (direct),12.00,0.00,gpt_as_policy_report,gpt_as_policy_report
+Build tower,RoboICL (1-shot),100.00,100.00,roboicl_ten_task_panel,roboicl_public_rollout_estimate
 Build tower,GPT-Policy,46.00,40.00,confirmed_paper_table_2,confirmed_paper_table_2
 Fold clothes,DM0.5,28.96,24.53,gpt_as_policy_report,gpt_as_policy_report
 Fold clothes,Galaxea G0.5,32.75,28.00,gpt_as_policy_report,gpt_as_policy_report
@@ -76,6 +81,7 @@ Fold clothes,InternVLA A1.5,16.16,13.60,gpt_as_policy_report,gpt_as_policy_repor
 Fold clothes,StarVLA-PI,32.21,28.53,gpt_as_policy_report,gpt_as_policy_report
 Fold clothes,π₀.₅ + GPT 6 Astra,100.00,100.00,gpt_as_policy_report,gpt_as_policy_report
 Fold clothes,GPT 6 Astra (direct),40.00,40.00,gpt_as_policy_report,gpt_as_policy_report
+Fold clothes,RoboICL (1-shot),84.00,,roboicl_ten_task_panel,unavailable
 Fold clothes,GPT-Policy,80.00,80.00,confirmed_paper_table_2,confirmed_paper_table_2
 Put bottles into dustbin,DM0.5,81.70,72.00,gpt_as_policy_report,gpt_as_policy_report
 Put bottles into dustbin,Galaxea G0.5,96.30,94.00,gpt_as_policy_report,gpt_as_policy_report
@@ -89,6 +95,7 @@ Put bottles into dustbin,InternVLA A1.5,86.23,79.33,gpt_as_policy_report,gpt_as_
 Put bottles into dustbin,StarVLA-PI,68.67,56.67,gpt_as_policy_report,gpt_as_policy_report
 Put bottles into dustbin,π₀.₅ + GPT 6 Astra,100.00,100.00,gpt_as_policy_report,gpt_as_policy_report
 Put bottles into dustbin,GPT 6 Astra (direct),36.00,20.00,gpt_as_policy_report,gpt_as_policy_report
+Put bottles into dustbin,RoboICL (1-shot),73.00,60.00,roboicl_ten_task_panel,roboicl_public_rollout_estimate
 Put bottles into dustbin,GPT-Policy,73.00,60.00,confirmed_paper_table_2,confirmed_paper_table_2
 Pack objects into box,DM0.5,14.72,1.33,gpt_as_policy_report,gpt_as_policy_report
 Pack objects into box,Galaxea G0.5,17.12,2.93,gpt_as_policy_report,gpt_as_policy_report
@@ -102,6 +109,7 @@ Pack objects into box,InternVLA A1.5,8.93,0.00,gpt_as_policy_report,gpt_as_polic
 Pack objects into box,StarVLA-PI,7.69,0.53,gpt_as_policy_report,gpt_as_policy_report
 Pack objects into box,π₀.₅ + GPT 6 Astra,50.00,20.00,gpt_as_policy_report,gpt_as_policy_report
 Pack objects into box,GPT 6 Astra (direct),50.00,20.00,gpt_as_policy_report,gpt_as_policy_report
+Pack objects into box,RoboICL (1-shot),36.00,,roboicl_ten_task_panel,unavailable
 Pack objects into box,GPT-Policy,70.00,60.00,confirmed_paper_table_2,confirmed_paper_table_2
 Make Kong,DM0.5,56.67,56.67,gpt_as_policy_report,gpt_as_policy_report
 Make Kong,Galaxea G0.5,90.00,90.00,gpt_as_policy_report,gpt_as_policy_report
@@ -115,6 +123,7 @@ Make Kong,InternVLA A1.5,26.00,26.00,gpt_as_policy_report,gpt_as_policy_report
 Make Kong,StarVLA-PI,18.00,18.00,gpt_as_policy_report,gpt_as_policy_report
 Make Kong,π₀.₅ + GPT 6 Astra,40.00,40.00,gpt_as_policy_report,gpt_as_policy_report
 Make Kong,GPT 6 Astra (direct),0.00,0.00,gpt_as_policy_report,gpt_as_policy_report
+Make Kong,RoboICL (1-shot),0.00,0.00,roboicl_ten_task_panel,roboicl_public_rollout_estimate
 Make Kong,GPT-Policy,80.00,80.00,confirmed_paper_table_2,confirmed_paper_table_2
 Classify objects,DM0.5,26.83,16.67,gpt_as_policy_report,gpt_as_policy_report
 Classify objects,Galaxea G0.5,10.33,4.00,gpt_as_policy_report,gpt_as_policy_report
@@ -128,6 +137,7 @@ Classify objects,InternVLA A1.5,5.70,0.00,gpt_as_policy_report,gpt_as_policy_rep
 Classify objects,StarVLA-PI,5.93,0.67,gpt_as_policy_report,gpt_as_policy_report
 Classify objects,π₀.₅ + GPT 6 Astra,71.00,60.00,gpt_as_policy_report,gpt_as_policy_report
 Classify objects,GPT 6 Astra (direct),100.00,100.00,gpt_as_policy_report,gpt_as_policy_report
+Classify objects,RoboICL (1-shot),71.00,60.00,roboicl_ten_task_panel,roboicl_public_rollout_estimate
 Classify objects,GPT-Policy,100.00,100.00,confirmed_paper_table_2,confirmed_paper_table_2
 Reported aggregate,DM0.5,31.82,22.04,gpt_as_policy_report,gpt_as_policy_report
 Reported aggregate,Galaxea G0.5,38.26,30.95,gpt_as_policy_report,gpt_as_policy_report
@@ -141,4 +151,5 @@ Reported aggregate,InternVLA A1.5,21.74,15.03,gpt_as_policy_report,gpt_as_policy
 Reported aggregate,StarVLA-PI,22.36,16.17,gpt_as_policy_report,gpt_as_policy_report
 Reported aggregate,π₀.₅ + GPT 6 Astra,62.60,48.00,gpt_as_policy_report,gpt_as_policy_report
 Reported aggregate,GPT 6 Astra (direct),37.81,26.00,gpt_as_policy_report,gpt_as_policy_report
+Mean (10 tasks),RoboICL (1-shot),60.60,,roboicl_ten_task_panel,unavailable
 Mean (10 tasks),GPT-Policy,80.20,72.00,confirmed_paper_table_2,confirmed_paper_table_2
