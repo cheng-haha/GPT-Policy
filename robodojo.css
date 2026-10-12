@@ -14,8 +14,9 @@
   --benchmark-blue: #3478f6;
   --benchmark-label: 228px;
   --benchmark-value: 54px;
-  margin: 10px 0 64px;
-  padding: 32px 4% 22px;
+  max-width: 1080px;
+  margin: 10px auto 64px;
+  padding: 32px min(4vw, 40px) 22px;
   border-top: 4px solid var(--benchmark-blue);
   background: #fff;
   color: #294462;
@@ -37,7 +38,7 @@
 .benchmark-controls button:focus-visible, .benchmark a:focus-visible, .benchmark summary:focus-visible, .benchmark-table-scroll:focus-visible { outline: 2px solid var(--benchmark-blue); outline-offset: 4px; }
 .benchmark-axis, .benchmark-row { display: grid; grid-template-columns: var(--benchmark-label) minmax(0, 1fr) var(--benchmark-value); column-gap: 12px; align-items: center; }
 .benchmark-bars { margin: 0; padding: 0; list-style: none; }
-.benchmark-row { height: 38.667px; margin: 0; }
+.benchmark-row { height: 36px; margin: 0; }
 .benchmark-model { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 500; line-height: 1.4; }
 .benchmark-icons { display: flex; align-items: center; gap: 2px; flex: 0 0 52px; height: 24px; }
 .benchmark-icons img { width: 24px; height: 24px; object-fit: contain; }
