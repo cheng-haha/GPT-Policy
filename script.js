@@ -47,7 +47,7 @@ const zhTranslations = new Map([
   ["Demonstrations · Goal image", "示范 · 目标图像"],
   ["Video · Optional actions · Target state", "视频 · 可选动作 · 目标状态"],
   ["Context compiler →", "上下文编译器 →"],
-  ["Keyframes · Subtasks · Aligned records", "关键帧 · 子任务 · 对齐记录"],
+  ["Keyframes · Subtasks · Aligned action records", "关键帧 · 子任务 · 对齐的动作记录"],
   ["Execution harness", "执行框架"],
   ["Grounding · EEF Chunks · Validation", "几何定位 · 末端执行器动作分块 · 轨迹检查"],
   ["Execute tool call", "执行工具调用"],
