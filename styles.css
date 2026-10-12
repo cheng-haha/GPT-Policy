@@ -302,6 +302,19 @@ html[lang="zh-CN"] .rollout-media.video-load-failed::after { content: "视频无
 .code-block { position: relative; margin-top: 40px; border: 1px solid var(--line); background: #f7f8fa; }
 .code-block button { position: absolute; top: 14px; right: 14px; padding: 8px 11px; border: 1px solid var(--line); border-radius: 4px; background: white; color: #454b55; font: 700 9px ui-monospace, monospace; cursor: pointer; text-transform: uppercase; }
 pre { margin: 0; padding: 32px; overflow-x: auto; font: 12px/1.7 ui-monospace, "SFMono-Regular", Consolas, monospace; }
+.citation-layout { display: grid; grid-template-columns: minmax(0, 1fr) 240px; align-items: start; gap: 24px; margin-top: 40px; }
+.citation-layout .code-block { min-width: 0; margin-top: 0; }
+.citation-layout pre { padding-top: 58px; }
+.citation-community { padding: 18px 12px 16px; border: 1px solid var(--line); background: #fff; text-align: center; }
+.citation-community h3 { margin: 0; font-size: 16px; font-weight: 620; letter-spacing: -.02em; }
+.citation-community a { display: block; margin-top: 10px; }
+.citation-community a:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+.citation-community img { width: 100%; height: auto; }
+.citation-community p { margin: 10px 0 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+@media (max-width: 760px) {
+  .citation-layout { grid-template-columns: minmax(0, 1fr); }
+  .citation-community { width: min(280px, 100%); justify-self: center; }
+}
 
 /* OpenWAM-inspired editorial labels: sentence case, compact spacing, and Geist Sans. */
 .section-kicker,
