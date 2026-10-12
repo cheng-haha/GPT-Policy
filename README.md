@@ -16,6 +16,7 @@ The implementation provides hardware adapters for **ARX X5** and **I2RT/YAM**, p
 [![ArXiv](https://img.shields.io/badge/arXiv-2609.19138-b31b1b.svg?logo=arxiv&logoColor=white)](https://arxiv.org/abs/2609.19138)
 [![Paper PDF](https://img.shields.io/badge/Paper-PDF-red.svg?logo=readthedocs&logoColor=white)](https://arxiv.org/pdf/2609.19138)
 [![X](https://img.shields.io/badge/X-Post-000000?logo=x&logoColor=white)](https://x.com/z_code68632/status/2098397364725895387)
+[![Hugging Face · RoboDojo Contexts](https://img.shields.io/badge/Hugging%20Face-RoboDojo%20Contexts-FFD21E?logo=huggingface)](https://huggingface.co/datasets/SII-CDZ/gpt-policy-robodojo-contexts)
 
 **Paper:** [*In-Context Robot Learning with VLM Agents*](https://arxiv.org/abs/2609.19138)  \
 **Authors:** Dongzhou Cheng, [Taoran Yi](https://taoranyi.com/), [Ye Fang](https://aleafy.github.io/), Xingwu Zhang, Fan Feng, Yixuan Li, Gengxiong Zhuang, Rongze Wang, Shuai Yang, Wei Song, Weizhi Xue, Minyan Wu, Jie Gui, Jiaqi Wang, and Tong Wu.
