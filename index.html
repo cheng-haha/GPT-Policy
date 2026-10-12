@@ -10,7 +10,7 @@
     <meta name="theme-color" content="#f7f8fa" />
     <title>In-Context Robot Learning with VLM Agents</title>
     <link rel="preload" as="image" href="assets/gpt-policy-logo.png" fetchpriority="high" />
-    <link rel="stylesheet" href="styles.css?v=20261011-experiment-sections" />
+    <link rel="stylesheet" href="styles.css?v=20261011-efficiency" />
     <link rel="stylesheet" href="robodojo.css?v=20261011-figure-size" />
     <link rel="stylesheet" href="assets/benchmarks/gpt-as-policy-heatmap.css?v=20261011-layout" />
     <link rel="stylesheet" href="policy-comparison.css?v=20261011-comparison" />
@@ -343,6 +343,25 @@
                 <noscript>GPT-Policy on RoboDojo: mean score 80.20 / 100 and success rate 72%. <a href="assets/benchmarks/robodojo-tasks.csv">Download task results</a>.</noscript>
               </div>
               <p class="table-note">Results combine recorded versions and explicitly selected replacement attempts. These task/layout families informed development; the panel is not a held-out evaluation. Baselines retain their published protocols.</p>
+              <article id="simulation-efficiency" class="simulation-efficiency" aria-labelledby="efficiency-title">
+                <h4 id="efficiency-title">Execution and token usage</h4>
+                <div class="table-wrap" role="region" aria-label="Execution and token usage" tabindex="0">
+                  <table aria-labelledby="efficiency-title" aria-describedby="efficiency-note">
+                    <thead><tr><th scope="col">Metric</th><th scope="col">GPT 6 Astra<br>(direct)</th><th scope="col">π₀.₅ + GPT 6 Astra<br>(hybrid)</th><th scope="col">GPT-Policy<br>(Ours)</th></tr></thead>
+                    <tbody>
+                      <tr><th scope="row">Success rate</th><td>26%</td><td>48%</td><td>72%</td></tr>
+                      <tr><th scope="row">Control steps</th><td>38,221</td><td>42,750</td><td>39,692</td></tr>
+                      <tr><th scope="row">Executed action segments</th><td>7,729</td><td>3,776</td><td>5,340</td></tr>
+                      <tr><th scope="row">Mean physical duration (s)</th><td>30.58</td><td>34.20</td><td>31.75</td></tr>
+                      <tr class="efficiency-token-start"><th scope="row">Total tokens (incl. cached input)</th><td>1,132,343,772</td><td>624,762,828</td><td>855,443,119<sup>*</sup></td></tr>
+                      <tr><th scope="row">Cached input tokens</th><td>1,107,349,760</td><td>607,555,840</td><td>815,661,184<sup>*</sup></td></tr>
+                      <tr><th scope="row">Uncached input tokens</th><td>22,907,448</td><td>15,901,963</td><td>36,906,672<sup>*</sup></td></tr>
+                      <tr><th scope="row">Output tokens</th><td>2,086,564</td><td>1,305,025</td><td>2,875,263<sup>*</sup></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+                <p id="efficiency-note" class="table-note"><span>* Recorded token lower bounds: 42 failed calls returned no usage. Physical duration excludes model waits. Reference results use different settings and were not rerun.</span> <a href="assets/robodojo-rollouts/results/efficiency.md">Accounting details ↗</a></p>
+              </article>
               <div id="simulation-rollouts" class="simulation-rollouts" role="region" aria-labelledby="simulation-rollouts-title"></div>
             </section>
 
@@ -430,7 +449,7 @@
       </div>
     </footer>
 
-    <script src="script.js?v=20261011-experiment-sections"></script>
+    <script src="script.js?v=20261011-efficiency"></script>
     <script src="benchmark-data.js?v=20261011-layout"></script>
     <script src="robodojo.js?v=20261011-experiment-sections"></script>
     <script src="assets/robodojo-rollouts/manifest.js?v=20261011"></script>

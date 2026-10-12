@@ -77,6 +77,12 @@ Task links in the heatmap open the corresponding video. Query parameters
 The release's evaluation protocol and attribution files are retained in
 `assets/robodojo-rollouts/`; their terms are unchanged.
 
+The execution/token table uses the release's `results/efficiency.md`; the source
+Markdown, aggregate JSON and two CSVs are retained under
+`assets/robodojo-rollouts/results/`. GPT-Policy token totals are recorded lower
+bounds because 42 failed calls did not return usage. Physical duration excludes
+model waits, and reference figures follow their different published settings.
+
 ## Deploy
 
 GitHub Pages publishes this website from the root (`/`) of the `page` branch in `cheng-haha/GPT-Policy`, with no build step.

@@ -475,6 +475,22 @@ footer { border-top: 1px solid var(--line); background: var(--soft); }
 .experiment-part-title { margin: 0; color: var(--ink); font-size: clamp(26px, 3.4cqi, 32px); font-weight: 630; line-height: 1.2; letter-spacing: -.035em; }
 .experiment-part > .section-intro { margin-top: 18px; font-size: 15px; }
 .experiment-part .table-note { font-family: inherit; font-size: 12px; line-height: 1.6; }
+
+.simulation-efficiency { max-width: 760px; margin: 46px auto 0; scroll-margin-top: 32px; }
+.simulation-efficiency h4 { margin: 0 0 18px; font-size: 23px; font-weight: 620; letter-spacing: -.025em; }
+.simulation-efficiency table { min-width: 650px; font-size: 12px; font-variant-numeric: tabular-nums; }
+.simulation-efficiency th, .simulation-efficiency td { padding: 10px 8px; text-align: right; font: inherit; letter-spacing: 0; text-transform: none; }
+.simulation-efficiency th:first-child { width: 40%; padding-left: 0; text-align: left; }
+.simulation-efficiency thead th { color: #535b68; font-size: 11px; font-weight: 550; line-height: 1.6; }
+.simulation-efficiency tbody th { color: inherit; border-bottom: 1px solid var(--line); font-weight: 400; }
+.simulation-efficiency tbody tr, .simulation-efficiency tbody tr:hover { background: #fff; }
+.simulation-efficiency td { white-space: nowrap; }
+.simulation-efficiency th:last-child, .simulation-efficiency td:last-child { padding-right: 0; font-weight: 650; }
+.simulation-efficiency .efficiency-token-start > * { border-top: 1px solid #a8afb8; }
+.simulation-efficiency sup { font-size: .75em; }
+.simulation-efficiency .table-note { font-size: 11px; }
+.simulation-efficiency .table-note a { white-space: nowrap; text-decoration: underline; text-underline-offset: 3px; }
+.simulation-efficiency .table-wrap:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
 @media (max-width: 760px) {
   .experiment-part { margin-top: 48px; padding-top: 32px; }
   .experiment-family-heading h4 { font-size: 21px; }
