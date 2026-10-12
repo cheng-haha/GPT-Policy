@@ -32,12 +32,17 @@ class AgentConfig:
     environment: Mapping[str, str] = field(default_factory=dict, repr=False)
     task_name_model: str | None = None
     task_name_effort: str | None = None
-    live_image_window: int | None = 8
+    live_image_window: int | None = None
+    # Programmatic simulation restriction; hardware/provider profile defaults are unchanged.
+    decision_only: bool = False
+
+    def __post_init__(self):
+        _validate_live_image_window(self.live_image_window)
 
 
 def _validate_live_image_window(window: int | None) -> None:
-    if window is not None and (isinstance(window, bool) or not isinstance(window, int) or window < 3):
-        raise ValueError("live_image_window must be an integer >= 3 or null")
+    if window is not None:
+        raise ValueError("live_image_window is disabled for simulation and hardware; must be null")
 
 
 def with_live_image_window(config: AgentConfig, window: int | None) -> AgentConfig:
@@ -86,7 +91,7 @@ def named_agent_config(
 
     kind = _PROVIDER_TYPES[selected]
     codex = selected == "codex"
-    window = value.get("live_image_window", 8)
+    window = value.get("live_image_window")
     if "live_image_window" in value and not codex:
         raise ValueError("live_image_window is only supported by Codex")
     _validate_live_image_window(window)

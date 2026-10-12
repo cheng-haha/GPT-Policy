@@ -11,15 +11,17 @@ import signal
 import subprocess
 import threading
 import time
+from collections.abc import Mapping
 from io import BytesIO
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any
 
 from PIL import Image
 
 from ..hardware.camera import CapturedImage
-from ..input.manifest import ContentPart, TextPart
-from .errors import AgentOverloadedError, AgentUsageLimitError
+from ..input.manifest import ContentPart
+from .codex_errors import codex_failure
+from .errors import AgentRecoverableError
 from .input_content import to_app_server_items, validate_input_size
 from .usage import model_call
 from .waiting import receive_event
@@ -35,6 +37,8 @@ class CodexAppServer:
         effort: str = "high",
         convert_camera_images_to_jpeg: bool = False,
         camera_jpeg_quality: int = 85,
+        *,
+        decision_only: bool = False,
     ) -> None:
         executable = shutil.which(codex_bin)
         if executable is None:
@@ -42,12 +46,27 @@ class CodexAppServer:
         if not 1 <= camera_jpeg_quality <= 95:
             raise ValueError("camera_jpeg_quality 必须在 1 到 95 之间")
         self.model = model
+        self.decision_only = decision_only
+        self.decision_only_overrides = {
+            "web_search": "disabled", "project_doc_max_bytes": 0,
+            **{f"features.{name}": False for name in (
+                "shell_tool", "unified_exec", "view_image", "browser_use",
+                "browser_use_external", "computer_use", "apps", "plugins",
+                "multi_agent", "code_mode", "code_mode_host", "skill_search",
+                "workspace_dependencies", "hooks", "memories", "goals",
+            )},
+        }
         self.effort = effort
         self.convert_camera_images_to_jpeg = convert_camera_images_to_jpeg
         self.camera_jpeg_quality = camera_jpeg_quality
         self.project_root = Path(__file__).resolve().parents[3]
+        command = [executable]
+        if decision_only:
+            for key, value in self.decision_only_overrides.items():
+                command.extend(["-c", key + "=" + json.dumps(value)])
+        command.append("app-server")
         self.process = subprocess.Popen(
-            [executable, "app-server"],
+            command,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
@@ -62,8 +81,16 @@ class CodexAppServer:
         self._next_id = 0
         self.thread_id: str | None = None
         threading.Thread(target=self._read_events, args=(self.process.stdout,), daemon=True).start()
-        self._request("initialize", {"clientInfo": {"name": "gpt-policy", "version": "0.1.0"}})
-        self._send({"method": "initialized", "params": {}})
+        init = {"clientInfo": {"name": "gpt-policy", "version": "0.1.0"}}
+        if decision_only:
+            # Required by the installed protocol for environments=[].
+            init["capabilities"] = {"experimentalApi": True}
+        try:
+            self._request("initialize", init)
+            self._send({"method": "initialized", "params": {}})
+        except BaseException:
+            self.close()
+            raise
 
     def start_thread(self, instructions: str, tools: list[dict[str, Any]] | None = None) -> None:
         """Start a native Codex thread with a GPT-Policy-shaped tool catalog."""
@@ -71,19 +98,45 @@ class CodexAppServer:
             instructions = instructions + "\n\nRobot tool catalog:\n" + json.dumps(
                 tools, ensure_ascii=False
             )
+        settings = self._thread_settings()
+        if getattr(self, "decision_only", False):
+            settings.update(environments=[], selectedCapabilityRoots=[], dynamicTools=[])
         result = self._request(
             "thread/start",
             {
-                "model": self.model,
-                "cwd": str(self.project_root),
-                "approvalPolicy": "never",
-                "sandbox": "read-only",
-                "ephemeral": True,
+                **settings,
+                "ephemeral": False,
                 "serviceName": "gpt-policy",
                 "baseInstructions": instructions,
             },
         )
         self.thread_id = str(result["thread"]["id"])
+
+    def resume_thread(self, thread_id: str) -> None:
+        """Restore the same native conversation after losing the local process."""
+        result = self._request(
+            "thread/resume",
+            {**self._thread_settings(), "threadId": thread_id, "excludeTurns": True},
+        )
+        if result["thread"]["id"] != thread_id:
+            raise RuntimeError("Codex resumed a different thread; refusing to continue")
+        self.thread_id = thread_id
+
+    def _thread_settings(self) -> dict[str, Any]:
+        settings = {
+            "model": self.model,
+            "cwd": str(self.project_root),
+            "approvalPolicy": "never",
+            "sandbox": "read-only",
+        }
+        if getattr(self, "decision_only", False):
+            overrides = dict(self.decision_only_overrides)
+            # Disable inherited MCP entries by name without copying credentials.
+            effective = self._request("config/read", {"includeLayers": False})
+            for name in effective.get("config", {}).get("mcp_servers", {}):
+                overrides[f"mcp_servers.{name}.enabled"] = False
+            settings.update(runtimeWorkspaceRoots=[], config=overrides)
+        return settings
 
     def decide(
         self,
@@ -91,7 +144,6 @@ class CodexAppServer:
         output_schema: dict[str, Any],
         images: Mapping[str, CapturedImage] | None = None,
         content: tuple[ContentPart, ...] | None = None,
-        *, replay: list[dict[str, Any]] | None = None,
     ) -> dict[str, Any]:
         """Ask Codex for one structured tool selection."""
         self.last_request_timing = {}
@@ -100,7 +152,7 @@ class CodexAppServer:
             self._usage_call = call
             self._pending_usage = {}
             try:
-                return self._decide(observation, output_schema, images, content, replay=replay)
+                return self._decide(observation, output_schema, images, content)
             finally:
                 if self._request_started_at is not None:
                     # Client round trip, including transport, provider wait and
@@ -111,14 +163,13 @@ class CodexAppServer:
                 self._usage_call = None
                 self._pending_usage = {}
 
-    def _decide(self, observation, output_schema, images=None, content=None, *, replay=None):
+    def _decide(self, observation, output_schema, images=None, content=None):
         prepare_started = time.perf_counter()
         if self.thread_id is None:
             raise RuntimeError("Codex thread has not been started")
-        replay_text = tuple(TextPart(item["text"]) for item in replay or () if item.get("type") == "text")
-        validate_input_size(replay_text + tuple(content or ()), observation, images or ())
+        validate_input_size(tuple(content or ()), observation, images or ())
         self._usage_call.update(request_started=True, thread_id=self.thread_id)
-        inputs = list(replay or ()) + self._input(
+        inputs = self._input(
             observation, images, content,
             self.convert_camera_images_to_jpeg, self.camera_jpeg_quality,
         )
@@ -160,12 +211,8 @@ class CodexAppServer:
                 if turn.get("status") != "completed":
                     error = turn.get("error")
                     message = f"Codex turn failed: {error}"
-                    if (turn.get("status") == "failed" and isinstance(error, dict)
-                            and error.get("codexErrorInfo") == "serverOverloaded"):
-                        raise AgentOverloadedError(message, provider="codex", code="serverOverloaded")
-                    if (turn.get("status") == "failed" and isinstance(error, dict)
-                            and error.get("codexErrorInfo") == "usageLimitExceeded"):
-                        raise AgentUsageLimitError(message, provider="codex", code="usageLimitExceeded")
+                    if turn.get("status") == "failed":
+                        raise codex_failure(error)
                     raise RuntimeError(message)
                 if answer is None:
                     raise RuntimeError("Codex 没有返回工具选择")
@@ -187,12 +234,6 @@ class CodexAppServer:
                     "arguments": arguments,
                     "_wire": selection,
                 }
-
-    def refresh_thread(self, instructions, tools=None):
-        """Release completed visual history; the caller supplies an explicit replay."""
-        if self.thread_id is not None:
-            self._request("thread/unsubscribe", {"threadId": self.thread_id})
-        self.start_thread(instructions, tools)
 
     @staticmethod
     def _input(
@@ -249,10 +290,10 @@ class CodexAppServer:
                 self._reject_unexpected_request(message)
                 continue
             if "error" in message:
-                raise RuntimeError(f"Codex {method} failed: {message['error']}")
+                raise codex_failure(message["error"], method)
             result = message.get("result", {})
             if not isinstance(result, dict):
-                raise RuntimeError(f"Codex {method} returned an invalid result")
+                raise RuntimeError(f"Codex {method} returned an invalid result")  # noqa: TRY004 - wire protocol failure
             return result
 
     def _record_usage(self, event):
@@ -276,13 +317,30 @@ class CodexAppServer:
     def _send(self, message: dict[str, Any]) -> None:
         if self.process is None:
             raise RuntimeError("Codex 已关闭")
-        self._stdin.write(json.dumps(message) + "\n")
-        self._stdin.flush()
+        try:
+            self._stdin.write(json.dumps(message) + "\n")
+            self._stdin.flush()
+        except OSError as error:
+            raise AgentRecoverableError(
+                f"Codex app-server write failed: {error}",
+                provider="codex", code="appServerDisconnected",
+            ) from error
 
     def _receive(self) -> dict[str, Any]:
         message = receive_event(self._events)
+        if isinstance(message, (EOFError, OSError)):
+            raise AgentRecoverableError(
+                f"Codex app-server disconnected: {message}",
+                provider="codex", code="appServerDisconnected",
+            ) from message
         if isinstance(message, Exception):
-            raise RuntimeError(f"Codex app-server 已停止: {message}") from message
+            raise RuntimeError(f"Codex app-server 已停止: {message}") from message  # noqa: TRY004 - transport failure
+        if getattr(self, "decision_only", False) and message.get("method") in {
+            "item/started", "item/completed",
+        }:
+            kind = message.get("params", {}).get("item", {}).get("type")
+            if kind not in {"userMessage", "agentMessage", "reasoning", "contextCompaction"}:
+                raise RuntimeError(f"Decision-only session rejected unexpected item type: {kind}")
         return message
 
     def _reject_unexpected_request(self, message: dict[str, Any]) -> None:
@@ -303,8 +361,11 @@ class CodexAppServer:
                     if not isinstance(message, dict):
                         raise ValueError("JSON-RPC message must be an object")
                     self._events.put(message)
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 - forward reader failures to the caller
             self._events.put(exc)
+        finally:
+            # A clean child exit used to leave _receive blocked on an empty queue.
+            self._events.put(EOFError("Codex app-server stdout closed"))
 
 
 def _camera_data_url(image: CapturedImage, convert_to_jpeg: bool, quality: int) -> str:

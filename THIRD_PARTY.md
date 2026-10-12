@@ -7,3 +7,13 @@ The optional hardware backends use these upstream projects:
 - Intel RealSense Python bindings, installed with `python scripts/install_drivers.py realsense`.
 
 The public package does not vendor these SDKs. Check each upstream project's terms before redistribution.
+
+## Optional RoboDojo backend
+
+The simulation dependency is the official RoboDojo-Benchmark/RoboDojo repository,
+pinned at 726e9aabfaa642203722eb126f5eaf0f37f3e1ad with the gitlinks recorded in
+src/gpt_policy/simulation/robodojo/config.py. Isaac Sim and external assets are not vendored.
+Protocol, camera calibration, robot-only FK/DLS and terminal diagnostics are
+adapted from RoboDojo_10tasks, revision
+`38ebd7c08903b93d313596f6bc970a9da2d832de`. Consult the upstream licenses before
+redistribution.

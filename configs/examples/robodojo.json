@@ -1,0 +1,25 @@
+{
+  "robodojo_root": "/path/to/pinned/RoboDojo",
+  "robodojo_commit": "726e9aabfaa642203722eb126f5eaf0f37f3e1ad",
+  "simulation_python": "/path/to/isaac/python",
+  "output_root": "var/simulation",
+  "model": "gpt-6-astra",
+  "effort": "medium",
+  "codex_bin": "codex",
+  "max_decisions": null,
+  "live_image_window": null,
+  "prepared_inputs": {
+    "classify_objects": "/path/to/prepared/input.json"
+  },
+  "simulation_environment": {},
+  "asset_audits": {
+    "classify_objects": "/path/to/classify-assets-audit.json"
+  },
+  "control_step_limit": "native",
+  "episode_wall_time_s": 9000,
+  "early_arrival": true,
+  "stop_on_arrival": true,
+  "ik_backend": "native",
+  "max_joint_increment_rad": 0.15,
+  "chunk_feedback": true
+}

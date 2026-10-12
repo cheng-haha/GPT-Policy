@@ -1,0 +1,84 @@
+{
+  "episode": 0,
+  "position_tolerance_m": 0.005,
+  "rotation_tolerance_rad": 0.08726646259971647,
+  "summary": "After the opponent's discard, the left hand tips two matching five-bamboo tiles face-up and the right tips the third using empty-gripper pushes. The left grasps a stacked tile, lifts clear before carrying and turning it toward the handoff. The right takes support before the left opens, separates from the handoff, carries the tile above the row end, then lowers and releases it upright. The historical images show the four matching tiles face-up and the added tile standing; no current-scene or hidden simulator state is included.",
+  "keyframes": [
+    {
+      "frame": 0
+    },
+    {
+      "frame": 50
+    },
+    {
+      "frame": 86
+    },
+    {
+      "frame": 114
+    },
+    {
+      "frame": 132
+    },
+    {
+      "frame": 142
+    },
+    {
+      "frame": 185
+    },
+    {
+      "frame": 198
+    },
+    {
+      "frame": 249
+    },
+    {
+      "frame": 258,
+      "stage": "Lift clear of stack",
+      "observation": "The green-backed tile stays between the left jaws as the hand lifts and shifts clear of its pickup pose near the stack.",
+      "roles": {
+        "left": "Maintains the end grip while lifting and clearing the stack before inward transport.",
+        "right": "Open and parked."
+      },
+      "result": "Tile retention during initial clearance is visible; transport to the handoff is still ahead."
+    },
+    {
+      "frame": 282
+    },
+    {
+      "frame": 320
+    },
+    {
+      "frame": 339,
+      "stage": "Separate after handoff",
+      "observation": "The left jaws are open while the right wrist view shows the tile retained as the hands separate; some contact surfaces remain occluded.",
+      "roles": {
+        "left": "Opens and withdraws from the overlapping handoff position.",
+        "right": "Keeps the tile while moving clear of the handoff."
+      },
+      "result": "The tile travels with the right hand during separation."
+    },
+    {
+      "frame": 361,
+      "stage": "Above row before descent",
+      "observation": "Overview shows the right-held tile raised above the right row end; the wrist view shows the tile beside the jaws.",
+      "roles": {
+        "left": "Open and returning outward.",
+        "right": "Carries and turns the retained tile above the placement location before descending."
+      },
+      "result": "The raised approach is visible; the tile has not yet been lowered into the row."
+    },
+    {
+      "frame": 370,
+      "stage": "Lowered before release",
+      "observation": "The tile is lowered beside the right row end while the right jaws still surround it.",
+      "roles": {
+        "left": "Open and parked.",
+        "right": "Holds the tile at the row end after descending from above."
+      },
+      "result": "Placement contact is visible before the later fully open release."
+    },
+    {
+      "frame": 382
+    }
+  ]
+}

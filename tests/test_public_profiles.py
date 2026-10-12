@@ -12,7 +12,7 @@ from gpt_policy import main
     "default.json", "examples/arx-local.json", "examples/yam-local.json",
     "machines/yambox.json", "machines/arx247.json", "machines/arx248.json",
 ])
-@pytest.mark.parametrize("flags,expected", [([], None), (["--no-live-window"], None), (["--live-window", "8"], 8)])
+@pytest.mark.parametrize("flags,expected", [([], None), (["--no-live-window"], None)])
 def test_public_profile_check_is_hardware_free(profile, flags, expected, monkeypatch, capsys):
     root = Path(__file__).resolve().parents[1]
     target = (["--machine", Path(profile).stem] if profile.startswith("machines/")

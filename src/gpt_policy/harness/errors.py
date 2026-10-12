@@ -29,3 +29,12 @@ class AgentUsageLimitError(AgentError):
         super().__init__(message)
         self.provider = provider
         self.code = code
+
+
+class AgentRecoverableError(AgentError):
+    """Model transport/provider failure before any host tool selection is returned."""
+
+    def __init__(self, message: str, *, provider: str, code: str):
+        super().__init__(message)
+        self.provider = provider
+        self.code = code

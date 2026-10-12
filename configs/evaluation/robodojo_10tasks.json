@@ -1,0 +1,55 @@
+{
+  "description": "Ten native engineering cases; full policy evaluation is a separate explicit run.",
+  "episodes": [
+    {
+      "task": "classify_objects_by_language",
+      "seed": 0,
+      "layout": 0
+    },
+    {
+      "task": "organize_table",
+      "seed": 0,
+      "layout": 0
+    },
+    {
+      "task": "imitate_sorting_sequence",
+      "seed": 0,
+      "layout": 0
+    },
+    {
+      "task": "arrange_largest_number",
+      "seed": 0,
+      "layout": 0
+    },
+    {
+      "task": "pack_objects_into_box",
+      "seed": 0,
+      "layout": 0
+    },
+    {
+      "task": "classify_objects",
+      "seed": 0,
+      "layout": 0
+    },
+    {
+      "task": "build_tower",
+      "seed": 0,
+      "layout": 0
+    },
+    {
+      "task": "make_kong",
+      "seed": 0,
+      "layout": 0
+    },
+    {
+      "task": "fold_clothes",
+      "seed": 0,
+      "layout": 0
+    },
+    {
+      "task": "put_bottles_into_dustbin",
+      "seed": 0,
+      "layout": 0
+    }
+  ]
+}

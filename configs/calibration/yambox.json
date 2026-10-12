@@ -1,10 +1,7 @@
 {
   "calibration": {
     "source": {
-      "url": "https://morphicrobot.feishu.cn/docx/HrPiddHZ3oSfVzxuoA8cqTuBnN9",
-      "title": "相机与手眼标定报告",
-      "revision_id": 99,
-      "xml_sha256": "d63dce8b0de259cb4c334cc999ccca3bccc402ef8e04c577b2761d6ca21e2ac3"
+      "description": "Measured camera and hand-eye calibration for the YAM setup."
     },
     "tcp_definition": "I2RT ac096928 grasp_site calibrated tool reference (flange-local [0,0,-0.1347] m), +z wrist to fingers, +y finger opening; preserve existing calibration/model convention.",
     "link6_from_sdk_eef": [
@@ -169,11 +166,11 @@
         ]
       }
     },
-    "top_source": "yam:/home/yambox/calibration_report_yam.md section 6.3",
+    "top_source": "Measured YAM top-camera extrinsics.",
     "reference_frame": "link6 fields refer to I2RT ac096928 grasp_site, matching the existing calibration report and deployed SDK."
   },
   "vision": {
-    "calibration_source": "https://morphicrobot.feishu.cn/docx/HrPiddHZ3oSfVzxuoA8cqTuBnN9 revision 99, board scheme",
+    "calibration_source": "Measured YAM camera intrinsics and distortion coefficients.",
     "camera_intrinsics": {
       "left": [
         [

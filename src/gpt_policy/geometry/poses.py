@@ -5,6 +5,38 @@ from __future__ import annotations
 import numpy as np
 
 
+def rotation_6d_to_quaternion(rotation: object) -> np.ndarray:
+    """Decode two matrix *columns* into unit xyzw, without changing frames.
+
+    Recorded rotations must already be orthonormal to float/rounding tolerance.
+    Gram-Schmidt removes small numeric drift; it must not hide corrupt data.
+    """
+    values = np.asarray(rotation, dtype=np.float64)
+    if values.shape != (6,) or not np.isfinite(values).all():
+        raise ValueError("rotation6d must be a finite six-vector")
+    columns = values.reshape(2, 3).T
+    if not np.allclose(columns.T @ columns, np.eye(2), atol=1e-3, rtol=0):
+        raise ValueError("rotation6d columns must be unit and orthogonal")
+    a = columns[:, 0] / np.linalg.norm(columns[:, 0])
+    b = columns[:, 1] - a * np.dot(a, columns[:, 1])
+    b /= np.linalg.norm(b)
+    matrix = np.column_stack((a, b, np.cross(a, b)))
+    # The largest eigenvector of this symmetric matrix is quaternion xyzw.
+    # Unlike trace-only division, this remains stable at rotations of pi.
+    m = matrix
+    k = np.array([
+        [m[0,0]-m[1,1]-m[2,2], m[0,1]+m[1,0], m[0,2]+m[2,0], m[2,1]-m[1,2]],
+        [m[0,1]+m[1,0], m[1,1]-m[0,0]-m[2,2], m[1,2]+m[2,1], m[0,2]-m[2,0]],
+        [m[0,2]+m[2,0], m[1,2]+m[2,1], m[2,2]-m[0,0]-m[1,1], m[1,0]-m[0,1]],
+        [m[2,1]-m[1,2], m[0,2]-m[2,0], m[1,0]-m[0,1], np.trace(m)],
+    ])
+    quaternion = np.linalg.eigh(k)[1][:, -1]
+    quaternion /= np.linalg.norm(quaternion)
+    if quaternion[3] < 0:
+        quaternion = -quaternion
+    return quaternion
+
+
 def quaternion_to_rpy(quaternion: object) -> np.ndarray:
     q = np.asarray(quaternion, dtype=np.float64)
     if q.shape != (4,) or not np.isfinite(q).all():

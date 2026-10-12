@@ -16,3 +16,12 @@ configs/default.local.json
 configs/machines/*.local.json
 .env
 .env.*
+
+configs/robodojo.local.json
+
+# Dated experiment/migration reports belong in an external research archive.
+/docs/migration/
+/docs/_local/
+/docs/*-20??????.md
+/docs/robodojo-endpose-audit.md
+/docs/robodojo-native-ik-chunks.md

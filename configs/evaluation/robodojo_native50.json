@@ -1,0 +1,255 @@
+{
+  "description": "Ten RoboDojo tasks, five scenes per task, using native control-step limits.",
+  "episodes": [
+    {
+      "task": "classify_objects",
+      "seed": 0,
+      "layout": 0
+    },
+    {
+      "task": "classify_objects_by_language",
+      "seed": 0,
+      "layout": 0
+    },
+    {
+      "task": "organize_table",
+      "seed": 0,
+      "layout": 0
+    },
+    {
+      "task": "imitate_sorting_sequence",
+      "seed": 0,
+      "layout": 0
+    },
+    {
+      "task": "arrange_largest_number",
+      "seed": 0,
+      "layout": 0
+    },
+    {
+      "task": "pack_objects_into_box",
+      "seed": 0,
+      "layout": 0
+    },
+    {
+      "task": "build_tower",
+      "seed": 0,
+      "layout": 0
+    },
+    {
+      "task": "make_kong",
+      "seed": 0,
+      "layout": 0
+    },
+    {
+      "task": "fold_clothes",
+      "seed": 0,
+      "layout": 0
+    },
+    {
+      "task": "put_bottles_into_dustbin",
+      "seed": 0,
+      "layout": 0
+    },
+    {
+      "task": "classify_objects",
+      "seed": 0,
+      "layout": 1
+    },
+    {
+      "task": "classify_objects_by_language",
+      "seed": 0,
+      "layout": 1
+    },
+    {
+      "task": "organize_table",
+      "seed": 0,
+      "layout": 1
+    },
+    {
+      "task": "imitate_sorting_sequence",
+      "seed": 0,
+      "layout": 1
+    },
+    {
+      "task": "arrange_largest_number",
+      "seed": 0,
+      "layout": 1
+    },
+    {
+      "task": "pack_objects_into_box",
+      "seed": 0,
+      "layout": 1
+    },
+    {
+      "task": "build_tower",
+      "seed": 0,
+      "layout": 1
+    },
+    {
+      "task": "make_kong",
+      "seed": 0,
+      "layout": 1
+    },
+    {
+      "task": "fold_clothes",
+      "seed": 0,
+      "layout": 1
+    },
+    {
+      "task": "put_bottles_into_dustbin",
+      "seed": 0,
+      "layout": 1
+    },
+    {
+      "task": "classify_objects",
+      "seed": 0,
+      "layout": 2
+    },
+    {
+      "task": "classify_objects_by_language",
+      "seed": 0,
+      "layout": 2
+    },
+    {
+      "task": "organize_table",
+      "seed": 0,
+      "layout": 2
+    },
+    {
+      "task": "imitate_sorting_sequence",
+      "seed": 0,
+      "layout": 2
+    },
+    {
+      "task": "arrange_largest_number_random",
+      "seed": 0,
+      "layout": 0
+    },
+    {
+      "task": "pack_objects_into_box_random",
+      "seed": 0,
+      "layout": 0
+    },
+    {
+      "task": "build_tower",
+      "seed": 0,
+      "layout": 2
+    },
+    {
+      "task": "make_kong",
+      "seed": 0,
+      "layout": 2
+    },
+    {
+      "task": "fold_clothes_random",
+      "seed": 0,
+      "layout": 0
+    },
+    {
+      "task": "put_bottles_into_dustbin",
+      "seed": 0,
+      "layout": 2
+    },
+    {
+      "task": "classify_objects",
+      "seed": 0,
+      "layout": 3
+    },
+    {
+      "task": "classify_objects_by_language",
+      "seed": 0,
+      "layout": 3
+    },
+    {
+      "task": "organize_table",
+      "seed": 0,
+      "layout": 3
+    },
+    {
+      "task": "imitate_sorting_sequence",
+      "seed": 0,
+      "layout": 3
+    },
+    {
+      "task": "arrange_largest_number_random",
+      "seed": 0,
+      "layout": 1
+    },
+    {
+      "task": "pack_objects_into_box_random",
+      "seed": 0,
+      "layout": 1
+    },
+    {
+      "task": "build_tower",
+      "seed": 0,
+      "layout": 3
+    },
+    {
+      "task": "make_kong",
+      "seed": 0,
+      "layout": 3
+    },
+    {
+      "task": "fold_clothes_random",
+      "seed": 0,
+      "layout": 1
+    },
+    {
+      "task": "put_bottles_into_dustbin",
+      "seed": 0,
+      "layout": 3
+    },
+    {
+      "task": "classify_objects",
+      "seed": 0,
+      "layout": 4
+    },
+    {
+      "task": "classify_objects_by_language",
+      "seed": 0,
+      "layout": 4
+    },
+    {
+      "task": "organize_table",
+      "seed": 0,
+      "layout": 4
+    },
+    {
+      "task": "imitate_sorting_sequence",
+      "seed": 0,
+      "layout": 5
+    },
+    {
+      "task": "arrange_largest_number_random",
+      "seed": 0,
+      "layout": 2
+    },
+    {
+      "task": "pack_objects_into_box_random",
+      "seed": 0,
+      "layout": 2
+    },
+    {
+      "task": "build_tower",
+      "seed": 0,
+      "layout": 4
+    },
+    {
+      "task": "make_kong",
+      "seed": 0,
+      "layout": 4
+    },
+    {
+      "task": "fold_clothes_random",
+      "seed": 0,
+      "layout": 2
+    },
+    {
+      "task": "put_bottles_into_dustbin",
+      "seed": 0,
+      "layout": 4
+    }
+  ]
+}

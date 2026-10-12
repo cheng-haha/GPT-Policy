@@ -89,7 +89,7 @@ def parse_args(default_agent: str | None = None) -> argparse.Namespace:
     live_window = parser.add_mutually_exclusive_group()
     live_window.add_argument("--live-window", dest="live_image_window", type=int, metavar="N",
                              default=argparse.SUPPRESS,
-                             help="Codex 实时图像窗口大小（N>=3），仅覆盖本次运行；默认沿用 agent 配置")
+                             help="已禁用；传入任何数值都会在打开硬件前报错")
     live_window.add_argument("--no-live-window", dest="live_image_window", action="store_const", const=None,
                              default=argparse.SUPPRESS,
                              help="关闭按实时图像数量触发的会话重建，保留服务过载后的恢复")
@@ -100,6 +100,10 @@ def parse_args(default_agent: str | None = None) -> argparse.Namespace:
 
 
 def main(default_agent: str | None = None) -> None:
+    import sys
+    if len(sys.argv) > 1 and sys.argv[1] == "sim":
+        from .simulation.robodojo.cli import main as sim_main
+        return sim_main(sys.argv[2:])
     args = parse_args(default_agent)
     with Interrupts() as interrupts:
         _run(args, interrupts)

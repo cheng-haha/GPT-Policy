@@ -1,0 +1,30 @@
+{
+  "description": "Five predetermined evaluation layouts. Run only after development acceptance; retain all outcomes.",
+  "episodes": [
+    {
+      "task": "classify_objects",
+      "seed": 0,
+      "layout": 0
+    },
+    {
+      "task": "classify_objects",
+      "seed": 0,
+      "layout": 1
+    },
+    {
+      "task": "classify_objects",
+      "seed": 0,
+      "layout": 2
+    },
+    {
+      "task": "classify_objects",
+      "seed": 0,
+      "layout": 3
+    },
+    {
+      "task": "classify_objects",
+      "seed": 0,
+      "layout": 4
+    }
+  ]
+}

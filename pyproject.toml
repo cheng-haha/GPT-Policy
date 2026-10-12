@@ -10,6 +10,7 @@ requires-python = ">=3.10"
 dependencies = ["numpy>=1.24", "ruckig>=0.15.3,<=0.19.4", "Pillow>=10", "jsonschema>=4.23", "rich>=13,<15", "mcap-protobuf-support>=0.5.3,<1"]
 
 [project.optional-dependencies]
+simulation = ["scipy>=1.10", "msgpack>=1.0", "PyYAML>=6"]
 arx = ["arx5-interface==0.1.3"]
 yam = ["i2rt @ git+https://github.com/i2rt-robotics/i2rt.git@ac096928d6899ddf852a71c5e8fbaa6055cd9745"]
 realsense = ["pyrealsense2"]
@@ -26,3 +27,6 @@ packages = ["src/gpt_policy"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+
+[tool.hatch.metadata]
+allow-direct-references = true

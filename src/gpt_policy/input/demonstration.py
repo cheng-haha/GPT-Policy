@@ -170,7 +170,7 @@ def prepare_demonstration(run_input, source, mode, destination, selector=None, e
         parts = [TextPart(HISTORICAL + (HISTORICAL_ACTION if mode == "video+action" else HISTORICAL_VIDEO))]
         header_keys = ("title", "source", "demonstrator", "coverage", "summary", "outcome", "finalization_state")
         if mode == "video+action":
-            header_keys += ("coordinate_frame", "source_robot")
+            header_keys += ("coordinate_frame", "source_robot", "numeric_reference_semantics")
         columns = tuple(dict.fromkeys(key for frame in frames
                          for sample in ((frame.get("action") or {}).get("samples") or [])
                          for key, _ in _sample_fields(sample)
@@ -197,6 +197,16 @@ def prepare_demonstration(run_input, source, mode, destination, selector=None, e
                     "per-sample source_times_s diagnostics remain in actions.jsonl. Saved source data retains full precision.",
             }
         parts.append(TextPart(json.dumps(header, ensure_ascii=False, separators=(",", ":"))))
+        if columns and demo.get("numeric_reference_semantics") == "measured_states":
+            header["action_sample_encoding"]["description"] = (
+                "Rows follow the listed columns and contain measured states at t_s/source_frame_index, "
+                "not issued controls or next-frame commands. Gripper values are observed openings, "
+                "possibly limited by object contact; they are not confirmed commanded openings. "
+                "Motion columns use 3 decimals and '=' for a preceding identical value; null is unknown. "
+                "Samples retain endpoints, periodic samples and reviewed geometric/gripper-feedback anchors. "
+                "These sparse observations describe the demonstrated route, not a trajectory to replay."
+            )
+            parts[-1] = TextPart(json.dumps(header, ensure_ascii=False, separators=(",", ":")))
         exported, hashes, statistics, seen_images = [], {}, [], {}
         previous = -math.inf
         raw_actions = temp / "actions.jsonl"
@@ -217,8 +227,13 @@ def prepare_demonstration(run_input, source, mode, destination, selector=None, e
                     action = frame["action"]
                     action_file.write(json.dumps({"keyframe": i, "action": action}, ensure_ascii=False, allow_nan=False) + "\n")
                     if isinstance(action.get("samples"), list):
-                        sampled, info = compress_samples(action["samples"])
-                        frame["action"] = {**action, "samples": sampled, "compression": info}
+                        sampled, info = compress_samples(
+                            action["samples"], preserve_indices=action.get("preserve_sample_indices", ()),
+                        )
+                        frame["action"] = {
+                            **{k: v for k, v in action.items() if k != "preserve_sample_indices"},
+                            "samples": sampled, "compression": info,
+                        }
                         statistics.append(info)
                 copied, image_ids, image_parts = {}, {}, []
                 for j, (camera, value) in enumerate(images.items()):

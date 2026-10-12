@@ -10,14 +10,14 @@
 
 This repository is the public implementation of GPT-Policy, a closed-loop control framework that connects a fixed vision-language model (VLM) to robot tools. At deployment time, the agent can use demonstrations, goal images, interaction history, and execution feedback without gradient updates or task-specific parameter changes.
 
-The implementation currently provides hardware adapters for two robot arm platforms: **ARX X5** and **I2RT/YAM**.
+The implementation provides hardware adapters for **ARX X5** and **I2RT/YAM**, plus an optional [RoboDojo simulation backend](docs/robodojo.md) with a separate Isaac process.
 
 [![Paper project](https://img.shields.io/badge/paper%20project-GPT--Policy-EA4C89)](https://cheng-haha.github.io/GPT-Policy/)
 [![ArXiv](https://img.shields.io/badge/arXiv-2609.19138-b31b1b.svg?logo=arxiv&logoColor=white)](https://arxiv.org/abs/2609.19138)
-[![Paper PDF](https://img.shields.io/badge/Paper-PDF-red.svg?logo=readthedocs&logoColor=white)](https://cheng-haha.github.io/GPT-Policy/paper.pdf?v=20260915-repository-rename)
+[![Paper PDF](https://img.shields.io/badge/Paper-PDF-red.svg?logo=readthedocs&logoColor=white)](https://arxiv.org/pdf/2609.19138)
 [![X](https://img.shields.io/badge/X-Post-000000?logo=x&logoColor=white)](https://x.com/z_code68632/status/2098397364725895387)
 
-**Paper:** [*In-Context Robot Learning with VLM Agents*](https://github.com/cheng-haha/GPT-Policy/blob/main/docs/GPT-Policy.pdf)  \
+**Paper:** [*In-Context Robot Learning with VLM Agents*](https://arxiv.org/abs/2609.19138)  \
 **Authors:** Dongzhou Cheng, [Taoran Yi](https://taoranyi.com/), [Ye Fang](https://aleafy.github.io/), Xingwu Zhang, Fan Feng, Yixuan Li, Gengxiong Zhuang, Rongze Wang, Shuai Yang, Wei Song, Weizhi Xue, Minyan Wu, Jie Gui, Jiaqi Wang, and Tong Wu.
 
 <details>
@@ -29,7 +29,8 @@ The implementation currently provides hardware adapters for two robot arm platfo
 
 ## News
 
-- 🚀 **[2026/09/16]** The [paper](https://cheng-haha.github.io/GPT-Policy/paper.pdf?v=20260915-repository-rename), [project page](https://cheng-haha.github.io/GPT-Policy/), and [code](https://github.com/cheng-haha/GPT-Policy) are now publicly available!
+- 🤖 **[2026/10/11]** Released [demonstration contexts](https://huggingface.co/datasets/SII-CDZ/gpt-policy-robodojo-contexts) for ten RoboDojo tasks, with a [reproduction guide](docs/robodojo.md).
+- 🚀 **[2026/09/16]** The [paper](https://arxiv.org/pdf/2609.19138), [project page](https://cheng-haha.github.io/GPT-Policy/), and [code](https://github.com/cheng-haha/GPT-Policy) are now publicly available!
 - 🎥 **[2026/09/11]** The first robot cases and [demonstrations](https://x.com/z_code68632/status/2098397364725895387) are added to the project page!
 
 ## Demos
@@ -90,6 +91,23 @@ python scripts/install_drivers.py realsense
 
 Agent CLIs are external dependencies. Install and authenticate the provider you select; credentials are stored outside this repository.
 
+## RoboDojo simulation
+
+The optional simulation host reuses the context compiler and one-tool-per-decision
+agent loop, with native task termination and three-camera recording.
+Follow the [simulation and evaluation guide](docs/robodojo.md) for environment
+setup, context download, the eight-GPU 50-episode command and result accounting.
+
+```bash
+python -m pip install -e '.[simulation]'
+gpt-policy sim --config configs/robodojo.local.json --check
+gpt-policy sim --config configs/robodojo.local.json --task classify_objects --smoke
+```
+
+The offline check never calls a model or starts Isaac. A short engineering smoke
+does not establish task success. See the guide for frozen evaluation, GPU queues,
+result accounting and reproduction limits.
+
 ## Quick start
 
 The default is **YAM (`yambox`) + Codex (`gpt-6-astra`)**. Run from the project directory after installation. For different hardware, configure a [machine profile](configs/machines/README.md) first.
@@ -128,15 +146,23 @@ Task requests live in `request_json/`; generated context, images and recordings 
 | --- | --- |
 | Choose `auto`, `video`, or `video+action` | [Demonstration modes](docs/demonstrations.md#select-a-mode) |
 | Preview context and see the loaded mode | [Context inspection](docs/demonstrations.md#see-which-mode-was-actually-loaded) |
-| Change machines, cameras, or live-window settings | [Runtime configuration](docs/runtime.md) |
+| Configure machines, cameras and recording | [Runtime configuration](docs/runtime.md) |
 
-## Results from the paper
+## Real-world results from the paper
 
 <p>🎯 <b>Target Image / Self History / Human–Robot Interaction:</b> 100% success on each of the six tasks evaluated under these conditions.</p>
 <p>👀 <b>Human Video:</b> Success rate improves from 0% to 67% on both towel and notebook pickup.</p>
 <p>🤖 <b>Robot Video + Action:</b> Success rate improves from 0% to 100% on bottle opening and from 0% to 67% on plug reinsertion.</p>
 
+## RoboDojo results
+
+[![Mean score across ten RoboDojo tasks](docs/assets/robodojo-results.png)](https://cheng-haha.github.io/GPT-Policy/#robodojo)
+
+[Interactive chart](https://cheng-haha.github.io/GPT-Policy/#robodojo) · [Reproduce the evaluation](docs/robodojo.md)
+
 ## Repository layout
+
+Start with the [documentation index](docs/README.md) for setup, context and evaluation guides.
 
 ```text
 src/gpt_policy/       protocol, input preparation, planning, recording, adapters
@@ -167,8 +193,8 @@ python -m compileall -q src
 
 - [x] Release the GPT-Policy pipeline for real-world ARX robots, including the complete harness and format adapters for different context types.
 - [x] Release the YAM pipeline with hardware integration and flexible context support.
-- [ ] Release the RoboDojo simulation pipeline for reproducible evaluation.
-- [ ] Optimize the agent harness for context construction, feedback, and execution efficiency.
+- [x] Implement and validate the optional RoboDojo simulation pipeline; see the [simulation and evaluation guide](docs/robodojo.md).
+- [x] Optimize the agent harness for context construction, feedback, and execution efficiency.
 
 ## Limitations and safety
 
@@ -180,7 +206,7 @@ See [THIRD_PARTY.md](THIRD_PARTY.md) for third-party notices and optional SDK so
 
 ```bibtex
 @article{cheng2026context,
-  title={In-Context Robot Learning with VLM Agents},
+  title={In-context robot learning with VLM agents},
   author={Cheng, Dongzhou and Yi, Taoran and Fang, Ye and Zhang, Xingwu and Feng, Fan and Li, Yixuan and Zhuang, Gengxiong and Wang, Rongze and Yang, Shuai and Song, Wei and others},
   journal={arXiv preprint arXiv:2609.19138},
   year={2026}

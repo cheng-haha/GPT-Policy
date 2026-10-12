@@ -15,7 +15,7 @@ def profile(tmp_path, monkeypatch):
     agents = tmp_path / "agents"
     agents.mkdir()
     agent = agents / "codex.json"
-    agent.write_text('{"model":"test","live_image_window":8}')
+    agent.write_text('{"model":"test","live_image_window":null}')
     config = tmp_path / "config.json"
     config.write_text(json.dumps({
         "extends": str(settings_path().parent / "examples/yam-local.json"),
@@ -27,12 +27,9 @@ def profile(tmp_path, monkeypatch):
 
 
 @pytest.mark.parametrize("configured,flags,expected", [
-    ({}, [], 8),
+    ({}, [], None),
     ({"live_image_window": None}, [], None),
-    ({"live_image_window": 16}, [], 16),
-    ({"live_image_window": 8}, ["--no-live-window"], None),
-    ({"live_image_window": None}, ["--live-window", "8"], 8),
-    ({"live_image_window": 8}, ["--live-window", "3"], 3),
+    ({}, ["--no-live-window"], None),
 ])
 def test_check_uses_effective_window_without_opening_hardware_or_writing_profiles(
     profile, monkeypatch, capsys, configured, flags, expected,
@@ -55,7 +52,7 @@ def test_check_uses_effective_window_without_opening_hardware_or_writing_profile
 
 
 @pytest.mark.parametrize("check", [False, True])
-@pytest.mark.parametrize("value", ["0", "2", "-1"])
+@pytest.mark.parametrize("value", ["0", "2", "-1", "3", "8", "100"])
 def test_invalid_window_fails_before_hardware(profile, monkeypatch, check, value):
     config, _ = profile
     monkeypatch.setattr("sys.argv", ["gpt-policy", "--config", str(config), "--live-window", value,
@@ -63,7 +60,7 @@ def test_invalid_window_fails_before_hardware(profile, monkeypatch, check, value
     resources = [Mock() for _ in range(3)]
     for name, resource in zip(("CameraSet", "_open_yam", "create_agent"), resources):
         monkeypatch.setattr(main, name, resource)
-    with pytest.raises(ValueError, match="integer >= 3"):
+    with pytest.raises(ValueError, match="disabled"):
         main.main()
     for resource in resources:
         resource.assert_not_called()
@@ -89,7 +86,7 @@ def test_override_is_rejected_for_non_codex(profile, monkeypatch, flags):
         main.main()
 
 
-@pytest.mark.parametrize("flags,expected", [([], 8), (["--no-live-window"], None), (["--live-window", "3"], 3)])
+@pytest.mark.parametrize("flags,expected", [([], None), (["--no-live-window"], None)])
 def test_run_passes_effective_window_to_session_and_records_it(profile, tmp_path, monkeypatch, flags, expected):
     config, _ = profile
     before = [path.read_bytes() for path in profile]

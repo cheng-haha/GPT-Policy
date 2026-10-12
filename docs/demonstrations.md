@@ -210,7 +210,40 @@ These execute commands load the configured machine/agent, open its cameras and r
 
 Normal free-form commands can use the task-selection model to reuse an existing `request_json/*.json`. Explicitly referenced demonstration paths and resolved modes filter incompatible candidates before that selection. `--input-json` uses the specified request directly and bypasses task lookup; `--prepare-only` also skips the task-selection model.
 
-Demonstration mode and the live-image history window are independent. The supplied Codex profile disables image-count refresh by default (`live_image_window: null`); see [runtime configuration](runtime.md). Generated requests and `var/` artifacts remain local and are excluded from Git. Source demonstration files remain at the locations supplied by the user.
+Demonstration mode and the live-image history window are independent. Image-count refresh is disabled for simulation and hardware; only `live_image_window: null` is accepted; see [runtime configuration](runtime.md). Generated requests and `var/` artifacts remain local and are excluded from Git. Source demonstration files remain at the locations supplied by the user.
+
+## RoboDojo LeRobot v3 episodes
+
+To prepare a new demonstration, use a local LeRobot v3 dataset and an environment
+with LeRobot and PyAV installed:
+
+```bash
+HF_HUB_OFFLINE=1 HF_DATASETS_OFFLINE=1 PYTHONPATH=src \
+python -m gpt_policy.input.lerobot_demo \
+  --dataset /path/to/robodojo_sim/classify_objects --episode 0 \
+  --output var/prepared/classify-episode-0 --expert-success --model-smoke
+```
+
+Preparation uses the existing frame selector, review and context compiler.
+It opens no robot or simulator; visual selection and `--model-smoke` call the
+configured model. Use `--expert-success` only for a dataset whose expert outcomes
+are confirmed. The label applies to the demonstration, not a new rollout.
+
+The output contains `prepared/input.json`, `reviewed.json`, images and source
+metadata. Every selected timestamp retains top, left-wrist and right-wrist
+views; 16 timestamps yield 48 images. To reproduce the published evaluation,
+download the prepared contexts from the [RoboDojo guide](robodojo.md).
+
+The importer converts 20D rot6d endposes to unit xyzw quaternions with continuous
+signs. Per-arm rows are `[x,y,z,qx,qy,qz,qw,opening]`. Original values remain in
+`raw_endposes.jsonl`; dataset next-state references retain their recorded time
+alignment and are not treated as issued EEF commands.
+
+Rotation conversion does not change the source coordinate frame or tool site.
+Use `scripts/audit_robodojo_endpose.py --help` to check an episode against its
+robot model, then pass the result with `--frame-audit`. Simulation uses link6 in
+the shared environment frame; hardware fingertip TCP calibration is separate.
+See the [execution contract](robodojo.md#execution).
 
 ## Code entry points
 

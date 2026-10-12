@@ -9,7 +9,7 @@ python -m pip install -r requirements/yam.txt
 # ARX: python -m pip install -r requirements/arx.txt
 ```
 
-These requirements use the optional extras in `pyproject.toml`; the YAM SDK revision is pinned there. FFmpeg/ffprobe and authenticated provider CLIs are external tools. Install `.[dev]` to run the [core offline regression suite](../tests/README.md). It covers configuration, live-window behavior, camera controls and recording layout using simulated devices/providers. The broader hardware, historical and evaluation test suites remain in the main development project.
+These requirements use the optional extras in `pyproject.toml`; the YAM SDK revision is pinned there. FFmpeg/ffprobe and authenticated provider CLIs are external tools. Install `.[dev,simulation]` to run the [offline regression suite](../tests/README.md), which covers configuration, context loading, camera controls, recording and simulation execution.
 
 ## Machine profiles
 
@@ -24,14 +24,16 @@ gpt-policy --machine yambox --check
 
 ## Live image window
 
-The shipped `configs/agents/codex.json` sets `live_image_window` to `null`, so image-count-triggered session refresh is off by default. Provider-overload recovery remains active. Custom profiles that omit this field retain the compatibility fallback of 8; set it explicitly to `null` for the same default behavior.
+Image-count-triggered thread refresh is disabled in both simulation and hardware.
+Omitted values and `live_image_window: null` resolve to off. Any non-null value
+(including programmatic AgentConfig construction and `--live-window N`) fails
+before model or hardware startup. `--no-live-window` remains a compatible no-op.
+There is no 12-turn history truncation. Codex retains its native conversation
+and manages its own context; full input and execution evidence remains on disk.
+Exceptional provider-overload recovery is separate and remains enabled.
 
-```bash
-gpt-policy --check --no-live-window
-gpt-policy --check --live-window 8
-```
-
-The flags apply to Codex, are mutually exclusive, and affect only this invocation. An enabled window must be an integer of at least 3. `--check`, `config.json`, `status.json` and the run-start event record the effective `live_image_window` and `live_window_enabled`. The window counts live observation groups, not demonstration views or total tokens.
+`--check`, run configuration and run-start metadata report
+`live_image_window: null` and `live_window_enabled: false`.
 
 ## Camera exposure and gain
 
