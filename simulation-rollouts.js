@@ -134,7 +134,12 @@
     const score = trace?.scores.findLast(item => item[0] <= step)?.[1];
     $('#sim-step').textContent = `${t().control} ${step} / ${episode.control_steps}${call ? ` · ${t().decision} ${call.decision} / ${episode.decisions}` : ''}`;
     $('#sim-tool').textContent = !trace ? (traceFailed ? t().traceError : t().loading) : call ? call.tool : t().initial;
-    $('#sim-note-text').textContent = call?.note || (trace ? t().noNote : '…');
+    const note = $('#sim-note-text');
+    const noteText = call?.note || (trace ? t().noNote : '…');
+    if (note.textContent !== noteText) {
+      note.textContent = noteText;
+      note.scrollTop = 0;
+    }
     $('#sim-live-score').textContent = `${t().liveScore} ${score == null ? '—' : Number(score.toFixed(2))}/100`;
     const targetAction = action?.decision === call?.decision ? action
       : trace?.actions.find(item => item.decision === call?.decision);
