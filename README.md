@@ -77,11 +77,10 @@ Task links in the heatmap open the corresponding video. Query parameters
 The release's evaluation protocol and attribution files are retained in
 `assets/robodojo-rollouts/`; their terms are unchanged.
 
-The execution/token table uses the release's `results/efficiency.md`; the source
-Markdown, aggregate JSON and two CSVs are retained under
-`assets/robodojo-rollouts/results/`. GPT-Policy token totals are recorded lower
-bounds because 42 failed calls did not return usage. Physical duration excludes
-model waits, and reference figures follow their different published settings.
+The execution/token table uses recorded usage from the release's aggregate JSON
+and two CSVs retained under `assets/robodojo-rollouts/results/`. Physical duration
+excludes model waits. Reference figures follow the different published settings
+of [GPT-as-Policy](https://anonymous-report-421.github.io/public-website/?view=1).
 
 ## Deploy
 
