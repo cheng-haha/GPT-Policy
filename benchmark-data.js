@@ -3,7 +3,7 @@
 // GPT-Policy: owner-confirmed paper Table 2. See assets/benchmarks/README.md.
 const benchmarkData = {
   "version": "2026-10-12",
-  "paper": "paper.pdf",
+  "paper": "https://arxiv.org/abs/2609.19138",
   "paperCompiledAt": "2026-10-11T14:51:05-07:00",
   "paperSha256": "7f423f44d4d4fcdaa690adc09d41b9af8aa5d91f96a9d3117953d8f3d7e09134",
   "reference": "https://anonymous-report-421.github.io/public-website/?view=1",

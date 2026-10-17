@@ -2,7 +2,7 @@
 
 ## Paper version
 
-The local website was updated from `GPT_Policy_iclr2027__Copy_ (6).pdf`, compiled **2026-10-11 14:51:05 PDT**, 47 pages. It was already present in Downloads and is now the site's `paper.pdf`. The Overleaf project is https://www.overleaf.com/project/6ab3f98275f46d738116b160. The browser project did not respond to content reads during this update, so this is the latest locally available export, not a newly fetched Overleaf revision. The exact SHA-256 is recorded in `benchmark-data.js`.
+The local website was updated from `GPT_Policy_iclr2027__Copy_ (6).pdf`, compiled **2026-10-11 14:51:05 PDT**, 47 pages. It was already present in Downloads. The website links to [arXiv:2609.19138](https://arxiv.org/abs/2609.19138) and does not host a manuscript PDF. The Overleaf project is https://www.overleaf.com/project/6ab3f98275f46d738116b160. The browser project did not respond to content reads during this update, so this is the latest locally available export, not a newly fetched Overleaf revision. The exact SHA-256 is recorded in `benchmark-data.js`.
 
 - Paper Table 2, page 8: simulation progress scores.
 - Paper Table 5, page 20: simulation success rates.
